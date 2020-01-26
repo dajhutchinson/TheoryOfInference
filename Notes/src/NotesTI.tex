@@ -1,0 +1,84 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in, paperwidth=8.3in, paperheight=11.7in]{geometry}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{changepage} 
+
+\begin{document}
+
+\pagestyle{fancy}
+\setlength\parindent{0pt}
+\allowdisplaybreaks
+
+\renewcommand{\headrulewidth}{0pt}
+
+% Cover page title
+\title{Theory of Inference - Notes}
+\author{Dom Hutchinson}
+\date{\today}
+\maketitle
+
+% Header
+\fancyhead[L]{Dom Hutchinson}
+\fancyhead[C]{Theory of Inference - Notes}
+\fancyhead[R]{\today}
+
+% Counters
+\newcounter{definition}[subsection]
+\newcounter{example}[subsection]
+\newcounter{notation}[subsection]
+\newcounter{proposition}[subsection]
+\newcounter{proof}[subsection]
+\newcounter{remark}[subsection]
+\newcounter{theorem}[subsection]
+
+% commands
+\newcommand{\dotprod}[0]{\boldsymbol{\cdot}}
+\newcommand{\cosech}[0]{\mathrm{cosech}\ }
+\newcommand{\cosec}[0]{\mathrm{cosec}\ }
+\newcommand{\sech}[0]{\mathrm{sech}\ }
+\newcommand{\prob}[0]{\mathbb{P}}
+\newcommand{\nats}[0]{\mathbb{N}}
+\newcommand{\cov}[0]{\mathrm{Cov}}
+\newcommand{\var}[0]{\mathrm{Var}}
+\newcommand{\expect}[0]{\mathbb{E}}
+\newcommand{\reals}[0]{\mathbb{R}}
+\newcommand{\integers}[0]{\mathbb{Z}}
+\newcommand{\indicator}[0]{\mathds{1}}
+\newcommand{\nb}[0]{\textit{N.B.} }
+\newcommand{\ie}[0]{\textit{i.e.} }
+\newcommand{\eg}[0]{\textit{e.g.} }
+\newcommand{\X}[0]{\textbf{X}}
+\newcommand{\x}[0]{\textbf{x}}
+\newcommand{\iid}[0]{\overset{\text{iid}}{\sim}}
+\newcommand{\proved}[0]{$\hfill\square$\\}
+
+\newcommand{\definition}[1]{\stepcounter{definition} \textbf{Definition \arabic{subsection}.\arabic{definition}\ - }\textit{#1}\\}
+\newcommand{\definitionn}[1]{\stepcounter{definition} \textbf{Definition \arabic{subsection}.\arabic{definition}\ - }\textit{#1}}
+\newcommand{\proof}[1]{\stepcounter{proof} \textbf{Proof \arabic{subsection}.\arabic{proof}\ - }\textit{#1}\\}
+\newcommand{\prooff}[1]{\stepcounter{proof} \textbf{Proof \arabic{subsection}.\arabic{proof}\ - }\textit{#1}}
+\newcommand{\example}[1]{\stepcounter{example} \textbf{Example \arabic{subsection}.\arabic{example}\ - }\textit{#1}\\}
+\newcommand{\examplee}[1]{\stepcounter{example} \textbf{Example \arabic{subsection}.\arabic{example}\ - }\textit{#1}}
+\newcommand{\notation}[1]{\stepcounter{notation} \textbf{Notation \arabic{subsection}.\arabic{notation}\ - }\textit{#1}\\}
+\newcommand{\notationn}[1]{\stepcounter{notation} \textbf{Notation \arabic{subsection}.\arabic{notation}\ - }\textit{#1}}
+\newcommand{\proposition}[1]{\stepcounter{proposition} \textbf{Proposition \arabic{subsection}.\arabic{proposition}\ - }\textit{#1}\\}
+\newcommand{\propositionn}[1]{\stepcounter{proposition} \textbf{Proposition \arabic{subsection}.\arabic{proposition}\ - }\textit{#1}}
+\newcommand{\remark}[1]{\stepcounter{remark} \textbf{Remark \arabic{subsection}.\arabic{remark}\ - }\textit{#1}\\}
+\newcommand{\remarkk}[1]{\stepcounter{remark} \textbf{Remark \arabic{subsection}.\arabic{remark}\ - }\textit{#1}}
+\newcommand{\theorem}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{subsection}.\arabic{theorem}\ - }\textit{#1}\\}
+\newcommand{\theoremm}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{subsection}.\arabic{theorem}\ - }\textit{#1}}
+
+\tableofcontents
+
+% Start of content
+\newpage
+
+\end{document}
