@@ -19,6 +19,7 @@
 \allowdisplaybreaks
 
 \renewcommand{\headrulewidth}{0pt}
+\setlist[enumerate,1]{label={\roman*)}}
 
 % Cover page title
 \title{Theory of Inference - Notes}
@@ -32,13 +33,13 @@
 \fancyhead[R]{\today}
 
 % Counters
-\newcounter{definition}[subsection]
-\newcounter{example}[subsection]
-\newcounter{notation}[subsection]
-\newcounter{proposition}[subsection]
-\newcounter{proof}[subsection]
-\newcounter{remark}[subsection]
-\newcounter{theorem}[subsection]
+\newcounter{definition}[section]
+\newcounter{example}[section]
+\newcounter{notation}[section]
+\newcounter{proposition}[section]
+\newcounter{proof}[section]
+\newcounter{remark}[section]
+\newcounter{theorem}[section]
 
 % commands
 \newcommand{\dotprod}[0]{\boldsymbol{\cdot}}
@@ -61,24 +62,427 @@
 \newcommand{\iid}[0]{\overset{\text{iid}}{\sim}}
 \newcommand{\proved}[0]{$\hfill\square$\\}
 
-\newcommand{\definition}[1]{\stepcounter{definition} \textbf{Definition \arabic{subsection}.\arabic{definition}\ - }\textit{#1}\\}
-\newcommand{\definitionn}[1]{\stepcounter{definition} \textbf{Definition \arabic{subsection}.\arabic{definition}\ - }\textit{#1}}
-\newcommand{\proof}[1]{\stepcounter{proof} \textbf{Proof \arabic{subsection}.\arabic{proof}\ - }\textit{#1}\\}
-\newcommand{\prooff}[1]{\stepcounter{proof} \textbf{Proof \arabic{subsection}.\arabic{proof}\ - }\textit{#1}}
-\newcommand{\example}[1]{\stepcounter{example} \textbf{Example \arabic{subsection}.\arabic{example}\ - }\textit{#1}\\}
-\newcommand{\examplee}[1]{\stepcounter{example} \textbf{Example \arabic{subsection}.\arabic{example}\ - }\textit{#1}}
-\newcommand{\notation}[1]{\stepcounter{notation} \textbf{Notation \arabic{subsection}.\arabic{notation}\ - }\textit{#1}\\}
-\newcommand{\notationn}[1]{\stepcounter{notation} \textbf{Notation \arabic{subsection}.\arabic{notation}\ - }\textit{#1}}
-\newcommand{\proposition}[1]{\stepcounter{proposition} \textbf{Proposition \arabic{subsection}.\arabic{proposition}\ - }\textit{#1}\\}
-\newcommand{\propositionn}[1]{\stepcounter{proposition} \textbf{Proposition \arabic{subsection}.\arabic{proposition}\ - }\textit{#1}}
-\newcommand{\remark}[1]{\stepcounter{remark} \textbf{Remark \arabic{subsection}.\arabic{remark}\ - }\textit{#1}\\}
-\newcommand{\remarkk}[1]{\stepcounter{remark} \textbf{Remark \arabic{subsection}.\arabic{remark}\ - }\textit{#1}}
-\newcommand{\theorem}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{subsection}.\arabic{theorem}\ - }\textit{#1}\\}
-\newcommand{\theoremm}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{subsection}.\arabic{theorem}\ - }\textit{#1}}
+\newcommand{\definition}[1]{\stepcounter{definition} \textbf{Definition \arabic{section}.\arabic{definition}\ - }\textit{#1}\\}
+\newcommand{\definitionn}[1]{\stepcounter{definition} \textbf{Definition \arabic{section}.\arabic{definition}\ - }\textit{#1}}
+\newcommand{\proof}[1]{\stepcounter{proof} \textbf{Proof \arabic{section}.\arabic{proof}\ - }\textit{#1}\\}
+\newcommand{\prooff}[1]{\stepcounter{proof} \textbf{Proof \arabic{section}.\arabic{proof}\ - }\textit{#1}}
+\newcommand{\example}[1]{\stepcounter{example} \textbf{Example \arabic{section}.\arabic{example}\ - }\textit{#1}\\}
+\newcommand{\examplee}[1]{\stepcounter{example} \textbf{Example \arabic{section}.\arabic{example}\ - }\textit{#1}}
+\newcommand{\notation}[1]{\stepcounter{notation} \textbf{Notation \arabic{section}.\arabic{notation}\ - }\textit{#1}\\}
+\newcommand{\notationn}[1]{\stepcounter{notation} \textbf{Notation \arabic{section}.\arabic{notation}\ - }\textit{#1}}
+\newcommand{\proposition}[1]{\stepcounter{proposition} \textbf{Proposition \arabic{section}.\arabic{proposition}\ - }\textit{#1}\\}
+\newcommand{\propositionn}[1]{\stepcounter{proposition} \textbf{Proposition \arabic{section}.\arabic{proposition}\ - }\textit{#1}}
+\newcommand{\remark}[1]{\stepcounter{remark} \textbf{Remark \arabic{section}.\arabic{remark}\ - }\textit{#1}\\}
+\newcommand{\remarkk}[1]{\stepcounter{remark} \textbf{Remark \arabic{section}.\arabic{remark}\ - }\textit{#1}}
+\newcommand{\theorem}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{section}.\arabic{theorem}\ - }\textit{#1}\\}
+\newcommand{\theoremm}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{section}.\arabic{theorem}\ - }\textit{#1}}
 
 \tableofcontents
 
 % Start of content
 \newpage
+
+\section{Motivation}
+
+\remark{General Idea}
+Learn something about the world using data \& statistical models.\\
+
+\definition{Statistical Models}
+\textit{Statistical Models} describe the way in which data is generate. They depend upon \textit{unknown} constant parameters, $\pmb\theta$, and subsidiary information (known data \& parameters).\\
+
+\definition{Parameteric Statistical Inference}
+\textit{Parameteric Statistical Inference} is the process of taking some data \& learning the \textit{unknown} parameters of the model which generated it.
+
+\definition{Parameteric Models}
+A \textit{Parameteric Model} is a statistical model whose pdf depends on some unknown parameter.\\
+A \textit{Semi-Parameteric Models} is a statistical models which contains unknown functions, as well as unknown parameters.\\
+A \textit{Non-Parameteric Model} has no parameters and thus makes minimal assumptions about how the data was generated.\\
+
+\proposition{Inferential Questions}
+When performing \textit{Statistical Inference} we wish to answer the following questions
+\begin{enumerate}
+	\item \textit{Confidence Intervals \& Credible Intervals} - What range of parameter valeus are consistent with the data?
+	\item \textit{Hypothesis Testing} - Are some pre-specified valeus (or restrictions) for the parameters consistent with the data?
+	\item \textit{Model Checking} - Could our model have generated the data at all?
+	\item \textit{Model Selection} - Which of several alternative odels could most plausibly have generated the data?
+	\item \textit{Statistical Design} - How could we better arrange teh data gathering process to improve the answers to the preceding questions?
+\end{enumerate}
+
+\subsection{Examples}
+
+\example{Mean Annual Temperatures}
+Consider a dataset of the mean annual temperature in New Haven, Conneticut.\\
+Suppose we plot it in a histogram \& notice that it fits a bell curve, then we may assume the data fits a simple model where each data point is observed independently from a $\mathcal{N}(\mu,\sigma^2)$ distribution with $\mu,\sigma^2$ unknown.\\
+Then the pdf for each data point, $y_i$, is
+$$f(y_i)=\frac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac1{2\sigma^2}(y_i-\mu)^2}$$
+The pdf for the whole data set, $\textbf{y}$, is the joint pdf of each data point since we assume iid
+$$f(\textbf{y})=\prod_{i=1}^Nf(y_i)$$
+Now suppose we notice that the histogram is \textit{heavy tailed} relative to a normal distribution.\\
+A better model might be
+$$\frac{y_i-\mu}\sigma\sim t_\alpha$$
+where $\mu,\sigma^2,\alpha$ are unknown.\\
+This means the pdf of the whole data set is
+$$f(\textbf{y})=\prod_{i=1}^N\frac{1}{\sigma}f_{t_\alpha}\left(\frac{y_i-\mu}{\sigma}\right)$$
+by \textit{standard transformation theory}.\\
+
+\example{Hourly Air Temperature}
+Consider a dataset of the air temperature, $a_i$, measured at hourly intervals, $t_i$, over the course of a week.\\
+The temperature is believed to follow a daily cycle, with a long-term dift over the course of the week and to be subject to random autocorrelated depatures from this overall pattern.\\
+A suitable model might be
+$$a_i=\underbrace{\theta_0+\theta_1t_i}_\text{Long-Term Drift}+\underbrace{\theta_2\sin(2\pi t_i/24)+\theta_3\cos(2\pi t_i/24)}_\text{Daily Cycle}+\underbrace{e_i}_\text{Auto Correlation}$$
+where $e_{i+1}:=\rho r_i+\varepsilon_i$ with $|\rho|<1$ \& $\varepsilon\iid\mathcal{N}(0,\sigma^2)$.\\
+This means $\textbf{e}\sim\mathcal{N}(\pmb0,\Sigma)$ \& $\textbf{a}\sim\mathcal{N}(\pmb\mu,\Sigma)$ with $\Sigma_{i,j}=\frac{\rho^{|1-j|}\sigma^2}{1-\rho}$.\\
+Thus, the pdf of the data set, $\textbf{a}$, is
+$$f(\textbf{a})=\frac{1}{\sqrt{(2\pi)^n|\Sigma|}}e^{-\frac{1}{2}(\textbf{a}-\pmb\mu)^T\Sigma^{-1}(\textbf{a}-\pmb\mu)}$$
+
+\example{Bone Marrow}
+Consider a dataset produced 23 patients suffering from non-Hodgkin's Lymphoma are split into two groups, each recieving a different treatment. We wish to test whether one of these treatments is more efficitive than the other.\\
+For each patient the days between treatment \& relapse was recorded. We have some \textit{censored data} as the patient had not relapsed by the time of their last appointment.\\
+Consider using an exponential distribution to model the times to relapse with parameters $\theta_a$ \& $\theta_b$ respecitvely. We want to test if $\theta_a=\theta_b$.\\
+We have the follow pdf for patients in group $a$
+$$f_a(t_i)=\begin{cases}\theta_ae^{-\theta_at_i}&\text{uncensored}\\\int_{t_i}^\infty\theta_ae^{-\theta_at_i}=e^{-\theta_at_i}&\text{censored}\end{cases}$$
+An equivalent pdf exists for patients in group $b$, with $\theta_b$ swapped in.\\
+Thus the model for the whole data set, $\textbf{t}$, is
+$$f(\textbf{t})=\prod_{i=1}^{11}f_a(t_i)\prod_{i=12}^{23}f_b(t_i)$$
+when patients $\{1,\dots,11\}$ are in group $a$ and the rest in group $b$.
+
+\section{Random Variables}
+
+\definition{Random Variable}
+A \textit{Random Variable} is a function from the sample space to the reals.
+$$X:\Omega\to\reals$$
+\textit{Random Variables} take a different value each time they are observed and thus we define distributions for the probability of them taking particular values.\\
+\textit{Random Variables} form the basis of models.\\
+
+\definition{Cummulative Distribution}
+The \textit{Cummulative Distribution} function of a \textit{Random Variable}, $X$, is the function $F_X(\cdot)$ st
+\[\begin{array}{rllrl}
+F_X(\cdot)&:&\reals\to[0,1]\\
+F_X(x)&:=&\prob(X\leq x)&=&\displaystyle\sum_{i=-\infty}^x\prob(X=i)\\
+&&&=&\displaystyle\int_{-\infty}^xf_X(x)dx
+\end{array}\]
+The \textit{Cummulative Distribution} is a monotonic function.\\
+
+\remark{Continuous Cummulative Distribution}
+If a \textit{Cummulative Distribution} is \textit{continuous} then $F_X(X)\sim\text{Uniform}[0,1]$.\\
+
+\prooff{Remark 2.1}
+\[\begin{array}{rcl}
+F(X)&=&\prob(X\leq x)\\
+&=&\prob(F(X)\leq F(x))\\
+\implies\prob(F(X)\leq u)&=&u\text{ if $F$ is continuous}
+\end{array}\]
+
+\definition{Quantile Function}
+The \textit{Quantile Function} of a \textit{Random Variable} is the inverse function of the \textit{Cumulative Distribution}.\\
+\[\begin{array}{rll}
+F^-_X(\cdot)&:&[0,1]\to\reals\\
+F^-_X(u)&:=&\min\{x:F(x)\geq u\}
+\end{array}\]
+If a distribution has a computable \textit{Quantile Function} then we are able to generate random variable values by sampling from a uniform distribution \& then passing that value into the \textit{Quantile Function}.\\
+
+\definition{(Q-Q) Plot}
+Consider a data set $\{x_1,\dots,x_n\}$.\\
+A \textit{(Q-Q) Plot} of this data set plots the ordered data set, $\{x_{(1)},\dots,x_{(n)}\}$, against the theoretical quantiles $F^-\left(\frac{i-.5}n\right)$.\\
+The close this line is to $y=x$ the more likely it is the data was generated by this \textit{Cummulative Distribtion}.\\
+\nb AKA \textit{Quantile-Quantile Plot}
+
+\definition{Probabiltiy Mass Function}
+A \textit{Probability Mass Function} returns the probabiltiy of a \underline{discrete} random variable taking a particular value.
+\[\begin{array}{rll}
+f_X(\cdot)&:&\reals\to[0,1]\\
+f_X(x)&:=&\prob(X=x)\\
+\end{array}\]
+
+\definition{Probability Density Function}
+Since the probabiltiy of a \textit{Continuous Random Variable} taking a specific value is zero we cannot use the \textit{Probability Mass Function}.
+\[\begin{array}{rll}
+f_X(\cdot)&:&\reals\to[0,1]\\
+\prob(a\leq X\leq b)&=&\displaystyle\int_a^bf(x)dx
+\end{array}\]
+\nb $F_X'(x)=f(x)$ when $F_X'(\cdot)$ exists.\\
+
+\definition{Joint Probabiltiy Density Function}
+Let $X\ \& Y$ be \textit{Random Variables}.\\
+The \textit{Joint Probabiltiy Density Function} of $X$ and $Y$ is the function $f_{X,Y}(x,y)$ st
+$$\prob((X,Y)\in\Omega)=\iint_\Omega f_{X,Y}(x,y)dxdy$$
+\nb This can be seen as evaluation $\Omega$ in the $X-Y$ plane.\\
+
+\definition{Marginal Distribution}
+Let $X\ \&\ Y$ be \textit{Random Variables} with \textit{Joint Probability Density} $f_{X,Y}(\cdot,\cdot)$.\\
+We can find the \textit{Marginal Distribution} of $X$ by evaluating the $f_{X,Y}$ at each value wrt $Y$.
+$$f_X(x)=\int_{-\infty}^\infty f_{X,Y}(x,y)dy$$
+
+\definition{Expected Value, $\expect$}
+The \textit{Expected Value} of a \textit{Random Variable}, $X$, is its mean value.
+\[\begin{array}{rcll}
+\expect(X)&:=&\displaystyle\int_{-\infty}^\infty xf(x)dx&\text{ [Continuous]}\\
+\expect(g(X))&:=&\displaystyle\int_{-\infty}^\infty g(x)f(x)dx&\\\\
+\expect(X)&:=&\displaystyle\sum_{-\infty}^\infty xf(x)&\text{ [Discrete]}\\
+\expect(g(X))&:=&\displaystyle\sum_{-\infty}^\infty g(x)f(x)&
+\end{array}\]
+
+\remarkk{Linear Transformations of Expected Value}
+$$\expect(a+bX)=a+b\expect(X)\text{ where }a,b\in\reals$$
+
+\remark{Expected Value of Composed Random Variables}
+Let $X$ \& $Y$ be \textit{Random Variables}. Then
+$$\expect(X+Y)=\expect(X)+\expect(Y)$$
+If $X$ \& $Y$ are \textit{independent}. Then
+$$\expect(XY)=\expect(X)\expect(Y)$$
+
+\proof{Remark 2.3}
+\[\begin{array}{rcl}
+\expect(X+Y)&=&\int(x+y)f_{X,Y}(x,y)dxdy\\
+&=&\int xf_{X,Y}(x,y)dxdy+\int yf_{X,Y}(x,y)dxdy\\
+&=&\expect(X)+\expect(Y)\\
+\expect(XY)&=&\int xyf_{X,Y}(x,y)dxdy\\
+&=&\int xf_X(x)yf_Y(y)dxdy\text{ by independence}\\
+&=&\int xf_X(x)dx\int yf_Y(y)dy\\
+&=&\expect(X)\expect(Y)
+\end{array}\]
+
+\definition{Variance, $\sigma^2$}
+The \textit{Variance} of a \textit{Random Variable}, $X$, is a measure of its spread around its expected value.
+$$\var(X)=\expect[(X-\expect(X))^2]=\expect(X^2)-\expect(X)^2$$
+
+\remarkk{Linear Transformations of Variance}
+$$\var(a+bX)=b^2\var(X)\text{ where }a,b\in\reals$$
+
+\prooff{Remark 2.4}
+\[\begin{array}{rcl}
+\var(a+bX)&=&\expect[((a+bX)-(a-b\mu))^2]\\
+&=&\expect[b^2(X-\mu)^2]\\
+&=&b^2\expect[(X-\mu)^2]\\
+&=&b^2\var(X)
+\end{array}\]
+
+\definition{Co-Variance}
+\textit{Co-Variance} is a measure of the joint variability of two \textit{Random Variables}.
+$$\cov(X,Y):=\expect[(X-\expect(X))(Y-\expect(Y))]=\expect(XY)-\expect(X)\expect(Y)$$
+\nb If $X\ \&\ Y$ are independent then $\cov(X,Y)=0$ since $\expect(XY)=\expect(X)\expect(Y)$.\\
+\nb $\cov(X,Y)=\cov(Y,X)$.\\
+
+\definition{Co-Variance Matrix, $\Sigma$}
+Let $\textbf{X}:=\{X_1,\dots,X_n\}$ be a set of random variables.\\
+A \textit{Co-Variance Matrix} describes the \textit{Variance} \& \textit{Co-Variance} of each combination of \textit{Random Variables} in $\textbf{X}$.\\
+$$\Sigma:=\expect[(\textbf{X}-\pmb\mu)(\textbf{X}-\pmb\mu)^T]$$
+\nb $\Sigma_{ii}=\var(X_i)\ \&\ \Sigma_{ij}=\cov(X_i,X_j)$ for $i\neq j$. $\Sigma$ is symmetric.\\
+
+\remarkk{Linear Transformation of Covariance}
+$$\Sigma_{AX+b}=A\Sigma A^T$$
+
+\prooff{Remark 2.5}
+\[\begin{array}{rcl}
+\Sigma_{AX+b}&=&\expect[(AX+\textbf{b}-A\pmb\mu-\textbf{b})(AX+\textbf{b}-A\pmb\mu-\textbf{b})^T]\\
+&=&\expect[(AX-A\pmb\mu)(AX-A\pmb\mu)^T]\\
+&=&A\expect[(X-\pmb\mu)(X-\pmb\mu)^T]A^T\\
+&=&A\Sigma A^T
+\end{array}\]
+
+\definition{Conditional Distribution}
+Let $X\ \&\ Y$ be \textit{Random Variables} with \textit{Joint Probability Density} $f_{X,Y}(\cdot,\cdot)$.\\
+Suppose we know that $Y$ takes the value $y_0$ \& we wish to establish the probability of $X$ taking the value $x$.
+$$f(X=x|Y=y_0)=\dfrac{f_{X,Y}(x,y_0)}{f_Y(y_0)}$$
+assuming $f(y_0)>0$.\\
+
+\proof{Conditional Distribution}
+We expect $f(X=x|Y=y_0)=kf_{X,Y}(x,y_0)$ for some constant $k$.\\
+We know that for $kf_{X,Y}(x,y_0)$ to be a valid distribution it must integrate to one.
+\[\begin{array}{rrcl}
+&k\displaystyle\int_{-\infty}^\infty f_{X,Y}(x,y_0)dx&=&1\\
+\implies&kf_Y(y_0)&=&1\\
+\implies&k&=&\dfrac{1}{f_Y(y_0)}\\
+\implies&f(X=x|Y=y_0)&=&\dfrac{f_{X,Y}(x,y_0)}{f_Y(y_0)}
+\end{array}\]
+
+\propositionn{Conditional Distributions with Three Random Variables}
+\[\begin{array}{rcl}
+f(x,z|y)&=&f(x|z,y)f(z|y)\\
+f(x,y,z)&=&f(x|y,z)f(z|y)f(y)\\
+&=&f(x|y,z)f(y,z)
+\end{array}\]
+
+\definition{Independent Random Variables}
+Let $X$ \& $Y$ be random variables.\\
+$X$ \& $Y$ are said to be \textit{Statistically Independent} if the \textit{Conditional Distribution} $f(x|y)$ is independent of $y$.\\
+Thus
+\[\begin{array}{rcl}
+f(x)=\displaystyle\int_{-\infty}^\infty f(x,y)dy\\
+&=&\displaystyle\int_{-\infty}^\infty f(x|y)f(y)dy\\
+&=&f(x|y)\displaystyle\int_{-\infty}^\infty f(y)dy\\
+&=&f(x|y)\\
+\implies f(x,y)&=&f(x|y)f_Y(y)=f_X(x)f_Y(y)
+\end{array}\]
+
+\theorem{Bayes' Theorem}
+Let $X\ \&\ Y$ be \textit{Random Variables}.\\
+\textit{Bayes' Theorem} states that
+$$f(X|Y)=\dfrac{f(Y|X)x(X)}{f(Y)}$$
+
+\definition{First Order Markov Property}
+Let $\textbf{X}:=\{X_1,\dots,X_n\}$ be a set of \textit{Random Variables}.\\
+The set $\textbf{X}$ is said to have the \textit{First Order Markov Property} if
+$$f(X_i|\textbf{X}_{\neg i})= f(X_i|X_{i-1})\text{ where }\textbf{X}_{\neg i}:=\textbf{X}/\{X_i\}$$
+Thus we can infer the \textit{marginal distribution}
+$$f(\textbf{X})=f(X_1)\prod_{i=2}^Nf(X_i|X_{i-1})$$
+
+%TODO Multivariate Normal Distribution
+
+\setcounter{section}{-1}
+\section{Reference}
+
+\subsection{Definitions}
+
+\definition{Heavy Tailed}
+
+\definition{Censored Data}
+
+\subsection{Probability Distributions}
+
+\definition{$\beta$-Distribution}
+Let $X\sim\text{Beta}(\alpha,\beta)$.\\
+A \textit{continuous} random variable with shape parameters $\alpha,\beta>0$. Then
+\[\begin{array}{rcl}
+f_X(x)&\propto&x^{\alpha-1}(1-x)^{\beta-1}\mathds{1}\{x\in[0,1]\}\\
+\expect(X)&=&\dfrac{\alpha}{\alpha+\beta}\\
+\var(X)&=&\dfrac{\alpha\beta}{(\alpha+\beta)^2(\alpha+\beta+1)}\\
+\mathcal{M}_X(t)&=&1+{\displaystyle\sum_{k=1}^\infty\left(\prod_{r=0}^{k-1}\dfrac{\alpha+r}{\alpha+\beta+r}\right)\dfrac{t^k}{k!}}
+\end{array}\]
+
+\definition{Bernoulli Distribution}
+Let $X\sim\text{Bernoulli}(p)$.\\
+A \textit{discrete} random variable which takes 1 with probability $p$ \& 0 with probability $(1-p)$. Then
+\[\begin{array}{rcl}
+p_X(k)&=&\begin{cases}1-p&\text{if }k=0\\p&\text{if }k=1\\0&\text{otherwise}\end{cases}\\
+P_X(k)&=&\begin{cases}0&\text{if }k<0\\1-p&\text{if }k\in[0,1)\\1&\text{otherwise}\end{cases}\\
+\expect(X)&=&p\\
+\var(X)&=&p(1-p)\\
+\mathcal{M}_X(t)&=&(1-p)+pe^t
+\end{array}\]
+\nb Often we define $q:=1-p$ for simplicity.\\
+
+\definition{Binomial Distribution}
+Let $X\sim\text{Binomial}(n,p)$.\\
+A \textit{discrete} random variable modelled by a \textit{Binomial Distribution} on $n$ independent events and rate of success $p$.\\
+\[\begin{array}{rcl}
+p_X(k)&=&{n\choose k}p^k(1-p)^{n-k}\\
+P_X(k)&=&\sum_{i=1}^k{n\choose i}p^i(1-p)^{n-i}\\
+\expect(X)&=&np\\
+\var(X)&=&np(1-p)\\
+\mathcal{M}_X(t)&=&[(1-p)+pe^t]^n
+\end{array}\]
+\nb If $Y:=\sum_{i=1}^nX_i$ where $\X\iid\text{Bernoulli}(p)$ then $Y\sim\text{Binomial}(n,p)$.\\
+
+\definition{Categorical Distribution}
+Let $X\sim\text{Categorical}(\textbf{p})$.\\
+A \textit{discrete} random varaible where probability vector $\textbf{p}$ for a set of events $\{1,\dots,m\}$.\\
+\[\begin{array}{rcl}
+f_X(i)=p_i
+\end{array}\]
+
+\definition{$\chi^2$ Distribution}
+Let $X\sim\chi^2_r$.\\
+A \textit{continuous} random variable modelled by the \textit{$\chi^2$ Distribution} with $r$ degrees of freedom. Then
+\[\begin{array}{rcl}
+f_X(x)&=&\dfrac{1}{2^{r/2}\Gamma(r/2)}x^{\frac{r}{2}-1}e^{-\frac{x}{2}}\\
+F_X(x)&=&\dfrac{1}{\Gamma(k/2)}\gamma\left(\frac{r}{2},\frac{x}{2}\right)\\
+\expect(X)&=&r\\
+\var(X)&=&2r\\
+\mathcal{M}_X(t)&=&\indicator\{t<\frac{1}{2}\}(1-2t)^{-\frac{r}{2}}
+\end{array}\]
+\nb If $Y:=\sum_{i=1}^kZ_i^2$ with $\textbf{Z}\iid\text{Normal}(0,1)$ then $Y\sim\chi^2_k$.\\
+
+\definition{Exponential Distribution}
+Let $X\sim\text{Exponential}(\lambda)$.\\
+A \textit{continuous} random variable modelled by a \textit{Exponential Distribution} with rate-parameter $\lambda$. Then
+\[\begin{array}{rcl}
+f_X(x)&=&\indicator\{t\geq0\}.\lambda e^{-\lambda x}\\
+F_X(x)&=&\indicator\{t\geq0\}.\left(1-e^{-\lambda x}\right)\\
+\expect(X)&=&\dfrac{1}{\lambda}\\
+\var(X)&=&\dfrac{1}{\lambda^2}\\
+\mathcal{M}_X(t)&=&\indicator\{t<\lambda\}\dfrac{\lambda}{\lambda-t}
+\end{array}\]
+\nb Exponential Distribution is used to model the wait time between decays of a radioactive source.\\
+
+\definition{Gamma Distribution}
+Let $X\sim\Gamma(\alpha,\beta)$.\\
+A \textit{continuous} random variable modelled by a \textit{Gamma Distribution} with shape parameter $\alpha>0$ \& rate parameter $\beta$. Then
+\[\begin{array}{rcll}
+f_X(x)&=&\dfrac{1}{\Gamma(\alpha)}\beta^\alpha x^{\alpha-1}e^{-\beta x}\\
+F_X(x)&=&\dfrac{\Gamma(\alpha)}\gamma(\alpha,\beta x)\\
+\expect(X)&=&\dfrac{\alpha}{\beta}\\
+\var(X)&=&\dfrac{\alpha}{\beta^2}\\
+\mathcal{M}_X(t)&=&\indicator\{t<\beta\}\left(1-\frac{t}{\beta}\right)^{-\alpha}
+\end{array}\]
+\nb There is an equivalent definition of a \textit{Gamma Distribution} in terms of a shape \& \underline{scale} parameter. The scale parameter is 1 over the rate parameter in this definition.\\
+
+\definition{Multinomial Distribution}
+Let $\X\sim\text{Multinomial}(n,\textbf{p})$.\\
+A \textit{discrete} random varible which models $n$ events with probability vector $\textbf{p}$ for events $\{1,\dots,m\}$.\\
+\[\begin{array}{rcl}
+f_\X(\x)&=&{\displaystyle\mathds{1}\left\{\sum_{i=1}^mx_i\equiv m\right\}\frac{n!}{x_1!\cdot\dots\cdot x_n!}\prod_{i=1}^np_i^{x_i}}\\
+\expect(X_i)&=&np_i\\
+\var(X_i)&=&np_i(1-p_i)\\
+\cov(X_i,x_j)&=&-np_ip_j\text{ for }i\neq j\\
+\mathcal{M}_{X_i}(\theta_i)&=&\left(\displaystyle\sum_{i=1}^mp_ie^{\theta_i}\right)^n
+\end{array}\]
+\nb In a realisation $\x$ of $\X$, $x_i$ is the number of times event $i$ has occured.\\
+
+\definition{Normal Distribution}
+Let $X\sim\text{Normal}(\mu,\sigma^2)$.\\
+A \textit{continuous} random variable  with mean $\mu$ \& variance $\sigma^2$.
+\[\begin{array}{rcl}
+f_X(x)&=&\dfrac{1}{\sqrt{2\pi\sigma^2}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}\\
+F_X(x)&=&\dfrac{1}{\sqrt{2\pi\sigma^2}}\int\limits_{-\infty}^xe^{-\frac{(y-\mu)^2}{2\sigma^2}}dy\\
+\expect(X)&=&\mu\\
+\var(X)&=&\sigma^2\\
+\mathcal{M}_X(\theta)&=&e^{\mu\theta+\sigma^2\theta^2(1/2)}
+\end{array}\]
+
+\definition{Pareto Distribution}
+Let $X\sim\text{Pareto}(x_0,\theta)$.\\
+A \textit{continuous} random variable modelled by a \textit{Pareto Distribution} with minimum value $x_0$ \& shape parameter $\alpha>0$. Then
+\[\begin{array}{rcll}
+f_X(x)&=&\dfrac{\alpha x_0^\alpha}{x^{\alpha+1}}\\
+F_X(x)&=&1-\left(\dfrac{x_0}{x}\right)^\alpha\\
+\expect(X)&=&\begin{cases}\infty&\alpha\leq1\\\dfrac{\alpha x_0}{\alpha-1}&\alpha>1\end{cases}\\
+\var(X)&=&\begin{cases}\infty&\alpha\leq2\\\dfrac{x_0^2\alpha}{(\alpha-1)^2(\alpha-2)}&\alpha>2\end{cases}\\
+\mathcal{M}_X(t)&=&\indicator\{t<0\}\alpha(-x_0t)^\alpha\Gamma(-\alpha,-x_0t)
+\end{array}\]
+
+\definition{Poisson Distribution}
+Let $X\sim\text{Poisson}(\lambda)$.\\
+A \textit{discrete} random variable modelled by a \textit{Poisson Distribution} with rate parameter $\lambda$. Then
+\[\begin{array}{rcll}
+p_X(k)&=&\dfrac{e^{-\lambda}\lambda^k}{k!}&\text{for }k\in\nats_0\\
+P_X(k)&=&{\displaystyle e^{-\lambda}\sum_{i=1}^k\frac{\lambda^i}{i!}}\\
+\expect(X)&=&\lambda\\
+\var(X)&=&\lambda\\
+\mathcal{M}_X(t)&=&e^{\lambda(e^t-1)}
+\end{array}\]
+\nb Poisson Distribution is used to model the number of radioactive decays in a time period.\\
+
+\definition{$t$-Distribution}
+Let $X\sim t_r$.\\
+A \textit{continuous} random variable with $r$ degrees of freedom. Then
+\[\begin{array}{rcll}
+f_X(k)&=&{\displaystyle\frac{\Gamma\left(\frac{\nu+1}{2}\right)}{\sqrt{\nu\pi}\Gamma\left(\frac{\nu}{2}\right)}\left(1+\frac{x^2}{\nu}\right)^{-\frac{\nu+1}{2}}}\\
+\expect(X)&=&\begin{cases}0&\text{if }\nu>1\\\text{undefined}&\text{otherwise}\end{cases}\\
+\var(X)&=&\begin{cases}\frac{\nu}{\nu-2}&\text{if }\nu>2\\\infty&1<\nu\leq2\\\text{undefined}&\text{otherwise}\end{cases}\\
+\mathcal{M}_X(t)&=&\text{undefined}
+\end{array}\]
+\nb Let $Y\sim\text{Normal}(0,1)\ \&\ Z\sim\chi^2_r$ be independent random variables then $X:=\dfrac{Y}{\sqrt{Z/r}}\sim t_r$.\\
+
+\definition{Uniform Distribution - Uniform}
+Let $X\sim\text{Uniform}(a,b)$.\\
+A \textit{continuous} random variable with lower bound $a$ \& upper bound $b$. Then
+\[\begin{array}{rcll}
+f_X(x)&=&\begin{cases}\frac{1}{b-a}&x\in[a,b]\\0&\text{otherwise}\end{cases}\\
+F_X(x)&=&\begin{cases}0&x<a\\\frac{x-a}{b-a}&x\in[a,b]\\1&\text{otherwise}\end{cases}\\
+\expect(X)&=&\frac{1}{2}(a+b)\\
+\var(X)&=&\frac{1}{12}(b-a)^2\\
+\mathcal{M}_X(t)&=&\begin{cases}\dfrac{e^{tb}-e^{ta}}{t(b-a)}&t\neq0\\1&t=0\end{cases}
+\end{array}\]
 
 \end{document}
