@@ -1,0 +1,236 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in, paperwidth=8.3in, paperheight=11.7in]{geometry}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{changepage} 
+
+\begin{document}
+
+\pagestyle{fancy}
+\setlength\parindent{0pt}
+\allowdisplaybreaks
+
+\renewcommand{\headrulewidth}{0pt}
+\hyphenpenalty 10000
+\exhyphenpenalty 10000
+
+% Cover page title
+\title{Statistics 2 - Problem Sheet 1}
+\author{Dom Hutchinson}
+\maketitle
+
+% Header
+\fancyhead[L]{Dom Hutchinson}
+\fancyhead[C]{Theory of Inference - Problem Sheet 1}
+\fancyhead[R]{\today}
+
+% Counters
+\newcounter{qpart}[section]
+
+% commands
+\newcommand{\dotprod}[0]{\boldsymbol{\cdot}}
+\newcommand{\cosech}[0]{\mathrm{cosech}\ }
+\newcommand{\cosec}[0]{\mathrm{cosec}\ }
+\newcommand{\sech}[0]{\mathrm{sech}\ }
+\newcommand{\prob}[0]{\mathbb{P}}
+\newcommand{\nats}[0]{\mathbb{N}}
+\newcommand{\cov}[0]{\mathrm{cov}}
+\newcommand{\var}[0]{\mathrm{var}}
+\newcommand{\expect}[0]{\mathbb{E}}
+\newcommand{\reals}[0]{\mathbb{R}}
+\newcommand{\integers}[0]{\mathbb{Z}}
+\newcommand{\indicator}[0]{\mathds{1}}
+\newcommand{\nb}[0]{\textit{N.B.} }
+\newcommand{\ie}[0]{\textit{i.e.} }
+\newcommand{\eg}[0]{\textit{e.g.} }
+\newcommand{\iid}[0]{\overset{\text{iid}}{\sim} }
+\newcommand{\x}[0]{\textbf{x} }
+\newcommand{\X}[0]{\textbf{X} }
+
+\newcommand{\qpart}[0]{\stepcounter{qpart} \textbf{Question \arabic{section} \alph{qpart})\\}}
+\newcommand{\qpartnb}[0]{\stepcounter{qpart} \textbf{Question \arabic{section} \alph{qpart})} - }
+\newcommand{\ans}[0]{ \textbf{Answer \arabic{section}\\}}
+\newcommand{\apart}[0]{ \textbf{Answer \arabic{section} \alph{qpart})\\}}
+\newcommand{\apartnb}[0]{\stepcounter{qpart} \textbf{Answer \arabic{section} \alph{qpart})} - }
+\newcommand{\question}[0]{\stepcounter{section}\section*{Question - \arabic{section}.}}
+
+\question
+
+\qpart
+If $\textbf{Y}$ and $\textbf{X}$ are random vectors st $\textbf{Y}=C\textbf{X}$ where $C$ is a matrix of fixed coefficients, show that if $\Sigma_X$ and $\Sigma_Y$ are the covariance matrices for $\textbf{X}$ and $\textbf{Y}$ respecitvely then
+$$\Sigma_y=C\Sigma_XC^T$$
+
+\apart
+\[\begin{array}{rcl}
+\mu_y&=&\expect(Y)\\
+&=&\expect(CX)\\
+&=&C\expect(X)\\
+&=&C\mu_X\\
+\Sigma_y&=&\expect[(Y-\mu_Y)(Y-\mu_Y)^T]\\
+&=&\expect[(CX-C\mu_X)(CX-C\mu_X)^T]\\
+&=&\expect[C(X-\mu_X)(X-\mu_X)^TC^T]\\
+&=&C\expect[(X-\mu_X)(X-\mu_X)^T]C^T\\
+&=&C\Sigma_XC^T
+\end{array}\]
+
+\qpart
+Consider a multivariate normal random vector $\textbf{X}\sim\text{Normal}(\pmb\mu_X,\Sigma_X)$ and suppose that the covariance matrix can be decomposed $\Sigma_X=CC^T$ (THis can always be done for a full rank covariance matrix using a Choleski decomposition). Show that $\Sigma_X^{-1}=C^{-T}C^{-1}$ and that ${\textbf{Y}=C^{-1}(\textbf{X}-\pmb\mu_X)\sim\text{Normal}(\textbf{0},I)}$.\\
+
+\apart
+\[\begin{array}{rrcl}
+&\Sigma_X\Sigma_X^{-1}&=&I\\
+\implies&CC^T\Sigma_X^{-1}&=&1\\
+\implies&C^TV_X^{-1}&=&C^{-1}\\
+\implies&V_X^{-1}&=&C^{-T}C^{-1}\\
+\\
+&Y&=&C^{-1}(X-\mu_X)\\
+&\prob(Y=x)&=&\prob(C^{-1}(X-\mu_X)=x)\\
+&&&TODO
+\end{array}\]
+
+\qpart
+Assuming that $\textbf{X}\sim\text{Normal}(\pmb\mu_X,\Sigma_X)$ show that
+$$(\textbf{X}-\pmb\mu_X)^T\Sigma_X^{-1}(\textbf{X}-\pmb\mu_X)=\textbf{Y}^T\textbf{Y}\text{ where }\textbf{Y}\sim\text{Normal}(\textbf{0},I)$$
+
+\apart
+TODO\\
+
+\qpart
+If $Z_i\iid\text{Normal}(0,1)$ random variables then
+$$\sum_{i=1}^nZ_i^2\sim\chi^2_n$$
+What is the distribution of
+$$(\textbf{X}-\pmb\mu_X)^T\Sigma_X^{-1}(\textbf{X}-\pmb\mu_X)$$
+if $\textbf{X}\sim\text{Normal}(\pmb\mu_X,\Sigma_X)$?\\
+
+\apart
+TODO\\
+
+\question
+
+\qpart
+Define $\textbf{y}=\begin{pmatrix}1\\-3\end{pmatrix}$ and $B=\begin{pmatrix}-1&2&-1\\2&-3&0\end{pmatrix}$.\\
+Find $B^T\textbf{y}$.\\
+$$\begin{pmatrix}-1&2&-1\\2&-3&0\end{pmatrix}^T\begin{pmatrix}1\\-3\end{pmatrix}=\begin{pmatrix}
+-1&2\\2&-3\\-1&0\end{pmatrix}\begin{pmatrix}1\\-3\end{pmatrix}=\begin{pmatrix}-1-7\\2+9\\-1+0\end{pmatrix}=\begin{pmatrix}-7\\11\\-1\end{pmatrix}$$
+
+\apart
+
+\qpart
+Let $A$ be a full rank $3\times 3$ matrix and $B$ be a full rank $5\times3$ matrix.\\
+State the dimensions of the following, if they exist. For those that do not exist, state why in a single sentence.
+\begin{enumerate}[label=\roman*)]
+	\item $A^{-1}B^T$\\
+	$A^{-1}\in\reals(3\times3),\ B^T\in\reals(3\times5)\implies A^{-1}B^T\in\reals(3\times5)$
+	\item $A^{-1}B$\\
+	$A^{-1}\in\reals(3\times3),\ B\in\reals(5\times3)\implies$ these matrices are incompatible for multiplication.
+	\item $B^{-1}A$\\
+	$B^{-1}\in\reals(3\times5),\ A\in\reals(3\times3)\implies$ these matrices are incompatible for multiplication.
+	\item $BA$\\
+	$B\in\reals(5\times3),\ A\in\reals(3\times3)\implies BA\in\reals(5\times3)$
+	\item $B^{-1}A^T$\\
+	$B^{-1}\in\reals(3\times5),\ A^T\in\reals(3\times3)\implies$ these matrices are incompatible for multiplication.
+	\item $BA^{-1}$\\
+	$B\in\reals(5\times3),\ A^{-1}\in\reals(3\times3)\implies BA^{-1}\in\reals(5\times3)$.
+	\item $(BA)^{-1}$\\
+	We know that $BA\in\reals(5\times3)\implies(BA)^{-1}\in\reals(3\times5)$.
+	\item $B^TA$\\
+	$B^T\in\reals(3\times5),\ A\in\reals(3\times3)\implies$ these matrices are incompatible for multiplication.
+	\item $B+A$\\
+	$B\in\reals(3\times5),\ A\in\reals(3\times3)$. Matrices must have the exact same dimensions in order to be added together, thus this in an illegal equation.
+	\item $B+A^T$\\
+	$B\in\reals(3\times5),\ A\in\reals(3\times3)$. Matrices must have the exact same dimensions in order to be added together, thus this in an illegal equation.
+\end{enumerate}
+
+\question
+The \textit{Exponential Distribution} is often a reasonable model of the times between random events. Suppose then, that ${x_1,\dots,x_n}$ are observations of times between hardware faults on a computer network, and it is reasonable to treat the faults as independent. To plan for fault tolerance the network managers need a reasonable model for the fault occurence rate. The \textit{pdf} of an \textit{Exponential Distribution} is
+$$f(x)=\mathds{1}\{x\geq0\}\lambda e^{-\lambda x}$$
+where $\lambda$ is a positive parameter.\\
+The variance of an exponential random variable is $\lambda^{-2}$.\\
+
+\qpartnb Let $X\sim\text{Exponential}(\lambda)$. Find $\expect(X)$.\\
+
+\apart
+\[\begin{array}{rcl}
+\expect(X)&=&\displaystyle\int_{-\infty}^\infty f_X(t)dt\\
+&=&\displaystyle\int_{-\infty}^\infty\mathds{1}\{t\geq0\}\lambda e^{-\lambda t}dt\\
+&=&\displaystyle\int_0^\infty\lambda e^{-\lambda t}dt\\
+&=&\left[-\dfrac{1}{\lambda}e^{-\lambda t}\right]_0^\infty\\
+&=&[0]-\left[-\dfrac{1}{\lambda}\right]\\
+&=&\dfrac{1}{\lambda}
+\end{array}\]
+
+\qpartnb Hence, suggest an estimator, $\hat\lambda$, for $\lambda$.\\
+
+\apart
+$$\hat\lambda=1/\bar{x}\text{ where }\bar{x}=\frac{1}{n}\sum_{i=1}^nx_i$$
+
+\qpartnb What is the variance of $\hat\lambda^{-1}$?
+\\
+\apart
+\[\begin{array}{rcl}
+\var\left(\hat\lambda^{-1}\right)&=&\var(\bar{X})\\
+&=&\var\left(\dfrac1n\displaystyle\sum_{i=1}^nX_i\right)\\
+&=&\dfrac{n}{n^2}\var(X_1)\\
+&=&\dfrac{1}{n\lambda^2}
+\end{array}\]
+
+\qpart
+Let $\bar{x}=\frac{1}{n}\sum x_i$.\\
+Find a first order Taylor expansion of $\hat\lambda$ about $\expect(\bar{x})$, considering $\hat\lambda$ as a function of $\bar{x}$.\\
+\\
+
+\apart
+TODO\\
+
+\qpart
+Hence find an approximation for the variance of $\hat\lambda$< in terms of $n$ and $\bar{x}$. This use of Taylor expansions to computer approximate variances via linearisation is known as the \textit{$\Delta$-method} in statistics.\\
+
+\apart
+TODO\\
+
+\question
+Consider again the setup from the previous question, but now taking a Bayesian approach. This means taht we need to augment our model with a prior distribution for the parameter, $\lambda\sim\Gamma(\alpha,\theta)$. So the prior \textit{pdf} of $\lambda$ is
+$$f(\lambda)=\frac{\lambda^{\alpha-1}e^{-\lambda/\theta}}{\theta^\alpha\Gamma(\alpha)}$$
+with $\expect(\lambda)=\alpha\theta$ and $\var(\lambda)=\alpha\theta^2$.\\
+
+\qpartnb Write down the \textit{pdf} for the joint distribution of the data $x_1,x_2,\dots$ given $\lambda$.\\
+
+\apart
+\[\begin{array}{rcl}
+f_n(\x;\lambda)&=&\displaystyle\prod_{i=1}^nf(x_i;\lambda)\\
+&=&\displaystyle\prod_{i=1}^n\mathds{1}\{x_i\geq0\}\lambda e^{-\lambda x_i}\\
+&=&\mathds1\{\text{all }x\geq0\}\lambda^ne^{-\lambda n\bar{x}}
+\end{array}\]
+
+\qpartnb By considering the joint distribution of $\lambda$ and $\x$, indentify the posterior distribution of $\lambda$ given $\x$.\\
+
+\apart
+\[\begin{array}{rcl}
+f(\lambda;\x)&\propto&f(\x;\lambda)f(\lambda)\\
+&=&\lambda^ne^{-\lambda n\bar{x}}\cdot\dfrac{\lambda^{\alpha-1}e^{-\lambda/\theta}}{\theta^\alpha\Gamma(\alpha)}\\
+&\propto&\lambda^{n+\alpha-1}e^{-\lambda(n\bar{x}+1/\theta)}\\
+&=&\lambda^{n+\alpha-1}e^{-\lambda\frac{n\bar{x}\theta+1}\theta}\\
+&\sim&\Gamma\left(n+\alpha,\dfrac{\theta}{n\bar{x}\theta+1}\right)
+\end{array}\]
+
+\qpartnb What are the posterior expection and variance of $\lambda$?\\
+
+\apart
+$$\expect[\lambda;\x]=\dfrac{\theta(n+\alpha-1)}{n\bar{x}\theta+1}\quad\var(\lambda;\x)=\dfrac{\theta^2(n+\alpha-1)}{(n\bar{x}\theta+1)^2}$$
+
+\qpart
+Consider the situation in which $n\to\infty$.\\
+What happens to the Bayesian and frequentist inferences aboute $\lambda$ in this case?\\
+
+\apart
+$$\expect[\lambda;\x]\overset{n\to\infty}{\longrightarrow}\dfrac{1}{\bar{x}}=\hat\lambda_\text{Frequentist}$$
+
+\end{document}
