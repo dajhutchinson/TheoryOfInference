@@ -146,7 +146,63 @@ Thus the model for the whole data set, $\textbf{t}$, is
 $$f(\textbf{t})=\prod_{i=1}^{11}f_a(t_i)\prod_{i=12}^{23}f_b(t_i)$$
 when patients $\{1,\dots,11\}$ are in group $a$ and the rest in group $b$.
 
-\section{Random Variables}
+\section{Basic Approaches to Inference}
+
+\definition{Frequentist Approach}
+In the \textit{Frequentist Approach} to inference we assume the model parameters are fixed states, which we wish to estimate. The parameter estimator $\hat\theta$ is a random variable which inherits its randomnewss from the data which it is constructed from.\\
+
+\definition{Bayesian Approach}
+In the \textit{Bayesian Approach} to inference model parameters are treated as random variables and we use probability distributions to encode our uncertainty about the parameters. We set a prior distribution, $\prob(\theta)$, and then use data to update it and learn a posterior distribution, $\prob(\theta|\x)$.\\
+
+\remark{Assumptions}
+Often we are required to make assumptions in order to analyse the results these approaches. For the \textit{Frequentist Approach} we often assume we have a large data set, whilst for the \textit{Bayesian Approach} we produce simulations from the posterior.\\
+
+\example{Comparing Frequentist \& Bayesian Approach}
+Let $X_1,\dots,X_n\iid\text{Normal}(\mu,1)$ where $\mu$ is an unknown parameter we wish to learn.\\
+Let $\x:=\{x_1,\dots,x_n\}$  be a realisation of $\X$.
+\begin{itemize}
+	\item[Frequentist]Let's use $\hat\mu=\bar{x}=\frac{1}{n}\sum_{i=1}^n x_i$.\\
+	Consider the expectation and variance of $\hat\mu$
+	$$\expect(\hat\mu)=\expect(\bar{x})=\frac{1}{n}\sum_{i=1}^n\expect(X_i)=\mu\text{ and }\var(\hat\mu)=\var(\bar{x})=\frac{1}{n^2}\sum_{i=1}^n\var(X_i)=\frac{1}{n}$$
+	Since $\hat\mu$ is a linear transformation of normal random variables it has a normal random variable, thus
+	$$\hat\mu\sim\text{Normal}\left(\mu,\frac1n\right)$$
+	Thus $\hat\mu$ is an \textit{unbiased} estimator of $\mu$.\\
+	By noting that $\sqrt{n}(\hat\mu-\mu)\sim\text{Normal}(0,1)$ we can construct \textit{Confidence Intervals} for $\mu$
+	\[\begin{array}{rcl}
+	0.95&=&\prob(-1.96<\sqrt{n}(\hat\mu-\mu)<1.96)\\
+	\implies0.95&=&\prob\left(\hat\mu-\dfrac{1.96}{\sqrt{n}}<\mu<\hat\mu+\dfrac{1.96}{\sqrt{n}}\right)
+	\end{array}\]
+	\item[Bayesian] Here we treat $\mu$ as a random variable and thus must choose a distribution for it
+	$$\mu\sim\text{Normal}(0,\sigma^2_\mu)$$
+	where $\sigma^2_\mu$ is a value we set. Generally we choose greater values for the variance when we are less certain.\\
+	We want to find $\prob(\mu|\x)$ and note that \textit{Bayes' Rule} states
+	$$\prob(\mu|\x)=\dfrac{\prob(\x|\mu)\prob(\mu)}{\prob(\x)}$$
+	In this setting $\prob(\x)$ is intractable so we use a trick that since $\prob(\x)$ is a normalising factor we have
+	$$\prob(\mu|\x)\propto\prob(\x|\mu)\prob(\mu)$$
+	From this proportionality we aim to identity the distribution of $\prob(\mu|\x)$.
+	\[\begin{array}{rcl}
+	\prob(\mu|\x)&\propto&\text{exp}\left\{-\dfrac{1}{2\sigma^2_\mu}\displaystyle\sum_{i=1}^n[(x_i-\mu)^2+\mu^2]\right\}\\
+	&\propto&\text{exp}\left\{-\dfrac{1}{2}\left(-2n\bar{x}\mu+\dfrac{\mu^2(n\sigma^2_\mu+1)}{\sigma^2_\mu}\right)\right\}\\
+	&\propto&\text{exp}\left\{-\dfrac12\left(\dfrac{n\sigma^2_\mu+1}{\sigma^2_\mu}\right)\left(\mu^2-2\bar{x}\mu\dfrac{n\sigma^2_\mu}{n\sigma^2_\mu+1}\right)\right\}\\
+	&\propto&\text{exp}\Bigg\{-\dfrac12\underbrace{\left(\dfrac{n\sigma^2_\mu+1}{\sigma^2_\mu}\right)}_{1/\sigma^2}\underbrace{\left(\mu-\bar{x}\dfrac{n\sigma^2_\mu}{n\sigma^2_\mu+1}\right)^2}_\mu\Bigg\}\text{ by completing the square}
+	\end{array}\]
+	We can produce a \textit{Credible Interval} for $\mu$ as
+	$$\bar{x}\dfrac{n\sigma^2_\mu}{n\sigma^2_\mu+1}\pm1.96\dfrac{\sigma_mu}{\sqrt{n\sigma^2_\mu+1}}$$
+\end{itemize}
+If we consider the final distribution from the \textit{Bayesian Approach} as $n\to\infty$ we notice that
+$$\mu|\x\to\bar{x}=\hat\mu\quad\text{and}\quad\sigma^2|\x\to\frac1n$$
+
+\newpage
+\setcounter{section}{-1}
+\section{Reference}
+
+\subsection{Definitions}
+
+\definition{Heavy Tailed}
+
+\definition{Censored Data}
+
+\subsection{Probability}
 
 \definition{Random Variable}
 A \textit{Random Variable} is a function from the sample space to the reals.
@@ -327,18 +383,7 @@ $$f(X_i|\textbf{X}_{\neg i})= f(X_i|X_{i-1})\text{ where }\textbf{X}_{\neg i}:=\
 Thus we can infer the \textit{marginal distribution}
 $$f(\textbf{X})=f(X_1)\prod_{i=2}^Nf(X_i|X_{i-1})$$
 
-%TODO Multivariate Normal Distribution
-
-\setcounter{section}{-1}
-\section{Reference}
-
-\subsection{Definitions}
-
-\definition{Heavy Tailed}
-
-\definition{Censored Data}
-
-\subsection{Probability Distributions}
+\subsubsection{Probability Distributions}
 
 \definition{$\beta$-Distribution}
 Let $X\sim\text{Beta}(\alpha,\beta)$.\\
