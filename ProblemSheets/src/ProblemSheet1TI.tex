@@ -88,20 +88,33 @@ Consider a multivariate normal random vector $\textbf{X}\sim\text{Normal}(\pmb\m
 \[\begin{array}{rrcl}
 &\Sigma_X\Sigma_X^{-1}&=&I\\
 \implies&CC^T\Sigma_X^{-1}&=&1\\
-\implies&C^TV_X^{-1}&=&C^{-1}\\
-\implies&V_X^{-1}&=&C^{-T}C^{-1}\\
+\implies&C^T\Sigma_X^{-1}&=&C^{-1}\\
+\implies&\Sigma_X^{-1}&=&C^{-T}C^{-1}\\
 \\
-&Y&=&C^{-1}(X-\mu_X)\\
-&\prob(Y=x)&=&\prob(C^{-1}(X-\mu_X)=x)\\
-&&&TODO
+\text{Note that}&\textbf{Y}&=&C^{-1}(\textbf{X}-\pmb\mu_X)\\
+&&=&C^{-1}\textbf{X}-C^{-1}\pmb\mu_X\\
+\text{We have}&\mathcal{M}_X(\textbf{t})&=&\text{exp}\left\{\textbf{t}^T\pmb\mu_X+\frac{1}{2}\textbf{t}^T\Sigma_X\textbf{t}\right\}\\
+&&=&\text{exp}\left\{\textbf{t}^T\pmb\mu_X+\frac{1}{2}\textbf{t}^TCC^T\textbf{t}\right\}\\
+\implies&\mathcal{M}_Y(\textbf{t})&=&\text{exp}\{-\textbf{t}^TC^{-1}\pmb\mu_X\}\mathcal{M}_X(C^{-t}\textbf{t})\\
+&&=&\text{exp}\{-\textbf{t}^TC^{-1}\pmb\mu_X\}\text{exp}\left\{\textbf{t}^TC^{-1}\pmb\mu_X+\frac{1}{2}\textbf{t}^TC^{-1}CC^TC^{-T}\textbf{t}\right\}\\
+&&=&\text{exp}\{\frac{1}{2}\textbf{t}^T\textbf{t}\}\\
+&&=&\mathcal{M}_Z(\textbf{t})\text{ where }\textbf{Z}\sim\text{Normal}(\pmb0,I)
 \end{array}\]
+Since $\textbf{Y}$ has the same moment generating function as $\textbf{Z}\sim\text{Normal}(\pmb0,I)$ they have the same distribution.\\
 
 \qpart
 Assuming that $\textbf{X}\sim\text{Normal}(\pmb\mu_X,\Sigma_X)$ show that
 $$(\textbf{X}-\pmb\mu_X)^T\Sigma_X^{-1}(\textbf{X}-\pmb\mu_X)=\textbf{Y}^T\textbf{Y}\text{ where }\textbf{Y}\sim\text{Normal}(\textbf{0},I)$$
 
 \apart
-TODO\\
+It is reasonable to assume that $\Sigma_X$ is full rank and thus $\exists\ C\text{ st }\Sigma_X=CC^T$.\\
+Thus
+\[\begin{array}{rcl}
+\textbf{Y}&=&C^{-1}(\textbf{X}-\pmb\mu_X)\\
+(\textbf{X}-\pmb\mu_X)^T\Sigma_X^{-1}(\textbf{X}-\pmb\mu_X)&=&(\textbf{X}-\pmb\mu_X)^T(CC^T)^{-1}(\textbf{X}-\pmb\mu_X)\\
+&=&(\textbf{X}-\pmb\mu_X)^TC^{-T}C^{-1}(\textbf{X}-\pmb\mu_X)\\
+&=&\textbf{Y}^T\textbf{Y}\text{ as required}
+\end{array}\]
 
 \qpart
 If $Z_i\iid\text{Normal}(0,1)$ random variables then
@@ -110,22 +123,31 @@ What is the distribution of
 $$(\textbf{X}-\pmb\mu_X)^T\Sigma_X^{-1}(\textbf{X}-\pmb\mu_X)$$
 if $\textbf{X}\sim\text{Normal}(\pmb\mu_X,\Sigma_X)$?\\
 
-\apart
-TODO\\
+\apartnb
+\[\begin{array}{rcl}
+(\textbf{X}-\pmb\mu_X)^T\Sigma_X^{-1}(\textbf{X}-\pmb\mu_X)&=&\textbf{Y}^T\textbf{Y}\\
+&=&\displaystyle\sum_{i=1}^ny_i^2\text{ where }y_i\sim\text{Norma}(0,1)\\
+&\sim&\chi^2_n
+\end{array}\]
 
 \question
 
 \qpart
 Define $\textbf{y}=\begin{pmatrix}1\\-3\end{pmatrix}$ and $B=\begin{pmatrix}-1&2&-1\\2&-3&0\end{pmatrix}$.\\
+
+\apart
 Find $B^T\textbf{y}$.\\
 $$\begin{pmatrix}-1&2&-1\\2&-3&0\end{pmatrix}^T\begin{pmatrix}1\\-3\end{pmatrix}=\begin{pmatrix}
 -1&2\\2&-3\\-1&0\end{pmatrix}\begin{pmatrix}1\\-3\end{pmatrix}=\begin{pmatrix}-1-7\\2+9\\-1+0\end{pmatrix}=\begin{pmatrix}-7\\11\\-1\end{pmatrix}$$
 
-\apart
-
 \qpart
 Let $A$ be a full rank $3\times 3$ matrix and $B$ be a full rank $5\times3$ matrix.\\
-State the dimensions of the following, if they exist. For those that do not exist, state why in a single sentence.
+State the dimensions of the following, if they exist. For those that do not exist, state why in a single sentence.\\
+
+\apart
+Let $M\in\reals(a,b)\ \&\ N\in\reals(c,d)$ with $a,b,c,d\in\nats$.\\
+$MN$ is a valid matrix multiplication iff $b=c$. If $b=c$ then $(MN)\in\reals(a,d)$.\\
+$M+N$ is a valid matrix addition iff $a=c$ \textbf{and} $b=d$. If these critera are fulfilled then $(M+N)\in\reals(a,b)$.
 \begin{enumerate}[label=\roman*)]
 	\item $A^{-1}B^T$\\
 	$A^{-1}\in\reals(3\times3),\ B^T\in\reals(3\times5)\implies A^{-1}B^T\in\reals(3\times5)$
@@ -159,21 +181,24 @@ The variance of an exponential random variable is $\lambda^{-2}$.\\
 
 \apart
 \[\begin{array}{rcl}
-\expect(X)&=&\displaystyle\int_{-\infty}^\infty f_X(t)dt\\
-&=&\displaystyle\int_{-\infty}^\infty\mathds{1}\{t\geq0\}\lambda e^{-\lambda t}dt\\
-&=&\displaystyle\int_0^\infty\lambda e^{-\lambda t}dt\\
-&=&\left[-\dfrac{1}{\lambda}e^{-\lambda t}\right]_0^\infty\\
-&=&[0]-\left[-\dfrac{1}{\lambda}\right]\\
-&=&\dfrac{1}{\lambda}
+\expect(X)&=&\displaystyle\int_{-\infty}^\infty xf_X(t)dt\\
+&=&\displaystyle\int_{-\infty}^\infty\mathds{1}\{t\geq0\}x\lambda e^{-\lambda t}dt\\
+&=&\displaystyle\int_0^\infty x\lambda e^{-\lambda t}dt\\
+&=&\left[-xe^{-\lambda x}\right]_0^\infty+\displaystyle\int_0^\infty e^{-\lambda x}dx \text{ integration by parts}\\
+&=&\left[-xe^{-\lambda x}-\frac1\lambda e^{-\lambda x}\right]_0^\infty\\
+&=&[0-0]-\left[0-\frac1\lambda\right]\\
+&=&\dfrac1\lambda
 \end{array}\]
 
 \qpartnb Hence, suggest an estimator, $\hat\lambda$, for $\lambda$.\\
 
 \apart
-$$\hat\lambda=1/\bar{x}\text{ where }\bar{x}=\frac{1}{n}\sum_{i=1}^nx_i$$
+Since $\expect(X)=1/\lambda\implies\lambda=1/\expect(X)$ and $\bar{X}\to_\prob\expect(X)$.\\
+Thus I suggest
+$$\hat\lambda=\frac1{\bar{X}}\text{ where }\bar{X}=\frac1n\sum_{i=1}^nX_i$$
 
-\qpartnb What is the variance of $\hat\lambda^{-1}$?
-\\
+\qpartnb What is the variance of $\hat\lambda^{-1}$?\\
+
 \apart
 \[\begin{array}{rcl}
 \var\left(\hat\lambda^{-1}\right)&=&\var(\bar{X})\\
@@ -184,17 +209,44 @@ $$\hat\lambda=1/\bar{x}\text{ where }\bar{x}=\frac{1}{n}\sum_{i=1}^nx_i$$
 
 \qpart
 Let $\bar{x}=\frac{1}{n}\sum x_i$.\\
-Find a first order Taylor expansion of $\hat\lambda$ about $\expect(\bar{x})$, considering $\hat\lambda$ as a function of $\bar{x}$.\\
+Find a first order \textit{Taylor Expansion} of $\hat\lambda$ about $\expect(\bar{x})$, considering $\hat\lambda$ as a function of $\bar{x}$.\\
 \\
 
 \apart
-TODO\\
+We have
+$$\hat\lambda(\bar{x})=\frac{1}{\bar{x}}\implies\frac{d}{d\bar{x}}\hat\lambda(\bar{x})=-\frac{1}{\bar{x}^2}$$
+A \textit{First Order Taylor Expansion} give us the following approximation
+$$f(x)\approx f(a)+f'(a)(x-a)\text{ for }a\in\reals$$
+Define $f(x)=\hat\lambda(x)$ and $a=\expect(\bar{x})\in\reals$. Then
+\[\begin{array}{rcl}
+\hat\lambda(\bar{x})&\approx&\hat\lambda(\expect(\bar{x}))+[\bar{x}-\expect(\bar{x})]\frac{d}{d\bar{x}}\hat\lambda(\bar{x})\\
+&=&\dfrac1{\expect(\bar{x})}-\dfrac{\bar{x}-\expect(\bar{x})}{\expect(\bar{x})^2}\\
+&=&\dfrac{\bar{x}}{\expect(\bar{x})^2}\\
+&=&\lambda^2\bar{x}
+\end{array}\]
 
 \qpart
-Hence find an approximation for the variance of $\hat\lambda$< in terms of $n$ and $\bar{x}$. This use of Taylor expansions to computer approximate variances via linearisation is known as the \textit{$\Delta$-method} in statistics.\\
+Hence find an approximation for the variance of $\hat\lambda$, in terms of $n$ and $\bar{x}$. This use of Taylor expansions to computer approximate variances via linearisation is known as the \textit{$\Delta$-method} in statistics.\\
 
 \apart
-TODO\\
+By definition
+$$\var(\hat\lambda)=\expect[(\hat\lambda-\expect(\hat\lambda))^2]=\expect(\hat\lambda^2)-\expect(\hat\lambda)^2$$
+Note that
+\[\begin{array}{rcl}
+\expect(\hat\lambda)&\approx&\expect\left(\lambda^2\bar{X}\right)\\
+&=&\lambda^2\expect(\bar{X})\\
+&=&\lambda^2\cdot\frac1\lambda\\
+&=&\lambda\\
+\expect(\hat\lambda^2)&\approx&\expect\left[\left(\lambda^2\bar{x}\right)^2\right]\\
+&=&\expect[\lambda^4\bar{X}^2]\\
+&=&\lambda^4\expect[\bar{X}^2]\\
+&=&\lambda^4[\var(\bar{X})+\expect(\bar{X})^2]\\
+&=&\lambda^4\left[\frac1n\var(X_1)+\left(\frac1\lambda\right)^2\right]\\
+&=&\lambda^4\left[\frac1{n\lambda^2}+\frac1{\lambda^2}\right]\\
+&=&\lambda^2\left[\frac1n+1\right]\\
+\implies\var(\hat\lambda)&=&\lambda^2\left[\frac1n+1\right]-\lambda^2\\
+&=&\dfrac{\lambda^2}n
+\end{array}\]
 
 \question
 Consider again the setup from the previous question, but now taking a Bayesian approach. This means taht we need to augment our model with a prior distribution for the parameter, $\lambda\sim\Gamma(\alpha,\theta)$. So the prior \textit{pdf} of $\lambda$ is
@@ -207,7 +259,7 @@ with $\expect(\lambda)=\alpha\theta$ and $\var(\lambda)=\alpha\theta^2$.\\
 \[\begin{array}{rcl}
 f_n(\x;\lambda)&=&\displaystyle\prod_{i=1}^nf(x_i;\lambda)\\
 &=&\displaystyle\prod_{i=1}^n\mathds{1}\{x_i\geq0\}\lambda e^{-\lambda x_i}\\
-&=&\mathds1\{\text{all }x\geq0\}\lambda^ne^{-\lambda n\bar{x}}
+&=&\mathds1\{\text{all }x\geq0\}\lambda^ne^{-\lambda n\bar{X}}
 \end{array}\]
 
 \qpartnb By considering the joint distribution of $\lambda$ and $\x$, indentify the posterior distribution of $\lambda$ given $\x$.\\
