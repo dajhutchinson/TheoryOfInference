@@ -1,6 +1,7 @@
 \documentclass[11pt,a4paper]{article}
 
 \usepackage[margin=1in, paperwidth=8.3in, paperheight=11.7in]{geometry}
+\usepackage[ruled, vlined, linesnumbered]{algorithm2e}
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amssymb}
@@ -192,6 +193,100 @@ Let $\x:=\{x_1,\dots,x_n\}$  be a realisation of $\X$.
 If we consider the final distribution from the \textit{Bayesian Approach} as $n\to\infty$ we notice that
 $$\mu|\x\to\bar{x}=\hat\mu\quad\text{and}\quad\sigma^2|\x\to\frac1n$$
 
+\subsection{Inference by Resampling}
+
+\remark{Motivation}
+The uncertainty we have about a parameter is inherited from the uncertainty in the data sampling process. Often we have a data set \& are unable to repeat the data gathering process, and even if we could we would just combine it into a larger sample rather than split it.\\
+
+\definition{Resampling}
+Let $\x$ be a given data set.\\
+We can \textit{Resample} from $\x$ be sampling values in $\x$ uniformly, with repetition. Since we use repetition the \textit{Resample}'s size is independent of the size of $\x$ (Although it makes little sense for it to be greater than $|\x|$).\\
+
+\definition{Bootstrapping}
+\textit{Bootstrapping} is the process of generating multiple \textit{Resamples} of a data set \& then estimating a parameter value for each of these \textit{resamples}. These estimated values can then be assessed.\\
+
+\example{Bootstrapping}
+The algorithm below describes how to perofrm a \textit{Bootstrapping} operation for the mean of a given data set $\x$. It produces $m$ \textit{resamples} of size $n$ from $\x$ and returns a $95\%$ \textit{Confidence Interval} for the estimated means of these samples.\\
+\begin{algorithm}[H]
+\SetKwInOut{Require}{require}
+\caption{Estimating Mean using Bootstrapping}
+\Require{$\x\ \{\text{data set}\}$}
+$\mu s=\{\}\ \{$resample means$\}$\\
+$\mu s$ append $mean(\x)$\\
+\For{$i=0\dots m$} {
+$x_i\leftarrow sample(\x,n,$replace=$TRUE)$\\
+$\mu s$ append $mean(x_i)$
+}
+\Return{$quantile(\mu s,(0.025,0.0975)$}
+\end{algorithm}
+
+\section{Inference for Linear Models}
+
+\definition{Linear Model}
+A \textit{Linear Model} is a mathematical model where the \textit{response vector}, $\textbf{y}$, is linear wrt some parameters $\pmb\beta$ and zero-mean \textit{random error} $\pmb\varepsilon$.
+$$\textbf{y}=X\pmb\beta+\pmb\varepsilon$$
+where $X$ is the \textit{Model Matrix} (\ie observed data).\\
+Usually we assume $\pmb\varepsilon\sim\text{Normal}(0,\sigma^2 I)$ although the normality assumption is less important as the \textit{Central Limit Theorem} typically takes care of any issues.\\
+
+\definition{Model Matrix}
+A \textit{Model Matrix}, $X$, is the set of values observed in a system. Rows are read as a single observation \& columns as a single \textit{Predictor Varaible}.\\
+The \textit{Predictor Variables} fulfil one of the following roles
+\begin{itemize}
+	\item[-] \textit{Metric} - Quantifable measurement from the system.
+	\item[-] \textit{Factor} - A categorisation. Typically take the a binary value ($0,1$) to represent whether an observation fits a given category or not.
+\end{itemize}
+
+\remark{Only the parameters of a Linear model need to be linear. The predictor variables can be composed in any way deemed fit.}
+$y=\alpha x^2+\varepsilon$ is valid but $y=\alpha^2x+\varepsilon$ is not.\\
+
+\example{Formulating Linear Model}
+The following is a linear model for a system with \textit{Metrics} $x_i\ \&\ z_i$ and \textit{Factor} $g_i$.
+$$y_i=\gamma_{g_i}+\alpha_1x_i+\alpha_2z_i+\alpha_4z_i^2+\alpha_4z_ix_i+\varepsilon_i$$
+where $\gamma_{g_i}$ is the parameter for category represented by $g_i$.\\
+We can describe the system about in terms of matrices
+$$\begin{pmatrix}y_1\\y_2\\\vdots\\y_n\end{pmatrix}=\begin{pmatrix}1&0&0&x_1&z_1&z_1^2&z_1x_1\\0&0&1&x_2&z_2&z_2^2&z_2x_2\\\vdots&\vdots&\vdots&\vdots&\vdots&\vdots&\vdots\\0&1&0&x_n&z_n&z_n^2&z_nx_n\end{pmatrix}\begin{pmatrix}
+\gamma_1\\\gamma_2\\\gamma_3\\\alpha_1\\\alpha_2\\\alpha_3\\\alpha_4\end{pmatrix}+\begin{pmatrix}\varepsilon_1+\varepsilon_2\\\vdots\\\varepsilon_n\end{pmatrix}$$
+In the above formulation $y_1$ fulfils category $1$, $y_2$ fulfils $3$ and $y_n$ fulfils $2$.\\
+
+\example{Linear Model}
+Consider a data set for the stopping $distance$ of a car with \textit{Predictor Variable} $speed$ at the point at which the signal to stop is given.\\
+By considering basic physics we can theorise the following model
+\[\begin{array}{rcl}
+distance_i&=&\beta_1 speed_i+\beta_2 speed_i^2+\varepsilon_i\\
+&=&\text{Thinking}+\text{Loss Kinetic Energy}+\text{Error}
+\end{array}\]
+where $\varepsilon_i\iid\text{Normal}(0,\sigma^2)$.\\
+Suppose we want to test whether to make the model more flexible. We can theorise the following model \& test whether $\beta_0=0=\beta_3$ (as expected).
+$$distance_i=\beta_0+\beta_1 speed_i+\beta_2 speed_i^2+\beta_3speed_i^3+\varepsilon_i\\$$
+
+\subsection{Linear Model Estimation \& Checking}
+
+\proposition{Frequentist Approach}
+In the \textit{Frequentist Approach} to \textit{Linear Models} we assume that $\pmb\beta$ and $\sigma^2$ are fixed states of nature, although they are unknown to us, and all randomness is inherited from the random variability in the data. We want to find a point estimate for $\pmb\beta$ which minimises the \textit{Residual Sum of Squares}.\\
+
+\definition{Residual Sum of Squares}
+Let $(X,\textbf{y})$  be a set of training data \& $\pmb\beta$ a \textit{Parameter Vector}.\\
+The \textit{Residual Sum of Squares} is the square difference between our estimate for the \textit{Response Variable} and its true value.
+$$S:=\sum_{i=1}^n(y_i-\mu_i)^2=\|\textbf{y}-\pmb\mu\|^2\text{ where }\pmb\mu=X\pmb\beta$$
+
+\proposition{Least Squares for Linear Model}
+From the definition of \textit{Residual Sum of Squares} as the \textit{Euclidian Distance} between the response \& estimated vectors we note that its value is unchanged if we reflect or rotate $(\textbf{y}-\pmb\mu)$.\\
+Next we note that any real matrix, $X\in\reals(n\times p)$, can be decomposed into
+$$X=\mathcal{Q}\begin{pmatrix}R\\0\end{pmatrix}=QR\text{ note that }\mathcal{Q}\neq Q$$
+where $R\in\reals(p\times p)$ is an \textit{Upper Triangular Matrix} and $\mathcal{Q}\in\reals(n\times n)$ is an \textit{Orthogonal Matrix}, the first $p$ columns of which form $Q$.\\
+Since $\mathcal{Q}$ is \textit{Orthogonal} we have that $\mathcal{Q}^T\mathcal{Q}=I$.\\
+We can now derive the result that
+\[\begin{array}{rcl}
+\|\textbf{y}-X\pmb\beta\|^2&=&\|\mathcal{Q}^T\textbf{y}-\mathcal{Q}^TX\pmb\beta\|^2\\
+&=&\left\|\mathcal{Q}^T\textbf{y}-\begin{pmatrix}R\\0\end{pmatrix}\pmb\beta\right\|^2\\
+&=&\left\|\begin{pmatrix}\textbf{f}\\\textbf{r}\end{pmatrix}-\begin{pmatrix}R\\0\end{pmatrix}\right\|^2\text{ where }\begin{pmatrix}\textbf{f}\\\textbf{r}\end{pmatrix}\equiv\mathcal{Q}^T\textbf{y}\\
+&=&\|\textbf{f}-R\pmb\beta\|^2+\|\textbf{r}\|^2
+\end{array}\]
+Thus minimising the \textit{Residual Sum of Squares} is reduced to choosing $\pmb\beta$ st $R\pmb\beta=\textbf{f}$.\\
+Hence, provided that $X$ and $R$ have full rank
+$$\hat\beta_\text{LS}=R^{-1}\textbf{f}$$
+\nb After choosing $\pmb\beta$ we have that the \textit{Residual Sum of Squares} is just $\|\textbf{r}\|^2$.
+
 \newpage
 \setcounter{section}{-1}
 \section{Reference}
@@ -201,6 +296,10 @@ $$\mu|\x\to\bar{x}=\hat\mu\quad\text{and}\quad\sigma^2|\x\to\frac1n$$
 \definition{Heavy Tailed}
 
 \definition{Censored Data}
+
+\definition{Upper Triangular Matrix}
+
+\definition{Orthogonal Matrix}
 
 \subsection{Probability}
 
