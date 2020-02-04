@@ -1,0 +1,163 @@
+---
+title: "Problem Sheet 2"
+subtitle: "Theory of Inference"
+author: "Dom Hutchinson"
+header-includes:
+   - \usepackage{dsfont}
+   - \usepackage{fancyhdr}
+   - \pagestyle{fancy}
+   - \renewcommand{\headrulewidth}{0pt}
+   - \fancyhead[L]{Dom Hutchinson}
+   - \fancyhead[C]{Theory of Inference - Problem Sheet 2}
+   - \fancyhead[R]{\today}
+   - \newcommand{\dotprod}[0]{\boldsymbol{\cdot}}
+   - \newcommand{\cosech}[0]{\mathrm{cosech}\ }
+   - \newcommand{\cosec}[0]{\mathrm{cosec}\ }
+   - \newcommand{\sech}[0]{\mathrm{sech}\ }
+   - \newcommand{\prob}[0]{\mathbb{P}}
+   - \newcommand{\nats}[0]{\mathbb{N}}
+   - \newcommand{\cov}[0]{\mathrm{Cov}}
+   - \newcommand{\var}[0]{\mathrm{Var}}
+   - \newcommand{\expect}[0]{\mathbb{E}}
+   - \newcommand{\reals}[0]{\mathbb{R}}
+   - \newcommand{\integers}[0]{\mathbb{Z}}
+   - \newcommand{\indicator}[0]{\mathds{1}}
+   - \newcommand{\nb}[0]{\textit{N.B.} }
+   - \newcommand{\ie}[0]{\textit{i.e.} }
+   - \newcommand{\eg}[0]{\textit{e.g.} }
+   - \newcommand{\X}[0]{\textbf{X}}
+   - \newcommand{\x}[0]{\textbf{x}}
+   - \newcommand{\iid}[0]{\overset{\text{iid}}{\sim}}
+   - \newcommand{\proved}[0]{$\hfill\square$\\}
+output:
+  pdf_document: 
+     fig_width: 6
+     fig_height: 4
+  html_notebook: default
+  html_document: default
+  word_document: default
+---
+```{r}
+set.seed(16111998)
+```
+# Question 1
+
+## Part a)
+```{r}
+head(cars);
+```
+
+## Part b)
+```{r}
+cars.model<-lm(dist~speed+I(speed^2)-1,data=cars) # response vars ~ expected predictors form # I() ensures ^2 is interpretted arithmetically & not as a model parameter
+cars.model
+```
+$\hat\beta_1=`r cars.model$coefficients["speed"]`\ \&\ \hat\beta_2=`r cars.model$coefficients["I(speed^2)"]`$.
+
+## Part c)
+```{r}
+summary(cars.model)
+coefs<-summary(cars.model)$coefficients
+coefs["speed","Estimate"]
+```
+$\hat\beta_1=`r coefs["speed","Estimate"]`,\ \hat\beta_2=`r coefs["I(speed^2)","Estimate"]`,\ \hat\sigma_{\hat\beta_1}=`r coefs["speed","Std. Error"]`\ \&\ \hat\sigma_{\hat\beta_2}=`r coefs["I(speed^2)","Std. Error"]`$.
+
+## Pard d)
+```{r}
+head(model.matrix(cars.model))
+```
+
+## Part e)
+```{r}
+cm1<-lm(dist~speed+I(speed^2)+I(speed^3),data=cars)
+plot(cm1)
+```
+
+The mean of the residuals deviates further from the mean as the fitted value increases, indicating it is less accurate for high values. The variability seems fairly consistent, possibly increasing as the fidded values increase. The mean of the residuals is less zero meaning the predicted valeus are consistently less than the true values.
+
+## Part f)
+```{r}
+summary(cm1)
+cm2<-lm(dist~speed+I(speed^2)+I(speed^3)-1,data=cars)
+summary(cm2)
+cm3<-lm(dist~speed+I(speed^3)-1,data=cars)
+summary(cm3)
+coefs3<-summary(cm3)$coefficients
+```
+By dropping the least significant term until all terms have $p$-valeus less than 0.05 we get the suggestion that the following is the best model
+$$\mathtt{dist}_i=\beta_1\mathtt{speed}_i+\beta_2\mathtt{speed}_i^3+\varepsilon_i$$
+where $\hat\beta_1=`r coefs3["speed","Estimate"]`\ \&\ \hat\beta_2=`r coefs3["I(speed^3)","Estimate"]`$.
+
+## Part g)
+$\mathtt{time}_i=\frac{\mathtt{dist}_i}{\beta_1\mathtt{speed}_i}$.\
+We obtain a $95\%$ confidence interval for $\beta_1$ using $\hat\beta_1\pm t_{n-p}(.975)\hat\sigma_{\hat\beta_1}$.\
+In this scenario $n=`r dim(cars)[1]`,\ p=2,\ \hat\beta_1=`r coefs3["speed","Estimate"]`\ \&\ \hat\sigma_{\hat\beta_1}=`r coefs3["speed","Std. Error"]`$. Note that $t_{`r dim(cars)[1]-2`}(.975)=`r qt(.975,dim(cars)[1]-2)`$.\
+Producing the following confidence interval for $\beta_1$.
+$$[`r lb<-coefs3["speed","Estimate"]-qt(.975,dim(cars)[1]-2)*coefs3["speed","Std. Error"];lb`,`r ub<-coefs3["speed","Estimate"]+qt(.975,dim(cars)[1]-2)*coefs3["speed","Std. Error"];ub`]$$
+If we now take the sample means $\mathtt{speed}$ \& $\mathtt{dist}$ of we can produce a confidence interval for $\mathtt{time}$ (accounting for speed being in miles/hour & distance being in feet).\
+$$\frac{1}{5280\times60\times60}\left[\frac{`r lb`\times`r mean(cars[,2])`}{`r mean(cars[,1])`},\frac{`r ub`\times`r mean(cars[,2])`}{`r mean(cars[,1])`}\right]=\left[`r (lb*mean(cars[,2]))/(mean(cars[,1])*5280*60*60)`,`r (ub*mean(cars[,2]))/(mean(cars[,1])*5280*60*60)`\right]$$
+The final confidence interval is for the reaction speed in seconds.\
+# Question 2
+
+## Part a)
+```{r}
+n<-100                # Sample size
+beta.true<-c(.5,1,10) # True parameter values
+ct<-qt(.975,n-3)      # Critical points for CIs
+cp<-beta.true*0       # Coverage probability array
+n.rep<-1000           # Number of replicates to run
+for (i in 1:n.rep) {
+  x<-runif(n)                                                      # simulated covariate
+  mu<-beta.true[1]+beta.true[2]*x+beta.true[3]*x^2
+  y<-mu+rnorm(n)*.3                                                # Simulated data
+  m1<-lm(y~x+I(x^2))                                               # fit model to this replicate
+  b<-coef(m1)                                                      # extract parameter estimates
+  sig.b<-diag(vcov(m1))^.5
+  cp<-cp+as.numeric(b-ct*sig.b<=beta.true & b+ct*sig.b>=beta.true) # Count whether coefficients in interval
+}
+cp/n.rep
+```
+Observed coverage is close to the nomial coverage of $.95$.
+
+## Part b)
+```{r}
+n<-100                # Sample size
+beta.true<-c(.5,1,10) # True parameter values
+ct<-qt(.975,n-3)      # Critical points for CIs
+cp<-beta.true*0       # Coverage probability array
+n.rep<-1000           # Number of replicates to run
+for (i in 1:n.rep) {
+  x<-runif(n)                                                      # simulated covariate
+  mu<-beta.true[1]+beta.true[2]*x+beta.true[3]*x^2
+  y<-rpois(n,mu)                                                # Simulated data
+  m1<-lm(y~x+I(x^2))                                               # fit model to this replicate
+  b<-coef(m1)                                                      # extract parameter estimates
+  sig.b<-diag(vcov(m1))^.5
+  cp<-cp+as.numeric(b-ct*sig.b<=beta.true & b+ct*sig.b>=beta.true) # Count whether coefficients in interval
+}
+cp/n.rep
+```
+The coverage increases for the constant \& linear $\mathtt{speed}$ terms but decreases for quadratic $\mathtt{speed}$
+
+## Part c)
+```{r}
+# Generate data
+n<-50;
+x<-runif(n)
+mu<-beta.true[1]+beta.true[2]*x+beta.true[3]*x^2
+y<-rpois(n,mu)
+
+# Bootstrap
+cp<-beta.true*0
+n.rep<-1000
+for (i in 1:n.rep) {
+  bi<-sample(1:n,n,replace=TRUE)
+  yb<-y[bi]
+  xb<-x[bi]
+  m1<-lm(yb~xb+I(xb^2))
+  b<-coef(m1)
+  sig.b<-diag(vcov(m1))^.5
+  cp<-cp+as.numeric(b-ct*sig.b<=beta.true & b+ct*sig.b>=beta.true) # Count whether coefficients in interval
+}
+cp/n.rep
+```
