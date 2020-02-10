@@ -284,8 +284,122 @@ We can now derive the result that
 \end{array}\]
 Thus minimising the \textit{Residual Sum of Squares} is reduced to choosing $\pmb\beta$ st $R\pmb\beta=\textbf{f}$.\\
 Hence, provided that $X$ and $R$ have full rank
-$$\hat\beta_\text{LS}=R^{-1}\textbf{f}$$
+$$\hat{\pmb\beta}_\text{LS}=R^{-1}\textbf{f}$$
 \nb After choosing $\pmb\beta$ we have that the \textit{Residual Sum of Squares} is just $\|\textbf{r}\|^2$.
+
+\proposition{$\hat{\pmb\beta}_\text{LS}$ is Unbiased}
+We have that
+\[\begin{array}{rcl}
+\expect(\hat{\pmb\beta})&=&\expect(\textbf{R}^{-1}\textbf{Q}^T\textbf{y})\\
+&=&\textbf{R}^{-1}\textbf{Q}^T\expect(\textbf{y})\\
+&=&\textbf{R}^{-1}\textbf{Q}^T\textbf{X}\pmb\beta\\
+&=&\textbf{R}^{-1}\textbf{Q}^T\textbf{Q}\textbf{R}\pmb\beta\\
+&=&\pmb\beta
+\end{array}\]
+Thus $\hat{\pmb\beta}_\text{LS}$ is unbiased.\\
+
+\proposition{Variance of $\hat{\pmb\beta}_\text{LS}$}
+We have $\Sigma_\textbf{y}=I\sigma^2$.\\
+Thus $\Sigma_\textbf{f}=\textbf{Q}^T\textbf{Q}\Sigma_\textbf{y}=\textbf{Q}^T\textbf{Q}I\sigma^2=I\sigma^2$.\\
+Hence
+$$\Sigma_{\hat\beta}=\textbf{R}^{-1}\textbf{R}^{-T}\sigma^2$$
+
+\remark{Checking}
+In order to make inferences beyond estimating $\beta$ we need to check that our assumptions about $\varepsilon_i$ still hold.\\
+We can estimate these values as $\hat\varepsilon_i=y_i-\hat\mu_i$ where $\hat{\pmb\mu}=\textbf{X}\hat{\pmb\beta}$.\\
+Plotting these estimates, $\hat\varepsilon_i$, against fitted values, $\hat\mu_i$, allows us to look for systematic patterns in the mean of residuals, which would indicate a violation of the independence assumption
+
+\subsection{Gauss-Markov Theorem}
+
+\remarkk{Alternatives to Least-Squares Estimates}
+\begin{itemize}
+	\item[-] We may wish to find an estimate of $\beta$ which is as close to the real value as possible, so minimising $\|\hat\beta-\beta\|^2$. However it is possible the data gives a lot of information about $\beta_i$ but little about $\beta_j$, does it make sense to weight these equally.
+	\item[-] We could only allow \textit{unbiased estimators}, ie $\expect(\hat\beta)=\beta$. And then among those choose the one with least variance.
+\end{itemize}
+
+\theorem{Gauss-Markov Theorem}
+Define $\pmb\mu:=\expect(\textbf{Y})=\textbf{X}\pmb\beta$ and $\Sigma_y=\sigma^2I$.\\
+Let $\tilde\phi=\textbf{c}^T\textbf{Y}$ be any unbiased linear estimator of $\phi=\textbf{t}^T\pmb\beta$ where $\textbf{t}$ is an arbitrary vector. Then
+$$\var(\tilde\phi)\geq\var(\hat\phi)\text{ where }\hat\phi=\textbf{t}^T\hat{\pmb\beta_\text{LS}}\ \&\ \hat{\pmb\beta}_\text{LS}=\textbf{R}^{-1}\textbf{Q}^T\textbf{Y}$$
+Since $\textbf{t}$ is arbitraru, this implies that each element of $\hat{\pmb\beta}$ is a minimum variance unbiased estimator.\\
+
+\proof{Gauss-Markov Theorem}
+Since $\tilde\phi$ is a linear transformation of $\textbf{Y}$, $var(\tilde\phi)=\textbf{c}^T\textbf{c}\sigma^2$.\\
+To compare the variances of $\hat\phi$ and $\tilde\phi$ it is useful to express $\var(\hat\phi)$ in terms of $\textbf{c}$.\\
+Because $\tilde\phi$ is unbiased we have
+\[\begin{array}{rrcl}
+&\expect(\textbf{c}^T\textbf{Y})&=&\textbf{t}^T\pmb\beta\\
+\implies&\textbf{c}^T\expect(\textbf{Y})&=&\textbf{t}^T\pmb\beta\\
+\implies&\textbf{c}^T\textbf{X}\pmb\beta&=&\textbf{t}^T\pmb\beta\\
+\implies&\textbf{c}^T\textbf{X}&=&\textbf{t}^T
+\end{array}\]
+So the variance of $\hat\phi$ can be written as
+$$\var(\hat\phi)=\var(\textbf{t}^T\hat{\pmb\beta})=\var(\textbf{c}^T\textbf{X}\hat{\pmb\beta})=\var(\textbf{c}^T\textbf{QR}\hat{\pmb\beta})$$
+This is the variance of a linear transformation of $\hat{\pmb\beta}$ and the covariance matrix of $\hat{\pmb\beta}$ is $\textbf{R}^{-1}\textbf{R}^{-T}\sigma^2$.\\
+Thus
+$$\var(\hat\phi)=\var(\textbf{c}^T\textbf{QR}\hat{\pmb\beta})=\textbf{c}^T\textbf{QRR}^{-1}\textbf{R}^{-T}\textbf{R}^T\textbf{Q}^T\textbf{c}^T\sigma^2=\textbf{c}^T\textbf{QQ}^T\textbf{c}\sigma^2$$
+Hence
+$$\var(\tilde\phi)-\var(\hat\phi)=\textbf{c}^T(I-\textbf{QQ}^T)\textbf{c}\sigma^2$$
+Because the columns of $\textbf{Q}$ are orthogonal, $\textbf{QQ}^T=\textbf{QQ}^T\textbf{QQ}^T$ it follows that
+$$\textbf{c}^T(I-\textbf{QQ}^T)\textbf{c}=[(I-\textbf{QQ}^T)\textbf{c}]^T(I-\textbf{Q}\textbf{Q}^T)\textbf{c}\geq0$$
+since this is just the sum of squares of the elements of teh vector $(I-\textbf{QQ}^T)\textbf{c}$.\proved
+
+\remark{Least Squares Variance}
+Amongst unbiased and linear estimators in $\textbf{Y}$, least squares estimators have minimum variance.\\
+It is still possible that some non-linear estimator might be even better.
+
+\subsection{Further Inference on Linear Models}
+
+\remark{Requirements}
+In order to make further inferences about linear models (\eg confidence intervals \& hypothesis testing) we need to make our model completely probabilistic, since these inferences are probabilistic concepts.\\
+This requires us to specify a full distribution for the error $\pmb\varepsilon$.\\
+We assume
+\[\begin{array}{rcl}
+\pmb\varepsilon&\iid&\text{Normal}(0,I\sigma^2)\\
+\implies\textbf{y}&\sim&\text{Normal}(\textbf{X}\beta,I\sigma^2)\\
+\implies\hat{\pmb\beta}&\sim&\text{Normal}(\pmb\beta,\Sigma_{\hat\beta})\\
+\text{where }\Sigma_{\hat\beta}&=&R^{-1}R^{-T}\sigma^2
+\end{array}\]
+
+\theorem{$\dfrac{\hat\beta_i-\beta_i}{\hat\sigma_{\hat\beta_i}}\sim t_{n-p}$}
+
+\proof{Theorem 3.2}
+$\pmb{\mathcal{Q}}^T\textbf{y}$ is a linear transformation of a normal random vector, so is a normal random vector with covariance matrix
+$$\Sigma_{\pmb{\mathcal{Q}}^T\textbf{y}}=\pmb{\mathcal{Q}}^TI\pmb{\mathcal{Q}}\sigma^2=I\sigma^2$$
+The elements of $\pmb{\mathcal{Q}}^T\textbf{y}$ are mtually independent. Further
+\[\begin{array}{rcl}
+\expect\left[\begin{pmatrix}\textbf{f}\\\textbf{r}\end{pmatrix}\right]&=&\expect[\pmb{\mathcal{Q}}^T\textbf{y})\\
+&=&\pmb{\mathcal{Q}}^T\textbf{X}\pmb\beta\\
+&=&\begin{pmatrix}\textbf{R}\\\pmb0\end{pmatrix}\pmb\beta\\
+\implies\expect(\textbf{f})&=&\textbf{R}\pmb\beta\\
+\text{and }\expect(\textbf{r})&=&\pmb0
+\end{array}\]
+Thus
+$$\textbf{f}\sim\text{Normal}(\textbf{R}\pmb\beta,I_p\sigma^2)\text{ and }\textbf{r}\sim\text{Normal}(0,I_{n-p}\sigma^2)$$
+Now we can deduce
+\[\begin{array}{rrcl}
+&r_i&\overset{\text{ind}}{\sim}&\text{Normal}(0,\sigma^2)\\
+\implies&\frac{r_i}{\sigma}&\sim&\text{Normal}(0,1)\\
+\implies&\displaystyle{\sum_{i=1}^{n-p}\left(\frac{r_i}{\sigma}\right)^2}&\sim&\chi^2_{n-p}
+\end{array}\]
+Since $\expect(\chi^2_{n-p})=n-p$ we have that $\hat\sigma^2=\frac1{n-P}\|\textbf{r}\|^2$ is an unbiased estimator.\\
+Let $\sigma_{\hat\beta_i}=\sqrt{\Sigma_{\hat\beta_i}(i,i)}$ then $\hat\sigma_{\hat\beta_i}=\sqrt{\hat\Sigma_{\hat\beta_i}(i,i)}$ but $\hat\Sigma_{\hat\beta_i}=\Sigma_{\hat\beta_i}\frac{\hat\sigma^2}{\sigma^2}\implies\hat\sigma_{\hat\beta_i}\frac{\hat\sigma}{\sigma}$.\\
+Consider
+\[\begin{array}{rcl}
+\dfrac{\hat\beta_i-\beta_i}{\hat\sigma_{\beta_i}}&=&\dfrac{\hat\beta_i-\beta_i}{\sigma_{\hat\beta_i}\hat\sigma/\sigma}\\
+&=&\dfrac{(\hat\beta_i-\beta_i)/\sigma_{\hat\beta_i}}{\sqrt{\frac1{\sigma^2}\|\textbf{r}\|^2/(n-p)}}\\
+&\sim&\dfrac{\text{Normal}(0,1)}{\sqrt{\chi^2_{n-p}/(n-p)}}\\
+&\sim&t_{n-p}
+\end{array}\]
+
+\proposition{Confidence Intervals for $\beta_i$}
+Supose we want a $(1-2\alpha)100\%$ confidence interval for $\beta_i$.\\
+Then
+\[\begin{array}{rcl}
+\prob\left(-t_{n-p}(\alpha)<\dfrac{\hat\beta_i-\beta_i}{\hat\sigma_{\hat\beta_i}}<t_{n-p}(\alpha)\right)&=&\prob\left(\hat\beta_i-t_{n-p}(\alpha)\sigma_{\hat\beta_i}<\beta_i<\hat\beta_i+t_{n-p}(\alpha)\sigma_{\hat\beta_i}\right)\\
+&=&1-2\alpha
+\end{array}\]
+where $\prob(t_{n-p}(\alpha)\geq t_{n-p})=1-\alpha$.\\
 
 \newpage
 \setcounter{section}{-1}
@@ -300,6 +414,8 @@ $$\hat\beta_\text{LS}=R^{-1}\textbf{f}$$
 \definition{Upper Triangular Matrix}
 
 \definition{Orthogonal Matrix}
+
+\definition{$p$-Value}
 
 \subsection{Probability}
 
