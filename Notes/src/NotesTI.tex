@@ -401,6 +401,69 @@ Then
 \end{array}\]
 where $\prob(t_{n-p}(\alpha)\geq t_{n-p})=1-\alpha$.\\
 
+\subsection{Geometry of Linear Models}
+
+\remark{Least Squares Estimation as Geometry}
+\textit{Least Squares Estimation} of linear models is the same as finding the orthogonal projection of the response vector $\textbf{y}\in\reals^n$ onto the $p$-dimensional linear subspace spanned by the columns of $\X\in\reals^{n\times p}$.\\
+By the linear model $\expect(\textbf{y})$ lies in the space spanned by all possible linear combinations of the columns of $\X$ \& least squares find the point in that space that is cloests to $\textbf{y}$ in \textit{Euclidean Distance}.\\
+
+\remark{Projection Matrix}
+Consider the \textit{Projection Matrix} that maps the response data $\textbf{y}$ to the fitted values $\hat{\pmb\mu}$.\\
+We have that
+$$\hat{\pmb\mu}=\X\hat{\pmb\beta}=\textbf{QRR}^{-1}\textbf{Q}^T\textbf{y}=\textbf{QQ}^T\textbf{y}$$
+Thus the projection matrix is $\textbf{A}=\textbf{QQ}^T$.\\
+\nb Often $\textbf{A}$ is referred to as the \textit{Influence Matrix} or \textit{Hat Matrix}.\\
+
+\proposition{Projection Matrix Idempotent}
+Let \textbf{A} be the \textit{Projection Matrix} of a \textit{Linear Model}.\\
+$\textbf{A}$ is said to be \textit{Idempotent} since $\textbf{A}=\textbf{AA}$.\\
+This is since the orthogonal projection of $\hat{\pmb\mu}$ onto the column space of $\X$ must be $\hat{\pmb\mu}$.\\
+
+\subsection{Results in terms of Model Matrix, $\X$}
+
+\propositionn{Results in terms of Model Matrix, $\X$}
+\[\begin{array}{rclcrclcrcl}
+\Sigma_{\hat\beta}&=&(\X^T\X)^{-1}\sigma^2&\quad&\hat{\pmb\beta}&=&(\X^T\X)^{-1}\X^T\textbf{y}&\quad&\textbf{A}&=&\X(\X^T\X)^{-1}\X^T\\
+&=&(\textbf{R}^T\textbf{Q}^T\textbf{QR})^{-1}\sigma^2&&&=&\textbf{R}^{-1}\textbf{R}^{-T}\textbf{R}^T\textbf{Q}^T\textbf{y}\\
+&=&(\textbf{R}^T\textbf{R}^{-1}\sigma^2&&&=&\textbf{R}^{-1}\textbf{Q}^T\textbf{y}\\
+&=&\textbf{R}^{-1}\textbf{R}^{-T}\sigma^2&&&=&\textbf{R}^{-1}\textbf{f}\\
+\end{array}\]
+
+\subsection{Bayesian Analysis}
+
+\remark{Bayesian Analysis of Linear Models}
+To perfor a full \textit{Bayesian Analysis} of a \textit{Linear Model} we need to define prior distributions for $\pmb\beta$ and $\sigma^2$. Typically
+In order to make this problem analytically tractable we use conjugate priors. Conjugacy can be used for defining
+$$\pmb\beta\sim\text{Normal}(\pmb\beta_0,\pmb\psi^{-1})\quad\text{and}\quad\tau\sim\Gamma(a,b)$$
+where $tau:=\frac1{\sigma^2}$ is precision measure.\\
+Here $a,b,\pmb\beta_0\text{ and }\pmb\psi$ are quantities which we need to define values for, for practical analysis.\\
+This gives us the following distributions
+\[\begin{array}{rcl}
+f(\textbf{y},\pmb\beta,\tau)&\propto&{\displaystyle\tau^{n/2}e^{-\frac{\tau}{2}\|\textbf{y}-\X\pmb\beta\|^2}e^{-\frac12(\pmb\beta-\pmb\beta_0)^T\pmb\psi(\pmb\beta-\pmb\beta_0)}e^{-b\tau}\tau^{a-1}}\\
+f(\tau|\pmb\beta,\textbf{y})&\propto&{\displaystyle\tau^{\frac{n}2+a-1}e^{-\tau(b+\frac12\|\textbf{y}-\X\pmb\beta\|^2)}}\\
+&\sim&{\displaystyle\Gamma(\frac{n}2+a,b+\frac12\|\textbf{y}-\X\pmb\beta\|^2)}\\
+f(\pmb\beta|\tau,\textbf{y})&\propto&e^{-\frac12(\pmb\beta^T\X^T\X\pmb\beta\tau-2\beta\X^T\textbf{y}\tau+\pmb\beta^T\pmb\psi\pmb\beta-2\pmb\beta^T\pmb\psi\pmb\beta_0)}\\
+&\propto&e^{-\frac12[\pmb\beta-(\X^T\X\tau+\pmb\psi)^{-1}(\tau\X^T\textbf{y}+\pmb\psi\pmb\beta_0)]^T(\X^T\X\tau+\pmb\psi)\pmb\beta-(\X^T\X\tau+\pmb\psi)^{-1}(\tau\X^T\textbf{y}+\pmb\psi\pmb\beta_0)]}\\
+&\sim&\text{Normal}[(\X^T\X\tau+\pmb\psi)^{-1}(\tau\X^T\textbf{y}+\pmb\psi\pmb\beta+0),(\X^T\X\tau+\pmb\psi)^{-1}]
+\end{array}\]
+If either the sample size tends to infinity (\ie $n\to\infty$) or the prior precision matrix tends to the zero matrix then
+$$f(\pmb\beta|\tau,\textbf{y})\overset\to\sim\text{Normal}(\hat{\pmb\beta},(\X^T\X)^{-1}\sigma^2)$$
+\nb We have not produced the joint distribution $\pmb\beta,\tau|\textbf{y}$ but just two conditionals.\\
+
+\remark{Proceeding from Conditionals}
+There are a few options to proceed from the results in \textbf{Remark 3.8}
+\begin{enumerate}
+	\item Iteratively find the posteior modes of $\pmb\beta$ given teh estiamte mode of $\tau$ and the posterior mode of $\tau$ given the estimated modes of $\pmb\beta$ until the mode of $\tau$ connverges.\\
+	Then plug this into the conditional density of $\pmb\beta$.
+	\item Integrate $\pmb\beta$ out of $f(\tau|\pmb\beta,\textbf{y})$ to obtain the marginal likelihood $f(\tau|\textbf{y})$ which can be maximised to find $\hat\tau$.\\
+	$\hat\tau$ can be plugged into $f(\pmb\beta|\tau,\textbf{y})$.
+	\nb Also known as \textit{Empirical Bayes}.
+	\item Alternate simulate of $\pmb\beta$ from $f(\pmb\beta|\tau,\textbf{y})$ given $tau$ with simulation from $f(\tau|\pmb\beta,\textbf{y})$, given the last simulated $\pmb\beta$, to generate joint draws of $\tau\ \&\ \pmb\beta$ from $f(\pmb\beta,\tau|\textbf{y})$.\\
+	\nb Also known as \textit{Gibbs Sampling}.
+\end{enumerate}
+
+\section{Causality, Confounding \& Randomisation}
+
 \newpage
 \setcounter{section}{-1}
 \section{Reference}
@@ -416,6 +479,8 @@ where $\prob(t_{n-p}(\alpha)\geq t_{n-p})=1-\alpha$.\\
 \definition{Orthogonal Matrix}
 
 \definition{$p$-Value}
+
+\definition{Euclidean Distance}
 
 \subsection{Probability}
 
