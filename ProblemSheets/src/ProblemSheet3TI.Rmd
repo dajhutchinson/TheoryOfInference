@@ -1,0 +1,129 @@
+---
+title: "Problem Sheet 3"
+subtitle: "Theory of Inference"
+author: "Dom Hutchinson"
+header-includes:
+   - \usepackage{dsfont}
+   - \usepackage{fancyhdr}
+   - \pagestyle{fancy}
+   - \renewcommand{\headrulewidth}{0pt}
+   - \fancyhead[L]{Dom Hutchinson}
+   - \fancyhead[C]{Theory of Inference - Problem Sheet 3}
+   - \fancyhead[R]{\today}
+   - \newcommand{\dotprod}[0]{\boldsymbol{\cdot}}
+   - \newcommand{\cosech}[0]{\mathrm{cosech}\ }
+   - \newcommand{\cosec}[0]{\mathrm{cosec}\ }
+   - \newcommand{\sech}[0]{\mathrm{sech}\ }
+   - \newcommand{\prob}[0]{\mathbb{P}}
+   - \newcommand{\nats}[0]{\mathbb{N}}
+   - \newcommand{\cov}[0]{\mathrm{Cov}}
+   - \newcommand{\var}[0]{\mathrm{Var}}
+   - \newcommand{\expect}[0]{\mathbb{E}}
+   - \newcommand{\reals}[0]{\mathbb{R}}
+   - \newcommand{\integers}[0]{\mathbb{Z}}
+   - \newcommand{\indicator}[0]{\mathds{1}}
+   - \newcommand{\nb}[0]{\textit{N.B.} }
+   - \newcommand{\ie}[0]{\textit{i.e.} }
+   - \newcommand{\eg}[0]{\textit{e.g.} }
+   - \newcommand{\X}[0]{\textbf{X}}
+   - \newcommand{\x}[0]{\textbf{x}}
+   - \newcommand{\iid}[0]{\overset{\text{iid}}{\sim}}
+   - \newcommand{\proved}[0]{$\hfill\square$\\}
+output:
+  pdf_document: 
+     fig_width: 6
+     fig_height: 4
+  html_notebook: default
+  html_document: default
+  word_document: default
+---
+# Question 1
+
+## Part a)
+\[\begin{array}{rrrl}
+&\|\tilde{\textbf{y}}-\tilde{\textbf{X}}\beta\|^2&=&\sum_i(\tilde{y}_i-\sum_j\tilde{X}_{ij}\beta_j)^2\\
+&&=&\sum_i(W_{ii}y_i-\sum_jW_{ii}X_{ij}\beta_j)^2\\
+&&=&\sum_iW_{ii}^2(y_i-\sum_jX_{ij}\beta_j)^2\\
+\text{Define}&W_{ij}&:=&\begin{cases}\frac1{\sqrt{n_{se(i)}}}&i\equiv j\\0&\text{otherwise}\end{cases}\\
+\implies&\|\tilde{\textbf{y}}-\tilde{\textbf{X}}\beta\|^2&=&\sum_i\frac1{\sqrt{n_{se(i)}}}(y_i-\sum_j X_{ij}\beta_j)^2
+\end{array}\]
+
+## Part b)
+\[\begin{array}{rrcl}
+\text{We have }&\|\tilde{\textbf{y}}-\tilde{X}\beta\|^2&=&(\tilde{\textbf{y}}-\tilde{X}\beta)^T(\tilde{\textbf{y}}-\tilde{X}\beta)\\
+&&=&(y-X\beta)^TW^2(y-X\beta)\\
+&&=&y^TW^2y-y^TW^2X\beta-\beta^TX^TW^2y+\beta^TX^TW^2X\beta\\
+\implies&\frac\partial{\partial\beta}\|\tilde{\textbf{y}}-\tilde{X}\beta\|&=&-X^TW^2y-X^TW^2y+2X^TW^2X\beta\\
+\text{Setting}&0&=&\frac\partial{\partial\beta}\|\tilde{\textbf{y}}-\tilde{X}\beta\|\\
+\implies&0&=&2(X^TW^2X\hat\beta_\text{WLS}+X^TW^2X\hat{\beta}_\text{WLS})\\
+\implies&\hat{\beta}_\text{WLS}&=&(X^TW^2X)^{-1}X^TW^2y\\
+\implies&\expect[\hat{\beta}_\text{WLS}]&=&\expect((X^TW^2X)^{-1}X^TW^2y)\\
+&&=&(X^TW^2X)^{-1}X^TW^2\expect(y)\\
+&&=&(X^TW^2X)^{-1}X^TW^2X\beta\\
+&&=&\beta
+\end{array}\]
+Since $\expect(\hat\beta_\text{WLS})=\beta$ then $\hat\beta_\text{WLS}$ is an unbiased estimator of $\beta$.
+
+## Part c)
+Since this estimator is unbiased and fulfils all the residual assumptions I would recommend the weighted least squares estimator here as it takes into account more information than a standard least squares estimator.
+
+# Question 2
+Model doesn't account for the fact that the markets close at night. There are likely to be sizable changes in the price of a share between closing and opening of the markets. This could be seen by regular spikes in model residual values at the start of each day.
+
+# Question 3
+
+## Part a)
+If we know that an observation is not in group one or two, then it most be in group three. Thus the groups are not independent \& the model matrix is rank deficient. This means we cannot invert the matrix.
+
+## Part b)
+```{r}
+m1<-lm(weight ~ group,data=PlantGrowth)
+```
+In this interpretation value which is the expected value for observations in $\mathtt{ctrl}$ group. There are then two binary variables which state whether the observation was made from $\mathtt{grouptrt1}$ or $\mathtt{grouptrt2}$ (these are not independent). The parameters associated with each of these variables is the expected difference in $\mathtt{weight}$ for observations in that group, compared to $\mathtt{ctrl}$.
+
+## Part c)
+$H_0:\pmb\beta=\begin{pmatrix}\mu\\0\\0\end{pmatrix}$ against $H_1:\pmb\beta\neq\begin{pmatrix}\mu\\0\\0\end{pmatrix}$.
+```{r}
+anova(m1)
+```
+We reject null hypothesis at the 5% level. Thus concludinf that $\mathtt{group}$ is needed in the model.\
+It uses the results in second $3.4.4$ of the notes, in particular
+$$F=\dfrac{(RSS_0-RSS_1)/q}{RSS_1/(n-p)}$$
+where $n=30,\ p=3,\ q=3$. $TODO check this
+
+## Part d)
+```{r}
+m0<-lm(weight~1,data=PlantGrowth)
+anova(m0,m1)
+```
+Same result as in part c).
+
+## Part e)
+```{r}
+summary(m1)
+```
+$H_0:\pmb\beta=\pmb0$ against $H_1:\pmb\beta\neq\pmb0$. The $p$-Value is unchanged.
+
+## Part f)
+We have that
+$$\dfrac{\hat\beta_2-\beta_i}{\hat\sigma_{\hat\beta_2}}\sim t_{27}$$
+Thus
+\[\begin{array}{rcl}
+1-2\alpha&=&\prob\left(-t_{27}(\alpha)<\dfrac{\hat\beta_2-\beta_i}{\hat\sigma_{\hat\beta_2}}<t_{27}(\alpha)\right)\\
+&=&\prob(\hat\beta_2-t_{27}(\alpha)\hat\sigma_{\hat\beta_2}<\beta_2<\hat\beta_2+t_{27}(\alpha)\hat\sigma_{\hat\beta_2})
+\end{array}\]
+In this scenario we have that
+\[\begin{array}{rcl}
+\hat\beta_2&=&\bar{x}_\text{trt2}-\bar{x}_\text{ctrl}\\
+&=&5.525-5.032\\
+&=&0.4940\\
+\hat{\sigma}^2_{\hat\beta_2}&=&\frac1{10-1}\sum_{i=1}^{10}(y_i-\hat{y}_i)^2\\
+&=&\frac{1}{9}1.76284\\
+&=&0.1959\\
+\implies\hat\sigma_{\hat\beta_2}&=&0.4425733
+\end{array}\]
+Giving us the following $90\%$ confidence interval for difference between treatment 2 and the control
+\[\begin{array}{rl}
+[0.4940-1.703\cdot0.4425733,0.4940+1.703\cdot0.4425733]\\
+=&[-0.272,4.342]
+\end{array}\]
