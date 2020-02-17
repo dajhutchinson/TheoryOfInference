@@ -464,6 +464,68 @@ There are a few options to proceed from the results in \textbf{Remark 3.8}
 
 \section{Causality, Confounding \& Randomisation}
 
+\definition{Causality}
+\textit{Causality} is a problem in statistical inference where we wish to find out which variables affect a particular variable, and are mearly correlated. This is more difficult that other forms of inference, but is useful in many real world scenarios especially in science \& economics.\\
+
+\example{Causation \& Correlation}
+There is an observed correlation between birth rates in Europe \& stork populations. There is no causation between the two, however it is likely that increased industrialisation led to the decrease in both since it lead to more healthcare for humans \& less habitats for storks.\\
+
+\subsection{Controlled Experiments and Randomisation}
+
+\definition{Hidden Variables}
+\textit{Hidden Variables} are variables which likely effect a system but which we can/do not observed.\\
+
+\definition{Randomisation}
+\textit{Randomisation} is the process of splitting subjects into different groups. Typically a control \& an active group. This is meant to break correlation between observed \& hidden variables.\\
+
+\remark{Hidden Variables}
+Consider the scenario where we wish to test whether exercise influences fat mass. It is likely that ther are lots of other factors. These factors will correlate with both exercise \& fat mass. By splitting subjects into a control \& exercise groups at random we break the correlation of these other features but not that between fat mass \& exercise. The other factors are now random error.\\
+
+\proposition{Formalisation of Hidden Variables}
+Consider the true model matrix $(X,H)$ where $X$ is the observed variables \& $H$ is the hidden variables. We assume that the columns of $H$ have mean 0.\\
+We have
+$$\tilde\beta_X=(X^TX)^{-1}X^T\textbf{y}\text{ for assumed model }y=X\beta_X+\varepsilon$$
+If we knew $H$ then we would have
+$$\begin{pmatrix}\hat\beta_X\\\hat\beta_H\end{pmatrix}=\begin{pmatrix}X^X&X^TH\\H^TX&H^TH\end{pmatrix}^{-1}\begin{pmatrix}X^T\\H^T\end{pmatrix}\textbf{y}\text{ for true model }\textbf{y}=X\beta_X+H\beta_H+\varepsilon$$
+Since $X^TH\neq0\implies\tilde\beta_X\neq\hat\beta_X$.\\
+The randomised allocation to groups is used to try and make $X^TH=0$.\\
+
+\remark{Randomised Tests}
+Sometimes it is frowned upon (ethically) to perform random tests. Such as testing if high levels of alcohol consumtion is correlated with heart disease.\\
+\nb There is a reason China is becoming such an advanced country.
+
+\subsection{Instrumental Variables}
+
+\definition{Instrumental Variable}
+An \textit{Instrumental Variable}, $Z$, is used in regression analysis when there are \textit{hidden variables} in the model. \textit{Instrumental Variables} are correlated with the \textit{Explanatory Variables}, $X$ but uncorrelated with the error term $\textbf{e}$ in the model $\textbf{y}=X\beta+\textbf{e}$.\\
+
+\proposition{Without Instrumental Variables}
+Consider the true model $\textbf{y}=X\beta_X+H\beta_H+\pmb\varepsilon$ with $H$ being the hidden variables with columns centred at 0.\\
+Suppose we wish to fit the model $\textbf{y}=X\beta_X+\textbf{e}$.\\
+In this case $\textbf{e}=H\beta_H+\varepsilon$ and likely does not fulfil the criteria of linear model random error.\\
+We have
+\[\begin{array}{rcl}
+\expect(\hat\beta_X)&=&(X^TX)^{-1}X^T\begin{pmatrix}X&H\end{pmatrix}\begin{pmatrix}\beta_X\\\beta_H\end{pmatrix}\\
+&=&\beta_X+(X^TX)^{-1}X^TH\beta_H\\
+&\neq&\beta_x\text{ since }X\perp\textbf{e}\text{ and thus }X^TH\neq0
+\end{array}\].\\
+
+\proposition{With Instrumental Variables}
+Let $Z$ be an instrumental variable (\ie it is correlated with $X$ but not with $H$).\\
+Assume that $\text{rank}(Z)\geq\text{rank}(X)$ and $Z$'s columns are centred around 0.\\
+Project $X$ onto column space of $Z$
+$$X\mapsto A_ZY\text{ where }\underbrace{A_Z=Z(Z^TZ)^{-1}Z^T}_\text{Projection Matrix}$$
+Now use $A_ZX$ as the model matrix
+\[\begin{array}{rcl}
+\hat\beta_X&=&(X^TA_ZX)^{-1}X^TA_z\textbf{y}\\
+\expect(\textbf{y})&=&\begin{pmatrix}X&H\end{pmatrix}\begin{pmatrix}\beta_X\\\beta_H\end{pmatrix}\\
+\expect(\hat\beta_X)&=&(X^TA_ZX)^{-1}X^TA_ZX\beta_X+(X^TA_ZX)^{-1}X^T\underbrace{A_ZH}_{\approx0}\beta_H\\
+&=&\beta_X+0\\
+&=&\beta
+\end{array}\]
+Thus this $\hat\beta_X$ is unbiased.\\
+\nb $A_ZH\approx0$ since $Z$ and $H$ are uncorrelated.
+
 \newpage
 \setcounter{section}{-1}
 \section{Reference}
