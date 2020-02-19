@@ -1,0 +1,160 @@
+---
+title: "Problem Sheet 4"
+subtitle: "Theory of Inference"
+author: "Dom Hutchinson"
+header-includes:
+   - \usepackage{dsfont}
+   - \usepackage{fancyhdr}
+   - \pagestyle{fancy}
+   - \renewcommand{\headrulewidth}{0pt}
+   - \fancyhead[L]{Dom Hutchinson}
+   - \fancyhead[C]{Theory of Inference - Problem Sheet 4}
+   - \fancyhead[R]{\today}
+   - \newcommand{\dotprod}[0]{\boldsymbol{\cdot}}
+   - \newcommand{\cosech}[0]{\mathrm{cosech}\ }
+   - \newcommand{\cosec}[0]{\mathrm{cosec}\ }
+   - \newcommand{\sech}[0]{\mathrm{sech}\ }
+   - \newcommand{\prob}[0]{\mathbb{P}}
+   - \newcommand{\nats}[0]{\mathbb{N}}
+   - \newcommand{\cov}[0]{\mathrm{Cov}}
+   - \newcommand{\var}[0]{\mathrm{Var}}
+   - \newcommand{\expect}[0]{\mathbb{E}}
+   - \newcommand{\reals}[0]{\mathbb{R}}
+   - \newcommand{\integers}[0]{\mathbb{Z}}
+   - \newcommand{\indicator}[0]{\mathds{1}}
+   - \newcommand{\nb}[0]{\textit{N.B.} }
+   - \newcommand{\ie}[0]{\textit{i.e.} }
+   - \newcommand{\eg}[0]{\textit{e.g.} }
+   - \newcommand{\X}[0]{\textbf{X}}
+   - \newcommand{\x}[0]{\textbf{x}}
+   - \newcommand{\iid}[0]{\overset{\text{iid}}{\sim}}
+   - \newcommand{\proved}[0]{$\hfill\square$\\}
+output:
+  pdf_document: 
+     fig_width: 6
+     fig_height: 4
+  html_notebook: default
+  html_document: default
+  word_document: default
+---
+```{r}
+set.seed(16111998)
+```
+
+# Question 1
+
+```{r}
+conf <- read.table("data/confound.txt")
+
+# Instrumental variables
+Zx<-fitted(lm(x~v+w-1,data=conf))
+Zz<-fitted(lm(z~v+w-1,data=conf))
+
+m<-lm(y~Zx+Zz,data=conf)
+summary(m)
+```
+$\beta_1=1$ and $\beta_2=2$.
+
+# Question 2
+<!-- https://thepoliticalmethodologist.com/2015/07/13/why-cant-we-just-make-up-instrumental-variables/ -->
+Instrumental variables should be independent of the random error related to the observed variables. However, by generating our instrumental variable using the observed data this no longer holds \& we have failed to break the correlation with the hidden random error.
+
+
+# Question 3
+$RSE=\sqrt{RSS/\text{df}}\implies RSS=\text{df}\cdot RSE^2$. Thus\
+$RSS_0=98\cdot(0.3009)^2=`r 98*(0.3009^2)`$.\
+$RSS_1=95\cdot(0.3031)^2=`r 95*(0.3031^2)`$
+
+## Part a)
+\[\begin{array}{rrl}
+F&=&\dfrac{(RSS_0-RSS_1)/q}{RSS_1/(n-p)}\\
+&=&\dfrac{(`r 98*(0.3009^2)`-`r 95*(0.3031^2)`)/(98-95)}{`r 95*(0.3031^2)`/95}\\
+&=&`r ((98*(0.3009^2)-95*(0.3031^2))/(98-95))/(95*(0.3031^2)/95)`
+\end{array}\]
+
+## Part b)
+
+$$p=\prob(F_{3,95}>`r ((98*(0.3009^2)-95*(0.3031^2))/(98-95))/(95*(0.3031^2)/95)`)=`r 1-pf(((98*(0.3009^2)-95*(0.3031^2))/(98-95))/(95*(0.3031^2)/95),3,95)`$$
+
+## Part c)
+
+# Question 4
+
+## Part a)
+```{r}
+X<-model.matrix(~cars$speed+I(cars$speed^2)) # 1 s s^2
+y<-cars$dist
+head(X)
+```
+
+## Part b)
+```{r}
+# p=3, n=50
+qrx<-qr(X) # QR decomposition
+Q  <-qr.Q(qrx,complete=TRUE) # extract Q, nxn orthogonal matrix
+R  <-qr.R(qrx) # extract R, pxp upper triangular matrix
+```
+
+## Part c)
+```{r}
+all.equal(
+   t(Q),
+   solve(Q)
+   )
+
+x<-runif(dim(Q)[1]) # Generate random n matrix
+all.equal(
+   sum((Q%*%x)^2),
+   sum(x^2)
+   )
+```
+<!-- TODO Why does this happen? -->
+
+## Part d)
+```{r}
+n=dim(Q)[1]; p=dim(R)[1]
+f=head(t(Q)%*%y,p)
+r=tail(t(Q)%*%y,n-p)
+```
+
+## Part e)
+```{r}
+beta_hat=solve(R)%*%f
+beta_hat
+```
+
+## Part f)
+```{r}
+all.equal(
+   sum(r^2),
+   sum((y-X%*%beta_hat)^2)
+   )
+```
+
+## Part g)
+```{r}
+sigma_hat2=sum(r^2)/(n-p)
+sigma_hat2
+```
+
+## Part h)
+```{r}
+Sigma_beta_hat=solve(R)%*%t(solve(R))*sigma_hat2
+Sigma_beta_hat
+```
+
+## Part i)
+```{r}
+lm.fit<-lm(dist~speed+I(speed^2),data=cars)
+beta_hat.fit<-coef(lm.fit)
+Sigma_beta_hat.fit<-vcov(lm.fit)
+
+all.equal(
+   as.numeric(beta_hat.fit),
+   as.numeric(beta_hat)
+   )
+all.equal(
+   as.numeric(Sigma_beta_hat.fit),
+   as.numeric(Sigma_beta_hat)
+   )
+```
