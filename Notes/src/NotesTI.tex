@@ -526,6 +526,49 @@ Now use $A_ZX$ as the model matrix
 Thus this $\hat\beta_X$ is unbiased.\\
 \nb $A_ZH\approx0$ since $Z$ and $H$ are uncorrelated.
 
+\section{Maximum Likelihood Estimation}
+
+\definition{Maximum Likelihood Estimation}
+A \textit{Maximum Likelihood Estimate} is the estimated value of a parameter which maximises some likelihood function, wrt observed data.
+$$\hat{\pmb\theta}_\text{MLE}=\text{argmax}_\theta\ell(\pmb\theta)\text{ where }\ell(\cdot):=\ln f(\textbf{y}|\pmb\theta)$$
+
+\remark{MLEs are only unbiased for large sample sizes}
+
+\proposition{MLE - Frequentist Approach}
+In the \textit{Frequentist Approach} parameters are fixed states of natire and teh uncertainty comes from our estimates of these parameters.\\
+We define the \textit{Likelihood Function} to be the probability of observing certain values given the parameters have certain values
+$$L(\pmb\theta)=f(\textbf{y}|\pmb\theta)\text{ where }\textbf{y}\text{ is fixed}$$
+Note that the natural log of the likelihood function is increasing wrt it so they have the same maximum.\\
+Thus we define the \textit{Maximum Likelihood Estimate} to be the set of parameters which maximise the \textit{Log-Likelihood Function}
+$$\hat{\pmb\theta}_\text{MLE}=\text{argmax}_\theta\ell(\pmb\theta)\text{ where }\ell(\cdot):=\ln f(\textbf{y}|\pmb\theta)$$
+
+\remark{Effectiveness of MLE}
+We have that
+$$\hat{\pmb\theta}_\text{MLE}\underset{n\to\infty}{\sim}\text{Normal}(\pmb\theta,\pmb{\mathcal{I}}^{-1})\text{ where }\pmb{\mathcal{I}}^{-1}:=-\expect\left(\frac{\partial^2\ell}{\partial\pmb\theta\partial\pmb\theta^T}\right)$$
+This is the best that can be achieved for an unbiased estimator.
+
+\definition{Nested Models}
+Two models are said to be \textit{Nested Models} if one can be expressed as the other model subject to some restrictions, $\textbf{R}$, on its parameters, $\pmb\theta$, which are written as $R(\pmb\theta)=\pmb0$.\\
+
+\proposition{}
+Consider wishing to compare two nested models.\\
+Let $\hat{\pmb\theta}_0$ denote the MLE of $\pmb\theta$ under the restrictions of the nested model.\\
+We want to test $H_0:\textbf{R}(\pmb\theta)=\textbf{0}$.\\
+If this null hypothesis is true then
+$$2[\ell(\hat{\pmb\theta})-\ell(\hat{\pmb\theta}_0]\sim\chi^2_r\text{ where }r=|\text{restrictions}|$$
+
+\example{}
+Consider the following model with a single parameter $\beta$
+$$y_i\sim\text{Poisson}(e^{\beta x_i})$$
+Let $\{(x_1,y_1),\dots,(x_n,y_n)\}$.\\
+For our model we have $f(y_i)=\dfrac{(e^{\beta x_i})^{y_i}e^{-e^{\beta x_i}}}{y_i!}$.\\
+Thus
+\[\begin{array}{rcl}
+L(\beta)&=&\displaystyle{\prod_{i=1}^n\dfrac{(e^{\beta x_i})^{y_i}e^{-e^{\beta x_i}}}{y_i!}}\\
+\implies\ell(\beta)&=&\sum_{i=1}^ny_i\beta x_i-e^{\beta x_i}-\ln y_i!
+\end{array}\]
+By taking the derivative of $\ell(\cdot)$ and finding the stationary points we identify $\hat\beta_\text{MLE}=2.41$.
+
 \newpage
 \setcounter{section}{-1}
 \section{Reference}
