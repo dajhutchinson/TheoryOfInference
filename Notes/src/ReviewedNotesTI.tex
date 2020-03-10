@@ -1,0 +1,553 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in, paperwidth=8.3in, paperheight=11.7in]{geometry}
+\usepackage[ruled, vlined, linesnumbered]{algorithm2e}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{dsfont}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{changepage} 
+
+\begin{document}
+
+\pagestyle{fancy}
+\setlength\parindent{0pt}
+\allowdisplaybreaks
+
+\renewcommand{\headrulewidth}{0pt}
+\setlist[enumerate,1]{label={\roman*)}}
+
+% Cover page title
+\title{Theory of Inference - Reviewed Notes}
+\author{Dom Hutchinson}
+\date{\today}
+\maketitle
+
+% Header
+\fancyhead[L]{Dom Hutchinson}
+\fancyhead[C]{Theory of Inference - Reviewed Notes}
+\fancyhead[R]{\today}
+
+% Counters
+\newcounter{definition}[section]
+\newcounter{example}[section]
+\newcounter{notation}[section]
+\newcounter{proposition}[section]
+\newcounter{proof}[section]
+\newcounter{remark}[section]
+\newcounter{theorem}[section]
+
+% commands
+\newcommand{\dotprod}[0]{\boldsymbol{\cdot}}
+\newcommand{\cosech}[0]{\mathrm{cosech}\ }
+\newcommand{\cosec}[0]{\mathrm{cosec}\ }
+\newcommand{\sech}[0]{\mathrm{sech}\ }
+\newcommand{\prob}[0]{\mathbb{P}}
+\newcommand{\nats}[0]{\mathbb{N}}
+\newcommand{\cov}[0]{\mathrm{Cov}}
+\newcommand{\var}[0]{\mathrm{Var}}
+\newcommand{\expect}[0]{\mathbb{E}}
+\newcommand{\reals}[0]{\mathbb{R}}
+\newcommand{\integers}[0]{\mathbb{Z}}
+\newcommand{\indicator}[0]{\mathds{1}}
+\newcommand{\nb}[0]{\textit{N.B.} }
+\newcommand{\ie}[0]{\textit{i.e.} }
+\newcommand{\eg}[0]{\textit{e.g.} }
+\newcommand{\X}[0]{\textbf{X}}
+\newcommand{\x}[0]{\textbf{x}}
+\newcommand{\iid}[0]{\overset{\text{iid}}{\sim}}
+\newcommand{\proved}[0]{$\hfill\square$\\}
+\newcommand{\argmin}[0]{\text{argmin}}
+\newcommand{\argmax}[0]{\text{argmax}}
+
+\newcommand{\definition}[1]{\stepcounter{definition} \textbf{Definition \arabic{section}.\arabic{definition}\ - }\textit{#1}\\}
+\newcommand{\definitionn}[1]{\stepcounter{definition} \textbf{Definition \arabic{section}.\arabic{definition}\ - }\textit{#1}}
+\newcommand{\proof}[1]{\stepcounter{proof} \textbf{Proof \arabic{section}.\arabic{proof}\ - }\textit{#1}\\}
+\newcommand{\prooff}[1]{\stepcounter{proof} \textbf{Proof \arabic{section}.\arabic{proof}\ - }\textit{#1}}
+\newcommand{\example}[1]{\stepcounter{example} \textbf{Example \arabic{section}.\arabic{example}\ - }\textit{#1}\\}
+\newcommand{\examplee}[1]{\stepcounter{example} \textbf{Example \arabic{section}.\arabic{example}\ - }\textit{#1}}
+\newcommand{\notation}[1]{\stepcounter{notation} \textbf{Notation \arabic{section}.\arabic{notation}\ - }\textit{#1}\\}
+\newcommand{\notationn}[1]{\stepcounter{notation} \textbf{Notation \arabic{section}.\arabic{notation}\ - }\textit{#1}}
+\newcommand{\proposition}[1]{\stepcounter{proposition} \textbf{Proposition \arabic{section}.\arabic{proposition}\ - }\textit{#1}\\}
+\newcommand{\propositionn}[1]{\stepcounter{proposition} \textbf{Proposition \arabic{section}.\arabic{proposition}\ - }\textit{#1}}
+\newcommand{\remark}[1]{\stepcounter{remark} \textbf{Remark \arabic{section}.\arabic{remark}\ - }\textit{#1}\\}
+\newcommand{\remarkk}[1]{\stepcounter{remark} \textbf{Remark \arabic{section}.\arabic{remark}\ - }\textit{#1}}
+\newcommand{\theorem}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{section}.\arabic{theorem}\ - }\textit{#1}\\}
+\newcommand{\theoremm}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{section}.\arabic{theorem}\ - }\textit{#1}}
+
+\tableofcontents
+
+% Start of content
+\newpage
+
+\section{General}
+
+\subsection{Approaches to Inference}
+
+\definition{Statistical Inference}
+\textit{Statistical Inference} is the process of taking some data and infering a property of the world from it. This is done by theorising a \textit{Statistical Model} which may have generated the data and then calculating parameters for it from the data.\\
+
+\definition{Statistical Model}
+\textit{Statistical Models} are a, simplified, mathematical description for how a set of data could have been generated. In particular, a \textit{Statistical Model} describes the random variability in the data generating process.\\
+
+\definition{Frequentist Inference}
+The \textit{Frequentist Approach} to \textit{Statistical Inference} treats model unknowns (paramters or functions) as fixed states of nature whose values we want to estimate.\\
+There is no modelling of random variability and thus any that occurs during data collection will be inherited by the model.\\
+
+\remark{Frequentist Inference}
+Often in \textit{Frequentist Inference} we use \textit{asymptotic results} which only become exact as the sample size tends to infty. This has practical drawbacks.\\
+
+\definition{Bayesian Inference}
+The \textit{Bayesian Approach} to \textit{Statistical Inference} treats unknown model parameters as random variables. We define our initial uncertainty about parameter values (the \textit{Prior Distribution}, $\prob(\Theta)$), observed data is used to update these distributions in order to reach a \text{\textit{Posterior Distribution}}, $\prob(\Theta|X)$.\\
+\nb This is done by using \textit{Bayes' Theorem}.\\
+
+\remark{Bayesian Inference}
+Often in \textit{Bayesian Inference} we use \textit{simulation methods}, which only become exact as the sample size tends to infty. Again, there are practical drawbacks to this.\\
+
+\remark{Statistical Design}
+When trying to infer a model from data there are a few common questions we ask
+\begin{enumerate}
+	\item What range of parameter values are consistent with the data?
+	\item Which of several alternative models could most plausibly have generated the data?
+	\item Could our model have generate the data at all?
+	\item How coudl we better arrange the data gatehering process to improve the ansers to the preceeding questions?
+\end{enumerate}
+
+\subsection{Models}
+
+\definition{Predictor Variables}
+\textit{Predictor Variables} are the dependent variables of a system, whose values we observe.\\
+\nb Typically denoted $\x$ or $\X$.\\
+
+\definition{Metric}
+\textit{Metrics} are \textit{Predictor Variables} which measure an explict quantity.\\
+
+\definition{Factor}
+\textit{Factors} are \textit{Predictor Variables} which act as labels to whether an observation belongs in a particular class due a property which cannot be explicitly quantified. (\eg Male or Female).\\
+
+\definition{Response Variables}
+\textit{Response Variables} are the \underline{in}dependent variables of a system, whose value we observe.\\
+\nb Typically denoted $y$ or $\textbf{y}$.\\
+
+\definition{Fitted Values, $\hat{y}$}
+\textit{Fitted Values} are our estimated values for the \textit{Response Variable}.
+$$\hat{y}_i:=f(\x_i)$$
+
+\definition{Residual}
+The \textit{Residual} is the difference between the true value of the \textit{Response Variables} \& our \textit{Fitted Values}.
+$$\epsilon:=|y_i-\hat{y}_i|$$
+
+\definition{Residual Sum of Squares}
+The \textit{Residual Sum of Squares} is the sum of the squared value of the \textit{Residuals} for each observation.\\
+The \textit{RSS} is used as a measure for how well our model fits the data
+$$RSS:=\sum_{i=1}^N\epsilon_i^2=\sum_{i=1}^N(y_i-\hat{y}_i)^2=\|\textbf{y}-\hat{\textbf{y}}\|^2$$
+
+\subsection{Inference by Mathmetical Manipulation}
+
+% Bayesian & Frequentist use computation
+% Simulation
+
+\remark{Inference by Mathematical Manipulation}
+\textit{Bayesian} and \textit{Frequentist Inference} use mathetmatical computaiton to make inferences about parameter valus \& their uncertainty. An alternative approach is to use mathematical manipulation, rather than computation.\\
+
+\definition{Bootstrapping}
+Let $X$ be a set of observed data.\\
+\textit{Bootstrapping} is a \textit{simulation} of the data gathering process.\\
+In \textit{Bootstrapping} we uniformly sample values from $X$ \underline{with replacement} until we reach a desired sample size (often $|X|$).\\
+
+\proposition{Inference by Resampling}
+Once we have used \textit{Bootstrapping} to generate a set of new data-sets we can use \textit{Bayesian} \& \textit{Frequentist Inference} techniques in order to estimate parameter values.\\
+
+\remark{Bootstrap Interval}
+An \textit{Interval} generated from \textit{Bootstrapping} datasets are generally narrower than those produced by \textit{Bayesian} or \textit{Frequentist Approaches}.\\
+\nb This discrepancy is reduced as sample size increases.\\
+
+\proposition{Bootstrap Percentiles}
+When wishing to create an interval for $\theta$ using \textit{Bootstrapped} data, we treat the $\hat\theta$ values as if they came from $\prob(\mu|X)$.
+
+\subsection{Hypothesis Testing}
+
+\definition{Simple Hypothesis}
+A \textit{Simple Hypothesis} states that a parameter takes an \underline{exact} value.\\
+\ie $\theta=\theta_0$ for $\theta_0\in\Theta$.\\
+
+\definition{Composite Hypothesis}
+A \textit{Composite Hypothesis} states that a parameter takes a value from a set.\\
+\ie $\theta\in\Theta_0$ for $\Theta_0\subseteq\Theta$.\\
+
+\definition{Test Statistic}
+A \textit{Test Statistic} is a random variable whose value depends on the observed set of data.\\
+\textit{Test Statistics} are used to assess the likelihood of observing a certain data set under a given \textit{Null Hypothesis} in \textit{Hypothesis Testing}.\\
+
+\definition{$p$-Value}
+The \textit{$p$-Value} of a \textit{Test Statistic} is the probability of observing a value more extreme than the one produced by the observed data, $\x$, under the \textit{Null Hypothesis}.\\
+$$p(\x):=\sup_{\theta\in\Theta_0}\prob(T(\X)\geq T(\x);\theta)$$
+\ie Under the null-hypothesis what is the probability of observing a more extreme test statistic value.\\
+
+\remark{$p(\x)$ is the smallest Significance Level at which we would reject the \text{Null Hypothesis}}
+
+\definition{Hypothesis Testing}
+\textit{Hypothesis Testing} is the porcess of determining which of two hypotheses about model parameters is more consistent with the data.\\
+We define a \textit{Null Hypothesis} and an \textit{Alternative Hypothesis}. The \textit{Null Hypothesis} acts as our default position, and we only reject it is if the observed data is too extreme (given that it is true).\\
+\nb \textit{Null} and \textit{Alternative Hypothesis} are mutually exclusive.\\
+
+\proposition{Process for Hypothesis Testing}
+Let $\x$ be a realisation of $\X$
+\begin{enumerate}
+	\item Choose a model $f(\cdot;\theta)$ st $\X\sim f(\cdot;\theta)$ for $\theta\in\Theta$.
+	\item Define a \textit{Null Hypothesis}, $H_0$, and an \textit{Alternative Hypothesis}, $H_1$.
+	\item Define a \textit{Test Statistic}, $T(\cdot)$.
+	\item Choose a \textit{Significance Level}, $\alpha$, and calculate the equivalent \textit{Critical Value}, $c$, for the \textit{Test Statistic}.
+	\item Calculate value of the \textit{Test Statistic} under the observed data, $t_\text{obs}=T(\x)$.
+	\item If $t_\text{obs}\geq c$ then reject $H_0$ in favour of $H_1$, otherwise accept $H_0$.
+\end{enumerate}
+
+\definition{Power Function, $\pi$}
+The \textit{Power Function}, $\pi(\cdot)$, measures the probability of rejecting the \textit{Null-Hypothesis} given that another set of parameter values is true (usually test with the \textit{Alternative Hypothesis}).\\
+Let $\X\sim f(\cdot;\theta)$, $T(\cdot)$ be a \textit{Test Statistic} and $c$ be the \textit{Critical Value} of $T$. Then
+$$\pi(\theta_1;T,c)=\prob(T(\X)\geq c;\theta_1)$$
+
+\subsection{Intervals}
+
+\definition{Random Interval}
+Let $\X\sim f_n(\cdot;\theta^*)$ for $\theta^*\in\Theta$ and $L,U:\mathcal{X}^n\to\Theta$ st $\forall\ \x\in\mathcal{X}^n\ L(\x)<U(\x)$.\\
+A \textit{Random Interval} is an \textit{Interval} whose bounds depends on a \textit{Random Variable}.\\
+Here $\mathcal{I}(\X):=[L(\X),U(\X)]$ is a \textit{Random Interval}.\\
+\nb $L(\cdot)$ \& $U(\cdot)$ are maps from observed data to parameter values.\\
+
+\definition{Coverage of an Interval}
+Let $\mathcal{I}(\X):=[L(\X),U(\X)]$ be a \textit{Random Interval} for $\theta$ with true value $\theta^*$.\\
+The \textit{Coverage of an Interval} is the probability that the true value of the parameter it is estimating lies in the inverval.
+$$C_\mathcal{I}=\prob(\theta^*\in\mathcal{I}(\X);\theta^*)$$
+
+\definition{Confidence Interval}
+A $1-\alpha$ \textit{Confidence Interval} for a parameter is an interval with \textit{Coverage} at least $1-\alpha$.
+\begin{center}
+$\mathcal{I}(\X):=[L(\X),U(\X)]$ is a $1-\alpha$ \textit{Confidence Interval} if $\prob(\theta^*\in\mathcal{I})\geq1-\alpha$
+\end{center}
+\nb If $\prob(\theta^*\in\mathcal{I}(\X))=1-\alpha$ then $\mathcal{I}$ is an \textit{\underline{Exact} Confidence Interval}.\\
+
+\remark{Confidence Intervals are a part of Frequentist Statistics, not Bayesian}
+
+\definition{Credible Interval}
+%TODO
+
+\remark{Credible Intervals are a part of Bayesian Statistics, not Frequentist}
+
+\subsection{Causality}
+
+\proposition{Causality v Causation}
+
+\definition{Confounding}
+ 
+\definition{Counfounding Variable}
+
+\subsubsection{Controlled Experiments}
+
+\definition{Randomisation}
+
+\subsubsection{Instrumental Variables}
+
+\definition{Instrumental Variables}
+
+\subsection{Regularity Conditions}
+%AIC??
+
+\section{Linear Models}
+
+\proposition{Implementing Factors}
+Suppose a model has \textit{Factor Variable} $g_i$ which seperates observations into $n$ categories.\\
+In the function for $y_i$, $g_i$ would be represented by a single term $\gamma_{g_i}$ whose value depends on the value of $g_i$. (\ie A different weight is assigned to each group). \\
+We want to find the $n$ values which $\gamma_{g_i}$ can take.\\
+We can express this in terms of matrices, as below, with each row on the LHS denoting which category each observation belongs to
+$$\begin{pmatrix}0&1&0&\dots&\\1&0&0&\dots\\0&0&1&\dots\\\vdots&\vdots&\vdots&\ddots\end{pmatrix}\begin{pmatrix}\gamma_1\\\gamma_2\vdots\\\gamma_n\end{pmatrix}$$
+\nb Each row has a single $1$ element and $n-1$ zero elements.\\
+
+\remark{We want to find the parameters to the Precitor Variables which produce accurate values for the Response Variables.}
+
+\definition{Model Matrix}
+Each element in a \textit{Model Matrix} is a function of the \textit{Predictor Variables}.\\
+Each row depends on a different set of observations.\\
+
+\definition{Linear Model}
+A \textit{Linear Model} is a \textit{Statistical Model} whose response vector, $\textbf{y}$, is linear wrt its \textit{Model Matrix}, $\X$, and some zero-mean random error, $\pmb\varepsilon$.
+$$\textbf{y}=\X\pmb\beta+\pmb\varepsilon$$
+$\X\in\reals^{n\times p},\ \pmb\beta\in\reals^p$ and $\varepsilon\sim\text{Normal}(\pmb0,\sigma^2 I)$.
+
+\subsection{Frequentist Approach}
+
+\proposition{Frequentist Approach to Linear Models}
+In the \textit{Frequentist Approach} to \textit{Linear Models} we treat $\pmb\beta$ and $\sigma^2$ as fixed (but unknown) states of nature.\\
+Thus all random variability from the data will be inherited into the model.\\
+
+\subsubsection{Estimation}
+
+\proposition{Point Value Estimates}
+We can make \textit{Point Value Estimates} of parameter values by finding the set of parameters $\pmb\beta$ which minimises the \textit{Residual Sum of Squares}.
+\[\begin{array}{rrl}
+\hat{\pmb\beta}_\text{LSE}&:=&\displaystyle{\argmin_{\pmb\beta}\sum_{i=1}^N(y_i-(\X\pmb\beta)_i)^2}\\
+&=&\displaystyle{\argmin_{\pmb\beta}\|\textbf{y}-\X\pmb\beta\|^2}
+\end{array}\]
+\nb This is the \textit{Least Squares Estimate} of $\pmb\beta$.\\
+
+\remark{$\hat{\pmb\beta}_\text{LSE}=R^{-1}Q^T\textbf{y}$}
+where $Q,R$ are from the decomposition of $\X$ st $\X=QR$ with $Q$ being \textit{Orthogonal} and $R$ being \textit{Upper-Triangle}.\\
+
+\proposition{Deriving Least Squares Estimate for $\pmb\beta$}
+Let $\X,\textbf{y}$ be $n$ observed data points \& $\pmb\beta\in\reals^p$ be a parameter vector we are fitting to our model.\\
+We want to find $\hat{\pmb\beta}_\text{LSE}=\displaystyle{\argmin_{\pmb\beta}\|\textbf{y}-\X\pmb\beta\|^2}$.\\
+Since $\X$ is a real-valued matrix it can be decomposed into
+$$\X=\mathcal{Q}\begin{pmatrix}R\\\pmb0\end{pmatrix}=QR\footnote{Known as \textit{QR Decomposition} and can be performed in R using $\mathtt{qr.Q(qr(X),complete=TRUE)}\ \&\ \mathtt{qr.R(qr(X))}$}$$
+where $R\in\reals^{p\times p}$ is an upper triangle matrix, $\mathcal{Q}\in\reals^{n\times n}$ is orthogonal \& $Q\in\reals^{n\times p}$ is the first $p$ columns of $\mathcal{Q}$.\\
+Note that $\mathcal{Q}^T$ is \textit{Orthogonal}.\\
+Thus
+\[\begin{array}{rcl}
+\|\textbf{y}-\X\pmb\beta\|^2&=&\left\|\textbf{y}-\mathcal{Q}\begin{pmatrix}R\\\pmb0\end{pmatrix}\pmb\beta\right\|^2\\
+&=&\left\|\mathcal{Q}^T\textbf{y}-\mathcal{Q}^T\mathcal{Q}\begin{pmatrix}R\\\pmb0\end{pmatrix}\pmb\beta\right\|^2\text{ since }\mathcal{Q}^T\text{ is orthogonal}\\
+&=&\left\|\mathcal{Q}^T\textbf{y}-\begin{pmatrix}R\\\pmb0\end{pmatrix}\pmb\beta\right\|^2
+\end{array}\]
+Decompose $\mathcal{Q}^T\textbf{y}=\begin{pmatrix}\textbf{f}\\\textbf{r}\end{pmatrix}$ with $\textbf{f}\in\reals^p$ \& $\textbf{r}\in\reals^{n-p}$.\\
+Note that $\textbf{f}=Q^T\textbf{y}$.\\
+$\textbf{f}$ is the first $p$ rows of $\mathcal{Q}^T\textbf{y}$ and $\textbf{r}$ is the last $n-p$ rows.\\
+Thus
+\[\begin{array}{rcl}
+\|\textbf{y}-\X\pmb\beta\|^2&=&\left\|\begin{pmatrix}\textbf{f}\\\textbf{r}\end{pmatrix}-\begin{pmatrix}R\\\pmb0\end{pmatrix}\pmb\beta\right\|^2\\
+&=&\|\textbf{f}-R\pmb\beta\|^2+\|\textbf{r}\|^2
+\end{array}\]
+$\|\textbf{r}\|^2$ is indepdent of $\pmb\beta$ and thus irreducible.\\
+This final expression is minimised when $\|\textbf{f}-R\pmb\beta\|^2=0$ (Meaning $\|\textbf{r}\|^2=\|\textbf{y}-\X\pmb\beta\|^2$).\\
+Thus
+$$\hat{\pmb\beta}_\text{LSE}=R^{-1}\textbf{f}=R^{-1}Q^T\textbf{y}$$
+This requires that $R$ is full rank, in order for its inverse to exist.\\
+Further, $\X$ has to have full rank, which we can ensure by our design of the model.\\
+
+\proposition{Least Squares Estimate of Parameter Vector is Unbiased}
+$$\expect(\hat{\pmb\beta})=\expect(R^{-1}Q^T\textbf{y})=R^{-1}Q^T\expect(\textbf{y})=R^{-1}Q^T\X\pmb\beta=R^{-1}Q^TQR\pmb\beta=\pmb\beta$$
+
+\propositionn{Variance of Least Squares Estimate of Parameter Vector}
+\[\begin{array}{rrcl}
+&\cov(\textbf{y})&=&I\sigma^2\\
+\implies&\cov(\textbf{f})&=&Q^T\textbf{y}\\
+&&=&Q^TQ\sigma^2\\
+&&=&I\sigma^2\\
+\implies&\cov(\hat{\pmb\beta}_\text{LSE})&=&\cov(R^{-1}\textbf{f})\\
+&&=&R^{-1}\cov(\textbf{f})R^{-T}\\
+&&=&R^{-1}I\sigma^2R^{-T}\\
+&&=&R^{-1}R^{-T}\sigma^2
+\end{array}\]
+
+\subsubsection{Checking}
+%Frequentist
+
+\remark{Assumptions}
+We assume that each $\varepsilon_i$ is independent \& has constant variance (we also assume they are normally distributed but this generaly holds due to CLT).\\
+We need a way to check this assumption holds in order for inferences (beyound point estimates) to be sound.\\
+
+\proposition{Graphical Checks}
+Plotting $\hat\epsilon=y_i-(\X\hat{\pmb\beta})_i$ on a graph tends to indicate whether an assumption has been broken, and if so, how it was broken.
+\begin{itemize}
+	\item[-] Systematic patterns in the mean indicate independence assumption is broken.
+	\item[-] Systematic patterns in the variability indicate the constant variance assumption is broken.
+\end{itemize}
+
+\subsubsection{Evaluating}
+
+\remark{Choice of measure to minimise?}
+Was choosing to minimise \textit{Residual Sum of Squares} a good one?\\
+\nb Choosing $\sum_i|\epsilon_i|$, $\sum_i\epsilon^4$,\dots could have worked.\\
+
+\remark{Problem with $\|\hat{\pmb\beta}-\pmb\beta\|$ as measure}
+Suppose our data has a lot of information for estimating $\beta_i$ but not mch for $\beta_j$, should we weight them equally?\\
+
+\remark{Preferred Estimators}
+We require estiamtors to be \textit{Unbiased}, and then we shall choose the estimator with the least variance among those which are \textit{Unbiased}.\\
+\nb Least variance means smallest covariance matrix (in a way which accounts for weighting individual parameters).\\
+
+\theorem{Gauss Markov Theorem}
+Let $\X,\textbf{y}$ be some observed data.\\
+Consider a model where $\pmb\mu:=\expect(\textbf{y})=\X\pmb\beta$ and $\Sigma^2_y=\sigma^2I$.\\
+Let $\tilde\theta:=\textbf{c}^T\textbf{y}$ be any \textit{Unbiased Linear Estimaor} of $\theta=\textbf{t}^T\pmb\beta$ for some arbitrary vector, $\textbf{t}$.\\
+Then
+$$\var(\tilde\theta)\geq\var(\hat\theta)$$
+where $\hat\theta=\textbf{t}^T\hat{\pmb\beta}$ and $\hat{\pmb\beta}=R^{-1}Q^T\textbf{y}$ where $\X=QR$.\\
+Thus each element of $\hat{\pmb\beta}$ is a \textit{minimum variance unbiased estimator}, since $\textbf{t}$ is arbitrary.
+
+\subsubsection{Hypothesis Testing \& Intervals}
+
+\remark{Populat Hypothesis Test}
+Often we want to test whether any $\beta_i=0$ as this would indicate that those predictors do not affect the model accuracy.\\
+
+\proposition{Distribution of $\hat{\pmb\beta}$}
+We assume that $\varepsilon_i\sim\text{Normal}(0,\sigma^2)$. Thus
+\[\begin{array}{rcl}
+\textbf{y}&\sim&\text{Normal}(\X\pmb\beta,\sigma^2I)\\
+\implies\hat{\pmb\beta}&\sim&\text{Normal}(\pmb\beta,R^{-1}R^{-T}\sigma^2)
+\end{array}\]
+Note that $\pmb\beta$ and $\sigma^2$ are unknown.\\
+\nb $\X=QR$ where $Q$ is orthogonal \& $R$ upper-triangle.
+
+\proposition{$\dfrac{\hat\beta_i-\beta_i}{\hat{\sigma}_{{\hat\beta}_i}}\sim t_{n-p}$}
+Note that we can produce a decomposition $\X=\mathcal{Q}\begin{pmatrix}R\\\pmb0\end{pmatrix}$ where $\mathcal{Q}$ is orthogonal \& $R$ is upper triangular.\\
+We have
+$$\cov(\mathcal{Q}^T\textbf{y})=\mathcal{Q}^T\cov(\textbf{y})\mathcal{Q}^{-T}=\mathcal{Q}^T\cov(\textbf{y})\mathcal{Q}=\mathcal{Q}^TI\sigma^2\mathcal{Q}=I\sigma^2$$
+This implies that elements of $\mathcal{Q}^T\textbf{y}$ are independent, due to their assumed normal distribution.\\
+Note that
+$$\expect(\mathcal{Q}^T\textbf{y})=\expect\left(\begin{pmatrix}\textbf{f}\\\textbf{r}\end{pmatrix}\right)\quad\text{and}\quad\expect(\mathcal{Q}^T\textbf{y})=\mathcal{Q}^T\expect(\textbf{y})=\mathcal{Q}^T\X\pmb\beta=\begin{pmatrix}R\\\pmb0\end{pmatrix}\pmb\beta$$
+Thus
+$$\expect\left(\begin{pmatrix}\textbf{f}\\\textbf{r}\end{pmatrix}\right)=\begin{pmatrix}R\\\pmb0\end{pmatrix}\pmb\beta\implies\expect(\textbf{f})=R\pmb\beta\ \&\ \expect(\textbf{r})=\pmb0$$
+Further
+$$\textbf{f}\sim\text{Normal}(R\pmb\beta,I_p\sigma^2)\quad\text{and}\quad\textbf{r}\sim\text{Normal}(\pmb0,I_{n-p}\sigma^2)$$
+and $\textbf{f}$ \& $\textbf{r}$ are independent.\\
+Thus $\hat{\pmb\beta}$ \& $\hat\sigma^2$ are independent.\\
+Since each $r_i\sim\text{Normal}(0,\sigma^2)$
+$$\frac{\|\textbf{r}\|^2}{\sigma^2}=\frac{1}{\sigma^2}\sum_{i=1}^{n-p}r_i^2\sim\chi^2_{n-p}$$
+Since $\expect(\chi^2_{n-p})=n-p\implies\hat\sigma^2:=\frac{1}{n-p}\|\textbf{r}\|^2$ is an unbiased estimator of $\sigma^2$.\\
+$\hat\Sigma_{\hat{\pmb\beta}}:=\Sigma_{\hat{\pmb\beta}}\frac{\hat\sigma^2}{\sigma^2}=R^{-1}R^{-T}\hat\sigma^2$ is an unbiased etimator of $\Sigma_{\hat{\pmb\beta}}$.\\
+Thus $\hat\sigma_{\hat\beta_i}:=\sqrt{[\hat\Sigma_{\hat\beta}]_i}=\sigma_{\hat\beta_i}\frac{\hat\sigma}\sigma$.\\
+Finally
+$$\dfrac{\hat\beta_i-\beta_i}{\hat\sigma_{\hat\beta_i}}=\dfrac{\hat\beta_i-\beta_i}{\sigma_{\hat\beta_i}\frac{\hat\sigma}{\sigma}}=\frac{\frac1{\sigma_{\hat\beta_i}}(\hat\beta_i-\beta_i)}{\sqrt{\hat\sigma^2/\sigma^2}}=\frac{\frac1{\sigma_{\hat\beta_i}}(\hat\beta_i-\beta_i)}{\sqrt{\frac1{\sigma^2}\frac1{n-p}\|\textbf{r}\|^2}}\sim\frac{\text{Normal}(0,1)}{\sqrt{\frac{1}{n-p}\chi^2_{n-p}}}\sim t_{n-p}$$
+\nb $\|\textbf{r}\|^2=\|\textbf{y}-\X\hat{\pmb\beta}\|^2$ by the results in \textbf{Proposition 2.4}.\\
+
+\proposition{Confidence Interval for $\beta_i$}
+Using the result in \textbf{Proposition 2.9} we can construct the following $1-\alpha$ confidence interval
+$$\prob\left(-t_{n-p,\frac{\alpha}{2}}<\dfrac{\hat\beta_i-\beta_i}{\hat{\sigma}_{{\hat\beta}_i}}<t_{n-p,\frac\alpha2}\right)=\prob\bigg(\hat\beta_i-t_{n-p,\frac{\alpha}2}\sigma_{\hat\beta_i}<\beta_i<\hat\beta_i+t_{n-p,\frac{\alpha}2}\sigma_{\hat\beta_i}\bigg)=1-\alpha$$
+
+\proposition{Hypothesis Testing on $\beta_i$}
+Suppose we want to test $H_0:\beta_i=\beta_{i0}$ against $H_1:\beta_i\neq\beta_{i0}$.\\
+We use test statistic
+$$T=\frac{\hat\beta_i-\beta_{i0}}{\hat\sigma_{\hat\beta_i}}$$
+under $H_0$ $T\sim t_{n-p}$ where $n$ is the number of observations \& $p$ the number of parameters.\\
+Thus we can assess the test using $p=\prob(|T|\geq|t_{obs}|)$.\\
+
+\proposition{Testing Multiple Variables in a Model}
+This can be expressed as the test of $H_0:\textbf{C}\pmb\beta=\textbf{d}$ against $H_1:\textbf{C}\pmb\beta\neq\textbf{d}$ where $\textbf{C}\in\reals^{q\times p}$ \& $\textbf{d}\in\reals^q$ with $q<p$.\\
+Under $H_0$ we have $(\textbf{C}\hat{\pmb\beta}-\textbf{d})\sim\text{Normal}(\pmb0,\textbf{C}\Sigma_{\hat{\pmb\beta}}\textbf{C}^T)$.\\
+We can produce a \textit{Cholesky Decomposition} $\textbf{L}^T\textbf{L}=\textbf{C}\Sigma_{\hat\beta}\textbf{C}^T$.\\
+Thus
+\[\begin{array}{rrcl}
+&\textbf{L}^{-T}(\textbf{C}\hat{\pmb\beta}-\textbf{d})&\sim&\text{Normal}(0,I)\\
+\implies&(\textbf{C}\hat{\pmb\beta}-\textbf{d})^T(\textbf{C}\Sigma_{\hat{\pmb\beta}}\textbf{C}^T)^{-1}(\textbf{C}\hat{\pmb\beta}-\textbf{d})&=&(\textbf{C}\hat{\pmb\beta}-\textbf{d})^T\textbf{L}^{-1}\textbf{L}^{-T}(\textbf{C}\hat{\pmb\beta}-\textbf{d})\\
+&&=&\|\textbf{L}^{-T}(\textbf{C}\hat{\pmb\beta}-\textbf{d})\|^2\\
+&&\sim&\displaystyle\sum_{i=1}^q\text{Normal}(0,1)^2\\
+&&\sim&\chi^2_q
+\end{array}\]
+Setting $\hat\Sigma_{\hat{\pmb\beta}}:=\frac{\hat\sigma^2}{\sigma^2}\Sigma_{\hat{\pmb\beta}}$ we can produce a test statistic
+$$F:=\frac1q(\textbf{C}\hat{\pmb\beta}-\textbf{d})^T(\textbf{C}\Sigma_{\hat{\pmb\beta}}\textbf{C}^T)^{-1}(\textbf{C}\hat{\pmb\beta}-\textbf{d})$$
+Which has the distribution
+\[\begin{array}{rcl}
+F&=&\frac1q\|\textbf{L}^{-T}(\textbf{C}\hat{\pmb\beta}-\textbf{d})\|^2\\
+&=&\dfrac{\sigma^2}{q\hat\sigma^2}\|\textbf{L}^{-T}(\textbf{C}\hat{\pmb\beta}-\textbf{d})\|^2\\
+&=&\dfrac{\frac1q\|\textbf{L}^{-T}(\textbf{C}\hat{\pmb\beta}-\textbf{d})\|^2}{\hat\sigma^2/\sigma^2}\\
+&=&\dfrac{\frac1q\|\textbf{L}^{-T}(\textbf{C}\hat{\pmb\beta}-\textbf{d})\|^2}{\frac1\sigma^2\frac1{n-p}\|\textbf{r}\|^2}\\
+&\sim&\dfrac{\frac1q\chi^2_q}{\frac1{n-p}\chi^2_{n-p}}\\
+&\sim&F_{q,n-p}
+\end{array}\]
+
+\proposition{$F=\dfrac{\frac1q(RSS_0-RSS_q)}{\frac1{n-p}RSS_1}$}
+Where $RSS_0$ is the residual sum of squares when $H_0$ is true and $RSS_1$ is the residual sum of squares when $H_1$ is true.\\
+
+\proposition{Testing whether a Factor Variable belongs in a Model}
+\textit{Factor Variables} have multiple parameters associated to them in a model and thus to test whether the \textit{Factor Variable} should be in the model requires testing whether all of these parameters should equal 0.\\
+This can be tested using the results in \textbf{Propostion 2.12} with $\textbf{d}=\pmb0$ and $\textbf{C}$ is the rows of the $I_p$ which indicate the parameters we wish to test.\\
+In this case $q$ is the number of parmeters we wish to test. 
+
+\subsection{Bayesian Approach}
+
+\subsection{Beyond}
+
+\definition{Linear Mixed Models}
+
+\section{Maximum Likelihood Estimation}
+
+\subsection{By Calculus}
+
+\definition{Likelihood}
+
+\definition{Log-Likelihood}
+
+\definition{Maximum Likelihood Estimator}
+
+\proposition{Consistency of MLE}
+
+\proposition{Large Sample Distribution of MLE}
+
+\subsection{Numerical Optimisation}
+
+\definition{Numerical Optimisation}
+
+\definition{Objective Function}
+
+\definition{Newton's Method}
+
+\subsection{Cramer-Rao Bound}
+
+\definition{Fisher Information}
+
+\definition{Fisher Information Matrix}
+
+\subsection{Hypothesis Teting}
+
+\definition{Neyman-Pearson Lemma}
+
+\definition{Generalise Likelihood Ratio Test Statistic}
+
+\subsection{Intervals}
+
+\newpage\setcounter{section}{-1}
+\section{Appendix}
+
+\subsection{Definitions}
+
+\definition{Parametric Models}
+\textit{Parameteric Models} are \textit{Statistical Models} whose only unkowns are parameters.\\
+
+\definition{Semi-Parametric Models}
+\textit{Parameteric Models} are \textit{Statistical Models} which contain unknown parameters \underline{and} unknown functions.\\
+
+\definition{Non-Parametric Models}
+\textit{Non-Parametric Models} make \textit{few} prior assumptions about how data was generated and instead depend mainly on the observed data.\\
+We \underline{cannot} simulate data from \textit{Non-Parameteric Models}.\\
+
+\definition{Orthongonal Matrix}
+A matrix $\X$ is \textit{Orthogonal} if
+$$\X^T\X=\X\X^T=I\implies\X^T=\X^{-1}$$
+\textit{Orthogonal Matrices} rotate \& reflect vectors without changing their magnitude.\\
+\nb $\X^T$ is \textit{Orthogonal}.\\
+
+\definition{Full Rank Matrix}
+Let $\X\in\reals^{m\times n}$.\\
+If $m>n$ then $\X$ has \textit{Full Rank} iff all its \underline{columns} are linearly independent.\\
+If $n>m$ then $\X$ has \textit{Full Rank} iff all its \underline{rows} are linearly independent.\\
+\nb In statistics the number of $m>n$ always as we should have more observations than fields.\\
+
+\definition{Upper Triangle Matrix}
+A matrix $X$ is an \textit{Upper Triangle Matrix} if $X_{i,j}=0$ for $i>j$.\\
+
+\definition{Unbiased Estimator}
+An \textit{Estimator} of a parameter, $\hat\theta$, is unbiased if its expected value is the true value of the parameter for all possible parameter values
+$$\expect(\hat\theta;)=\theta^*$$
+
+\definition{Conjugacy}
+\definition{Fisher Information}
+\definition{Correlation}
+\definition{Covariance}
+\definition{Expected Value}
+\definition{Variance}
+\definition{Positive Semi-Definite Matrix}
+\definition{Taylor's Theorem}
+
+\subsection{Theorems}
+
+\theorem{Bayes' Theorem}
+Suppose $X\sim f(\cdot;\Theta)$. Then
+$$\underbrace{\prob(\Theta|X)}_\text{Posterior}=\frac{\overbrace{\prob(X|\Theta)}^\text{Likelihood}\overbrace{\prob(\Theta)}^\text{Prior}}{\underbrace{\prob(X)}_\text{Evidence}}$$
+
+\theorem{Euclidean Distance Identities}
+$$\|\x\|^2=\x^T\x=\sum_{i=1}^nx_i^2$$
+
+\end{document}
