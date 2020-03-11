@@ -241,19 +241,85 @@ $\mathcal{I}(\X):=[L(\X),U(\X)]$ is a $1-\alpha$ \textit{Confidence Interval} if
 
 \subsection{Causality}
 
-\proposition{Causality v Causation}
+\definition{Causality}
+\textit{Causality} is a relationship between two events where one of the events caused the other.\\
 
-\definition{Confounding}
+\definition{Correlation}
+\textit{Causality} is a relationship between two events where the events are likely to occur together. This does not mean that one event has caused the other, but they may have been caused by the same variable (which may be hidden).\\
+
+\remark{When two variables are highly correlated it is hard to distinguish their effects}
  
 \definition{Counfounding Variable}
+A \textit{Confounding Variable} is a variable which influences both the \textit{Predictor} \& \textit{Response Variables} in a system.\\
+Suppose $x,h$ are highly-correlated and $y=\beta_0+\beta_1x$. The model $y=\beta_2+\beta_3h$ would appear statistically good even though $h$ had no part in geneating $y$. Here $x$ is the \textit{Confounding Variable}.\\
+\nb AKA \textit{Hidden Variables}
 
 \subsubsection{Controlled Experiments}
 
 \definition{Randomisation}
+\textit{Randomisatiation} is a technique used when designing experiments to break relationships between \textit{Confounder Variables} and our \textit{Response Variable}.\\
+\textit{Randomisation} involves taking a set of subjects and randomly assigning them to different ``treatments".\\
+Provided these treaments only vary the \textit{Predictor Variable} we wish to test, this breaks association between other \textit{Prectior Variables} \& our \textit{Response Variable}. Making these \textit{Predictor Variables} now part of the ranom variability of the model, $\varepsilon$.\\
+ 
+\remark{Randomisation is the Gold Standard for Inferring Causation}
+
+\proposition{Mathematical Justification}
+Consider model matrix $(\X,\textbf{H})$ where $\X$ is formed from observed \textit{Predictor Variables} \& $\textbf{H}$ is from \textit{Confounding Variables} (\nb we would not know its value in practice).\\
+Assume the oolumns of $\textbf{H}$ are centred on 0.\\
+We now have \textit{Least Squares Estimate} for the parameters of
+$$\begin{pmatrix}\tilde{\pmb\beta}_X\\\tilde{\pmb\beta}_H\end{pmatrix}=\begin{pmatrix}\X^T\X&\X^T\textbf{H}\\\textbf{H}^T\X&\textbf{H}^T\textbf{H}\end{pmatrix}^{-1}\begin{pmatrix}\X^T\\\textbf{H}^T\end{pmatrix}\textbf{y}$$
+If $\X,\textbf{H}$ are dependent on each other then $\X^T\textbf{H}\neq\pmb0\implies\tilde{\pmb\beta}_X\neq(\X^T\X)^{-1}\X^T\textbf{y}=\hat{\pmb\beta}_X$.\\
+If $\X,\textbf{H}$ are \underline{independent} of each other then $\X^T\textbf{H}=\pmb0$, for a large sample size,\\
+$\implies\tilde{\pmb\beta}_X=(\X^T\X)^{-1}\X^T\textbf{y}=\hat{\pmb\beta}_X$.\\
+\nb \textit{Randomisation} ensures $\X$ and $\textbf{H}$ are independent.
 
 \subsubsection{Instrumental Variables}
 
+\remark{Motivation}
+In some scenarios it is impractical or unethical to perform randomised experiments.\\
+
 \definition{Instrumental Variables}
+Let $(\X,\textbf{H})$ be a \textit{Model Matrix} with $\X$ observed \& $\textbf{H}$ confounding for our \textit{Response Variable}, $\textbf{y}$.\\
+A variable is an \textit{Instrumental Variable} if
+\begin{itemize}
+	\item It is \underline{not} part of the true model of the \textbf{Response Variable};
+	\item It \underline{is} correlated with the \textit{Predictor Variables} in $\X$;
+	\item[And,] It is \underline{not} correlated with the \textit{Confounding Variables} in $\textbf{H}$.
+\end{itemize}
+
+\remark{Finding Instrumental Variables is Hard, very!}
+
+\proof{Confounding Variables affect Least Squares Estimate in Linear Models}
+Let $(\X,\textbf{H})$ be a \textit{Model Matrix} where $\X$ comes from some observed variables \& $\textbf{H}$ is from \textit{Confounding Variables}.\\
+This means the true model is of the form
+$$\textbf{y}=\X\pmb\beta_X+\textbf{H}\pmb\beta_H+\pmb\varepsilon$$
+Since we only know $\X$ we try to fit $\textbf{y}=\X\pmb\beta_X+\textbf{e}$.\\
+Effectively $\textbf{e}=\textbf{H}\pmb\beta_H+\pmb\varepsilon$, which is unlikey to fulfil the assumptions of indepdence \& constant variance.\\
+This is a problem for the model. Further
+\[\begin{array}{rcl}
+\expect(\hat{\pmb\beta}_X)&=&(\X^T\X)^{-1}\X^T(\X,\textbf{H})\pmb\beta\\
+&=&(\X^T\X)^{-1}\X^T\X\pmb\beta_X+(\X^T\X)^{-1}\X^T\textbf{H}\pmb\beta_H\\
+&=&\pmb\beta_X+(\X^T\X)^{-1}\X^T\textbf{H}\pmb\beta_H\\
+&\neq&\pmb\beta_X
+\end{array}\]
+\nb The space spanned by the columns of $\X$ is not orthogonal to $\textbf{e}$.\\
+
+\proposition{Instrumental Variables for Linear Models}
+Let $(\X,\textbf{H})$ be a \textit{Model Matrix} where $\X$ comes from some observed variables \& $\textbf{H}$ is from \textit{Confounding Variables}.\\
+Let $\textbf{Z}$ be the \textit{Model Matrix} for some \textit{Instrumental Variables}.\\
+We assume $\text{Rank}(\textbf{Z})\geq\text{Rank}(\X)$.\\
+Perform the projection of $\X$ onto the column space of $\textbf{Z}$. Giving
+$$\X_Z:=\textbf{Z}(\textbf{Z}^T\textbf{Z})^{-1}\textbf{Z}^T\X=\textbf{A}_Z\X$$
+This gives us the least squares estimate of the model parameters
+$$\hat{\pmb\beta}_X=(\X_Z^T\X_Z)^{-1}\X_Z^T\textbf{y}=(\X^T\textbf{A}_Z\X)^{-1}\X^T\textbf{A}_Z\textbf{y}$$
+Since $\textbf{Z}$ is independent of $\textbf{H}$. $\textbf{Z}^T\textbf{H}\simeq\pmb0\implies\textbf{A}_Z\textbf{H}\simeq\pmb0$. Thus
+\[\begin{array}{rcl}
+\expect(\hat{\pmb\beta}_X)&=&(\X^T\textbf{A}_Z\X)^{-1}\X^TA_Z(\X,\textbf{H})\pmb\beta\\
+&=&(\X\textbf{A}_Z\X)^{-1}\X^T\textbf{A}_Z\X\pmb\beta_X+\underbrace{(\X\textbf{A}_Z\X)^{-1}\X^T\underbrace{\textbf{A}_Z}_{\simeq0}\textbf{H}\pmb\beta_H}_{\simeq0}\\
+&=&(\X\textbf{A}_Z\X)^{-1}\X^T\textbf{A}_Z\X\pmb\beta_X\\
+&=&\pmb\beta_X
+\end{array}\]
+This shows the estimate produced by using \textit{Instrumental Variables} produces a much more accurate estimate of the model parameters, than when they are not used \& \textit{Convolution Variables} exist.
 
 \subsection{Regularity Conditions}
 %AIC??
@@ -340,6 +406,27 @@ $$\expect(\hat{\pmb\beta})=\expect(R^{-1}Q^T\textbf{y})=R^{-1}Q^T\expect(\textbf
 &&=&R^{-1}I\sigma^2R^{-T}\\
 &&=&R^{-1}R^{-T}\sigma^2
 \end{array}\]
+
+\remark{Least Squares Estimation - Geometric Interpretation}
+\textit{Linear Models} state that $\expect(\textbf{y})$ lies on the space spanned by all possible linear combinations of the columns of the \textit{Model Matrix}.\\
+\textit{Least Squares Estimation} finds the point in the space closest to $\textbf{y}$.\\
+Thus \textit{Least Sqaures Estimation} amounts to find the orthogonal projection of $\textbf{y}$ in the linear space spanned by the columns of $\X$.\\
+
+\definition{Influence Matrix}
+The \textit{Influence Matrix}, $A$, is the orthogonal projection of the response variables onto the linear space spanned by the columns of $\X$.\\
+Since
+$$\hat{\textbf{y}}=\X\hat{\pmb\beta}=(QR)(R^{-1}Q^T\textbf{y})=QQ^T\textbf{y}$$
+the \textit{Influence Matrix} is
+$$A=QQ^T$$
+\nb The \textit{Influence Matrix} is \textit{Idempotent}, $AA=A$.\\
+
+\propositionn{Results in terms of Model Matrix}
+\[\begin{array}{rcl}
+\hat{\pmb\beta}&=&(\X^T\X)^{-1}\X^T\textbf{y}\\
+\Sigma_{\hat{\pmb\beta}}&=&(\X^T\X)^{-1}\sigma^2\\
+A&=&\X(\X^T\X)^{-1}\X^T
+\end{array}\]
+\nb Substituting $\X=QR$ gets back to previous results.
 
 \subsubsection{Checking}
 %Frequentist
@@ -458,43 +545,224 @@ In this case $q$ is the number of parmeters we wish to test.
 
 \subsection{Bayesian Approach}
 
-\subsection{Beyond}
+\proposition{Prior Distributions}
+We need to define \textit{Prior Distributions} for $\pmb\beta$ and $\sigma^2$.
+$$\pmb\beta\sim\text{Normal}(\pmb\beta_0,\pmb\phi^{-1})\quad\text{and}\quad\frac1{\sigma^2}=:\tau\sim\Gamma(a,b)$$
+where $\pmb\beta_0,\pmb\phi,a,b$ are given by us.\\
+\nb In order for results to be tractable we use conjugate priors. $\tau:=\frac1{\sigma^2}$ is called \textit{Precision}.\\
 
-\definition{Linear Mixed Models}
+\proposition{Resulting Distribution}
+\[\begin{array}{rcl}
+f(\textbf{y},\pmb\beta,\tau)&\propto&\displaystyle\frac{\tau^{\alpha-1+\frac{n}2}e^{-\frac\tau2\|\textbf{y}-\X\pmb\beta\|^2}}{e^{\frac12(\pmb\beta-\pmb\beta_0)^T\pmb\phi(\pmb\beta-\pmb\beta_0)}e^{-b\tau}}\\
+f(\tau|\pmb\beta,\textbf{y})&\propto&\dfrac{\tau^{\alpha-1\frac{n}2}}{e^{\frac\tau2(b+\|\textbf{y}-\X\pmb\beta\|^2}}\\
+&\sim&\Gamma\left(\frac{n}2+a,b+\frac12\|\textbf{y}-\X\pmb\beta\|^2\right)\\
+f(\pmb\beta|\tau,\textbf{y})&\propto&\text{exp}\bigg\{-\frac12(\pmb\beta^T\X^T\X\pmb\beta\tau-2\pmb\beta\X^T\textbf{y}\tau+\pmb\beta^T\pmb\phi\pmb\beta-2\pmb\beta^T\pmb\phi\pmb\beta_0)\bigg\}\\
+&\sim&\text{Normal}\left((\X^T\X\tau+\pmb\phi)^{-1}(\tau\X^T\textbf{y}+\pmb\phi\pmb\beta_0),\ (\X^T\X\tau+\pmb\phi)^{-1}\right)
+\end{array}\]
+If sample size tends to infinity or the prior precision matrix tends to $\pmb0$, then $$f(\pmb\beta|\tau,\textbf{y})\overset\sim\to\text{Normal}(\hat{\pmb\beta},(\X^T\X)^{-1}\sigma^2)$$
+This is the same as in the \textit{Frequentist Approach}, so the same results acan be used for intervals \& hypothesis testing.\\
+\nb As sample size tends to infinity $\X^T\X\tau$ dominates $\pmb\phi$.\\
+
+\propositionn{Find Posterion, $f(\pmb\beta,\tau|\textbf{y})$}1
+\begin{itemize}
+	\item Iteratively find the posterior modes of $\pmb\beta$ (given the estimated mode of $\tau$) and the posterior mode of $\tau$ (given the estimated modes of $\pmb\beta$), until convergence.\\
+	Then plug this into $f(\pmb\beta|\tau,\textbf{y})$.
+	\item[Empirical Bayes] Integrate $\pmb\beta$ outo of $f(\tau|\pmb\beta,\textbf{y})$ to obtain $f(\tau|\textbf{y})$.\\
+	Maximise $f(\tau|\textbf{y})$ to find $\hat\tau$.\\
+	Then plug this into $f(\pmb\beta|\tau,\textbf{y})$.
+	\item[Gibbs Sampling] Alternate simulation of $\pmb\beta$ from $f(\pmb\beta|\tau,\textbf{y})$ (give simulated $\tau$) with simulation of $\tau$ from $f(\tau|\pmb\beta,\textbf{y})$ (given simulated $\pmb\beta$)
+\end{itemize}
 
 \section{Maximum Likelihood Estimation}
 
-\subsection{By Calculus}
+\subsection{Frequentist}
+
+\proposition{Frequentist Approach to Linear Models}
+Parameters, $\pmb\beta$, are treataed as fixed states of nature and all uncertainty occurs in our estimation of these parameters.\\
 
 \definition{Likelihood}
+Let $\textbf{y}$ a set of $n$ observations from $f(\cdot;\pmb\theta)$.\\
+\textit{Likelihood} measures the probability of observing specified outcomes, given a possible set of parameter values.
+$$L_n(\pmb\theta;\textbf{y}):=f_n(\textbf{y};\pmb\theta)=\prod_{i=1}^nf(y_i;\pmb\theta)$$
+Often we use the \textit{Log-Likelihood} function as it turns products into summations and exponents into parameter.
+$$\ell_n(\pmb\theta;\textbf{y}):=\ln L(\pmb\theta;\textbf{y})=\sum_{i=1}^nf(y_i;\pmb\theta)$$
+\nb $\argmax_\theta L(\theta)\equiv\argmax_\theta \ell(\theta)$
 
-\definition{Log-Likelihood}
+\definition{Maximum Likelihood Estimate}
+Let $\textbf{y}$ a set of $n$ observations from $f(\cdot;\pmb\theta)$.\\
+The \textit{Maximum Likelihood Estimate},$\hat{\pmb\theta}_\text{MLE}$, for a set of parameter, $\pmb\theta$ is the set of parameter values which maximise the \textit{Likelihood Function}.
+$$\hat{\pmb\theta}_\text{MLE}=\argmax_\theta L(\pmb\theta;\textbf{y})=\argmax_\theta \ell(\pmb\theta;\textbf{y})$$
 
-\definition{Maximum Likelihood Estimator}
+\proposition{Finding Maximum Likelihood Estimate}
+Let $\textbf{y}$ be a set $n$ of observations from the model $f(\textbf{X};\pmb\theta)$ with $|\pmb\theta|=m$.\\
+To find the \textit{Maximum Likelihood Estimate} of $\pmb\beta$
+\begin{enumerate}
+	\item Define the \textit{Log-Likelihood Function} $\ell(\pmb\theta;\textbf{y})$.
+	\item Find the gradient of $\ell(\pmb\theta;\textbf{y})$ wrt $\pmb\theta$
+	$$\nabla\ell(\pmb\theta;\textbf{y}):=\begin{pmatrix}\frac\partial{\partial\theta_1}\ell(\pmb\theta;\textbf{y})&\dots&\frac\partial{\partial\theta_m}\ell(\pmb\theta;\textbf{y})\end{pmatrix}$$
+	\item Equate the gradient to the zero-vector and solve for $\pmb\theta$ to find extrema of $\ell$
+	$$\nabla\ell(\pmb\theta;\textbf{y})=\pmb0$$
+	\item Calculate the \textit{Hessian} of $\ell(\pmb\theta;\textbf{x})$
+	$$\nabla^2\ell(\pmb\beta;\textbf{y})=\begin{pmatrix}\frac{\partial}{\partial\theta_1^2}\ell(\pmb\theta;\textbf{y})&\dots&\frac{\partial}{\partial\theta_1\partial\theta_m}\ell(\pmb\theta;\textbf{y})\\\vdots&\ddots&\vdots\\\frac{\partial}{\partial\theta_m\partial\theta_1}\ell(\pmb\theta;\textbf{y})&\dots&\frac{\partial}{\partial\theta_m^2}\ell(\pmb\theta;\textbf{y})\end{pmatrix}$$
+	\item Test each extremum, $\hat{\pmb\theta}$ to see if any are maxima
+	\begin{center}
+	If $\text{det}(H(\hat{\pmb\theta}))>0$ and $\frac\partial{\partial\theta_1^2}\ell(\hat{\pmb\theta};\textbf{y})<0$ then $\hat{\pmb\theta}$ is a local maximum.\\
+	\ie If $H(\hat{\pmb\theta})$ is negative definite.
+	\end{center}
+\end{enumerate}
 
-\proposition{Consistency of MLE}
+\remark{It is rare to find explicit expressions for MLEs. Instead we use \text{numerical optimisation}}
 
-\proposition{Large Sample Distribution of MLE}
+\subsection{Performance}
 
-\subsection{Numerical Optimisation}
-
-\definition{Numerical Optimisation}
-
-\definition{Objective Function}
-
-\definition{Newton's Method}
-
-\subsection{Cramer-Rao Bound}
-
-\definition{Fisher Information}
+\remark{Here we look at properties of an MLE when we have a large sample size}
 
 \definition{Fisher Information Matrix}
+Let $\ell(\cdot):=\ln f(\textbf{y};\pmb\theta))\ \&\ \pmb\theta^*$ be the true parameter values.\\
+\textit{Fisher Information} describes how much information the $X$ carries about the parameters, $\pmb\theta$.\\
+The \textit{Fisher Information Matrix} is defined as
+$$\mathcal{I}:=\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\dfrac{\partial\ell}{\partial\pmb\theta^T}\bigg|_{\pmb\theta=\pmb\theta^*}\right)$$
+
+\proposition{Interpretting Fisher Information Matrix}
+If $\mathcal{I}$ carries lots of information if it has large magnitude eigenvalues \& less information if they have small magnitude.\\
+\nb See \textbf{Proposition 3.5} for a different formulation of \textit{Fisher Information Matrix}.\\
+
+\remark{Properties of Expected Log-Likelihood}
+Here are some properties of the \textit{Expected Log-Likelihood} as \textit{Large Sample Theory} of \textit{MLEs} relies on them.\\
+
+\theorem{Expect a turning point in Log-Likelihood at the true parameter values}
+Let $\ell(\cdot):=\ln f(\textbf{y};\pmb\theta))\ \&\ \pmb\theta^*$ be the true parameter values.
+$$\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\right)=\pmb0$$
+\textit{Proof}
+$$\expect\left(\dfrac\partial{\partial\pmb\theta}\ln f(\textbf{y};\pmb\theta)\right)=\int\dfrac1{f(\textbf{y};\pmb\theta)}\dfrac{\partial f}{\partial\pmb\theta}f(\textbf{y};\pmb\theta)d\textbf{y}=\int\dfrac{\partial f}{\partial\pmb\theta}d\textbf{y}=\dfrac\partial{\partial\pmb\theta}\int f(\textbf{y};\pmb\theta)d\textbf{y}=\dfrac{\partial\pmb1}{\partial\pmb\theta}=\pmb0$$
+\proved
+
+\theorem{Covariance as Expectation}
+Let $\ell(\cdot:=\ln f(\textbf{y};\pmb\theta))\ \&\ \pmb\theta^*$ be the true parameter values.
+$$\cov\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\right)=\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\dfrac{\partial\ell}{\partial\pmb\theta^T}\bigg|_{\pmb\theta=\pmb\theta^*}\right)$$
+\textit{Proof}\\
+Follows from \textbf{Theorem 3.1} and the defiinition of a covariance matrix, noting that $\frac{\partial\ell}{\partial\pmb\theta}$ is a column vector and $\frac{\partial\ell}{\partial\pmb\theta^T}$ is a row vector.\\
+
+\proposition{Fisher Information Matrix as negative expectation}
+Let $\ell(\cdot):=\ln f(\textbf{y};\pmb\theta))\ \&\ \pmb\theta^*$ be the true parameter values.
+$$\mathcal{I}:=\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\dfrac{\partial\ell}{\partial\pmb\theta^T}\bigg|_{\pmb\theta=\pmb\theta^*}\right)\equiv-\expect\left(\dfrac{\partial^2\ell}{\partial\pmb\theta\partial\pmb\theta^T}\bigg|_{\pmb\theta=\pmb\theta^*}\right)$$
+\textit{Proof}
+\[\begin{array}{rrcl}
+&\displaystyle\int\dfrac{\partial\ell}{\partial\pmb\theta}f(\textbf{y};\pmb\theta)d\textbf{y}&=&\pmb0\\
+\implies&\displaystyle\int\dfrac{\partial^2\ell}{\partial\pmb\theta\partial\pmb\theta^T}f(\textbf{y};\pmb\theta)+\dfrac{\partial\ell}{\partial\pmb\theta}\dfrac{\partial f}{\partial\pmb\theta^T}d\textbf{y}&=&\pmb0\\
+\text{but}&\dfrac{\partial\ell}{\partial\pmb\theta^T}&=&\dfrac1f\dfrac{\partial f}{\partial\pmb\theta^T}\\
+\implies&\displaystyle\int\dfrac{\partial^2\ell}{\partial\pmb\theta\partial\pmb\theta^T}f(\textbf{y};\pmb\theta)d\textbf{y}&=&-\displaystyle\int\dfrac{\partial\ell}{\partial\pmb\theta}\dfrac{\partial\ell}{\partial\pmb\theta^T}f(\textbf{y};\pmb\theta)d\textbf{y}
+\end{array}\]
+\proved
+\nb $\ell(\theta)=\ln f(\theta)\implies\frac{\partial}{\partial\theta}\ell(\theta)=\frac{\frac\partial{\partial\theta}f(\theta)}{f(\theta)}$.\\
+
+\proposition{Expected Log-Likelihood has Global Maximum at True Parameter Value}
+Let $\ell(\cdot):=\ln f(\textbf{y};\pmb\theta))\ \&\ \pmb\theta^*$ be the true parameter values.
+$$\forall\ \pmb\theta\in\pmb\Theta,\ \expect[\ell(\pmb\theta)]\leq\expect[\ell(\pmb\theta^*)]$$
+\textit{Proof}
+Since $\ln$ is concave we can use \textit{Jensen's Inequality}
+$$\expect\left[\ln\left(\dfrac{f(\textbf{y};\pmb\theta)}{f(\textbf{y};\pmb\theta^*)}\right)\right]\leq\ln\left[\expect\left(\dfrac{f(\textbf{y};\pmb\theta)}{f(\textbf{y};\pmb\theta^*)}\right)\right]=\ln\int\dfrac{f(\textbf{y};\pmb\theta)}{f(\textbf{y};\pmb\theta^*)}f(\textbf{y};\pmb\theta^*)d\textbf{y}=\ln\int f(\textbf{y};\pmb\theta)d\textbf{y}=\ln1=0$$
+\proved
+
+\theorem{Cram\'er-Rao Lower Bound}
+Let $\textbf{y}\sim f(\cdot;\pmb\theta)$ and $\mathcal{I}$ be the \textit{Fisher Information Matrix}.\\
+The \textit{Cram\'er-Rao Lower Bound} states that
+\begin{center}$\mathcal{I}^{-1}$ is a lower bound of the variance matrix of any unbiased estimator $\tilde{\pmb\theta}$ \end{center}
+In the sense that $\cov(\pmb\theta)-\mathcal{I}^{-1}$ is positive semi-definite.\\
+\nb Look at proof.\\
+
+\proposition{Consistency of MLE}
+\textit{Maximum Likelihood Estimators} \underline{are} usually \textit{Consistent}.\\
+This is because $\frac1n\ell(\pmb\theta)\overset{n\to\infty}{\longrightarrow}\frac{1}{n}\expect(\ell(\pmb\theta))\to\pmb\theta^*$ by \textbf{Proposition 3.5} (and WLLN if log can be broken down into summations).\\
+\nb \textit{Consistency} likeliy fails when the number of parameters increases as sample sie increases.\\
+
+\proposition{MLE Distribution for Large Sample Size}
+Let $\hat{\pmb\theta}$ be an MLE for a set of parameters, with true value $\pmb\theta^*$.\\
+As the same size tends to infty
+$$\hat{\pmb\theta}\sim\text{Normal}(\pmb\theta^*,\mathcal{I}^{-1})$$
+This means that in regular situtations, for large sample sizes, MLEs are unbiased and achieve the \textit{Cram\'er Rao Lower Bound}.
+
+\proof{Proposition 3.7}
+If the log-likelihood is based on independent observations then $\ell(\pmb\theta)=\sum_i\ell_i(\pmb\theta)$.\\
+$\implies\frac{\partial\ell}{\partial\pmb\theta}=\sum_i\frac{\partial\ell_i}{\partial\pmb\theta}$.
+Thus the central limit theorem applies and we get the result.\\
+If the log-likelihood is \underline{not} base don independent observations then $\frac{\partial\ell}{\partial\pmb\theta}$ usually has a limiting normal distribution so the result holds anyways.\proved
 
 \subsection{Hypothesis Teting}
 
 \definition{Neyman-Pearson Lemma}
 
 \definition{Generalise Likelihood Ratio Test Statistic}
+
+\subsection{Numerical Optimisation}
+
+\definition{Numerical Optimisation}
+\textit{Numerical Optimisation} is the process of finding the set of parameters which maximise a function by numerically evaluating the function with multiple different values. This is used when we cannot take derivatives of a function for whatever reason.\\
+\nb A lot of techniques focus on finding the \underline{minimum} so we use the negative of the \textit{Objective Function} in order to find the maximum instead.\\
+
+\definition{Objective Function}
+The \textit{Objective Function} is the function we wish to optimise in \textit{Numerical Optimisation}.\\
+\nb In \textit{Statistical Inference} this is the \textit{Probability Density/Mass Function}.\\
+
+\proposition{Assumptions about Objective Function}
+In order to make problems easier we assume that the \textit{Objective Function} is:
+\begin{enumerate}
+	\item Sufficiently smooth;
+	\item Bounded below; and,
+	\item The parameter elements are unrestricted real values.\\
+	If we want to put restrictions on $\pmb\theta$ we need to be able to implement them as $\pmb\theta=\textbf{r}(\pmb\theta_r)$ where $\textbf{r}(\cdot)$ is a known function \& $\pmb\theta_r$ is the unrestricted parameter set.
+\end{enumerate}
+\nb We require $f$ to be convex for \textit{Newton Methods} to work but that is an assumption too far. If it is not then we may only find a local minimum, not global.\\
+
+\proposition{Requirements for Newton's Method}
+In order to guarantee that \textit{Newton's Method} converges to the MLE, we need to ensure the followin
+\begin{enumerate}
+	\item The approximating quadratic actually has a maximum (not a minimum, inflection point etc.).\\
+	If it has a minimum then we use its negative value instead.
+	\item The proposed change in parameter values actually increases the \textit{Log-Likelihood} itself.\\
+	If not we move the parameter back towards the previous parameter guess until the \textit{Log-Likelihood} increases.
+\end{enumerate}
+
+\definition{Newton's Method}
+Let $f(\pmb\theta)$ be the function we wish to optimise (this would be the \textit{Likelihood Function}).\\
+\textit{Newton's Method} is a method for \textit{Numerical Optimisation}.\\
+The idea is to iteratively use a truncated \textit{Taylor Expansion} (to the second degree) of function $f(\pmb\theta)$ and to find the minimum of this approximation at each step.
+\begin{enumerate}
+	\item Make an initial input guess $\pmb\theta^{[0]}$. Set $k=0$.
+	\item Evaluate the function \& its first two derivatives
+	$$f(\pmb\theta^{[k]}),\ \nabla f(\pmb\theta^{[k]}),\ \nabla^2f(\pmb\theta^{[k]})$$
+	\item \textbf{If} $\nabla f(\pmb\theta^{[k]})=\pmb0$ \textbf{and} $\nabla^2f(\pmb\theta^{[k]})$ is positive semi-definite\textbf{:}
+	\begin{itemize}
+		\item $\pmb\theta^{[k]}$ is a minimum. TERMINATE
+	\end{itemize}
+	\item \textbf{If} $\nabla^2f(\pmb\theta^{[k]})$ is \textit{positive-definite}\textbf{:} Set $\textbf{H}=\nabla^2f(\pmb\theta^{[k]})$.\\
+	\textbf{Else:} Set $\textbf{H}=U\tilde{\Lambda}U^T$ where we have decomposed $\nabla^2f(\pmb\theta^{[k]})=U\Lambda U^T$ with $\Lambda$ being the diagonal matrix of eigenvalues \& $\tilde{\Lambda}_{ij}=|\Lambda_{ij}|$ (all values positive).\\
+	\nb This step is to ensure that $\textbf{H}$ is \textit{postive definite}.
+	\item Solve $\Delta:=-\dfrac{\nabla f(\pmb\theta^{[k]})}{\textbf{H}}$ where $\Delta$ is the search direction.
+	\item \textbf{If not} $f(\pmb\theta^{[k]}+\Delta)<f(\pmb\theta^{[k]})$\textbf{:} repeatedly have $\Delta$ until condition is met.\\
+	\nb Implementation of \textit{Step Length Control}.
+	\item Set $\pmb\theta^{[k+1]}=\pmb\theta^{[k]}+\Delta$. Set $k+=1$
+	\item Repeat ii)-vii) until we get a termination in stage iii).
+\end{enumerate}
+\nb In practice we terminate in iii) if $\|\nabla f(\pmb\theta^{[k]})\|<|\nabla f(\pmb\theta^{[k]})|\epsilon_r+\epsilon_a$, for some small $\epsilon_a,epsilon_r$ which we set.\\
+
+\remark{\text{The first derivative tells us the direction, the second derivative suggests the step length}}
+
+\remark{$f(\pmb\theta^{[k]})$ is only evaluated to ensure that step is an improvement.}
+If $f(\cdot)$ is not avaiable (but $\nabla f\ \&\ \nabla^2 f$ are) we have a few options
+\begin{itemize}
+	\item Show that $f$ is non-increasing in the direction of the step, $\Delta$, at $\pmb\theta+\Delta$ (\ie $\nabla f(\pmb\theta+\Delta)^T\Delta\leq0$).
+	\item[Or] Replace $-\nabla^2 \ell(\pmb\theta)$ with $-\expect[\nabla^2\ell(\pmb\theta)]$ (Known as the \textit{Fisher Scoring Matrix}).
+\end{itemize}
+\nb This only affects step vi) of \textbf{Definition 3.5}.\\
+
+\remarkk{Other Numerical Optimisation Techniques}
+\begin{itemize}
+	\item[Quasi-Newton] \textit{Quasi-Newton Methods} are \textit{Newton type Methods} in which an approximation is made for the \textit{Hessian Matrix} ($\nabla^2 f(\cdot)$), or its inverse, by building it from the first derivative information computed at each trial.\\
+	\nb In R this is done with $\mathtt{optim(\dots,method='BFGS')}$.
+	\item[Steepest Descent] Truncating the \textit{Taylor Expansion} allows us to establish the direction to step but not length. Thus we need to implement step length control methods.
+\end{itemize}
+\nb There plenty of methods not covered here.
 
 \subsection{Intervals}
 
@@ -530,7 +798,7 @@ A matrix $X$ is an \textit{Upper Triangle Matrix} if $X_{i,j}=0$ for $i>j$.\\
 
 \definition{Unbiased Estimator}
 An \textit{Estimator} of a parameter, $\hat\theta$, is unbiased if its expected value is the true value of the parameter for all possible parameter values
-$$\expect(\hat\theta;)=\theta^*$$
+$$\expect(\hat\theta;\theta=\theta^*)=\theta^*$$
 
 \definition{Conjugacy}
 \definition{Fisher Information}
@@ -538,8 +806,19 @@ $$\expect(\hat\theta;)=\theta^*$$
 \definition{Covariance}
 \definition{Expected Value}
 \definition{Variance}
+
+\definition{Positive Definite Matrix}
+A matrix is \textit{Positive Definite} if it is symmetric and all its eigenvalues are \underline{positive}.\\
+
 \definition{Positive Semi-Definite Matrix}
+A matrix is \textit{Postitive Semi-Definite} if all its eigenvalues are \underline{non-negative}.
+
 \definition{Taylor's Theorem}
+\definition{Casual Inference}
+
+\definition{Consistent Estimator}
+A \textit{Parameter Estimator}, $\hat{\pmb\theta}_n$, is \textit{Consistent} if its value tends to the true parameter value, $\pmb\theta^*$, as sample size tends to infinity
+$$\hat{\pmb\theta}_n\overset{n\to\infty}{\longrightarrow}\pmb\theta^*$$
 
 \subsection{Theorems}
 
@@ -549,5 +828,14 @@ $$\underbrace{\prob(\Theta|X)}_\text{Posterior}=\frac{\overbrace{\prob(X|\Theta)
 
 \theorem{Euclidean Distance Identities}
 $$\|\x\|^2=\x^T\x=\sum_{i=1}^nx_i^2$$
+
+\theorem{}
+If $\X$ and $\textbf{Y}$ are independent. Then
+$$\X\textbf{Y}\simeq\pmb0$$
+%TODO find the formal version of this
+
+\theorem{Jensen's Inequality}
+For any random variable $X$ and concave function $f$
+$$f[\expect(X)]\geq\expect[f(X)]$$
 
 \end{document}
