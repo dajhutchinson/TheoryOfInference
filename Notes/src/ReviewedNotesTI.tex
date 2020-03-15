@@ -120,6 +120,10 @@ When trying to infer a model from data there are a few common questions we ask
 
 \subsection{Models}
 
+\definition{Nested Models}
+Let $\X_1\sim f_1(\cdot;\pmb\theta_1),\ \X_2\sim f_2(\cdot;\pmb\theta_2)$ for $\pmb\theta_1,\pmb\theta_2\in\pmb\Theta_1$.\\
+If $\pmb\theta_1\subset\pmb\theta_2$ then $\X_1$ is \textit{Nested} in $\X_2$.\\
+
 \definition{Predictor Variables}
 \textit{Predictor Variables} are the dependent variables of a system, whose values we observe.\\
 \nb Typically denoted $\x$ or $\X$.\\
@@ -138,14 +142,29 @@ When trying to infer a model from data there are a few common questions we ask
 \textit{Fitted Values} are our estimated values for the \textit{Response Variable}.
 $$\hat{y}_i:=f(\x_i)$$
 
-\definition{Residual}
-The \textit{Residual} is the difference between the true value of the \textit{Response Variables} \& our \textit{Fitted Values}.
-$$\epsilon:=|y_i-\hat{y}_i|$$
+\definition{Regular Models}
+Let $\X\sim f(\cdot;\pmb\theta)$ for $\pmb\theta\in\pmb\Theta$ be a \textit{Statistical Model}.\\
+A \textit{Statistical Model} is deemed \textit{Regular} if it fulfils all the following:
+\begin{enumerate}
+	\item Densities for distinct $\pmb\theta$ are distinct.\\
+	\nb If not, parameters won't be identifiable \& thus no guaranteed consistency.
+	\item $\pmb\theta^*\in\pmb\Theta$.\\
+	\nb Otherwise we cannot approximat \textit{Log-Likelihood} by \textit{Taylor Expansion} in the region of $\pmb\theta^*$.
+	\item Within some neighbourhood of $\pmb\theta^*$
+	\begin{itemize}
+		\item The first three derivatives of the \textit{Log-Likelihood} exist \& are bounded.
+		\item $\mathcal{I}:=\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\theta^*}\dfrac{\partial\ell}{\partial\pmb\theta^T}\bigg|_{\theta^*}\right)\equiv-\expect\left(\dfrac{\partial^2\ell}{\partial\pmb\theta\pmb\theta^T}\bigg|_{\theta^*}\right)$ is satisfied.
+		\item The \textit{Fisher Information Matrix}, $\mathcal{I}$, is positive-definite \& finite.
+	\end{itemize}
+\end{enumerate}
+\nb These requirements are required for certain results.
 
-\definition{Residual Sum of Squares}
-The \textit{Residual Sum of Squares} is the sum of the squared value of the \textit{Residuals} for each observation.\\
-The \textit{RSS} is used as a measure for how well our model fits the data
-$$RSS:=\sum_{i=1}^N\epsilon_i^2=\sum_{i=1}^N(y_i-\hat{y}_i)^2=\|\textbf{y}-\hat{\textbf{y}}\|^2$$
+\subsection{Graphical Models}
+%TODO 10
+
+\definition{Directed Acycle Graphs}
+\definition{Stocastic Nodes}
+\definition{Deterministic Nodes}
 
 \subsection{Inference by Mathmetical Manipulation}
 
@@ -169,75 +188,6 @@ An \textit{Interval} generated from \textit{Bootstrapping} datasets are generall
 
 \proposition{Bootstrap Percentiles}
 When wishing to create an interval for $\theta$ using \textit{Bootstrapped} data, we treat the $\hat\theta$ values as if they came from $\prob(\mu|X)$.
-
-\subsection{Hypothesis Testing}
-
-\definition{Simple Hypothesis}
-A \textit{Simple Hypothesis} states that a parameter takes an \underline{exact} value.\\
-\ie $\theta=\theta_0$ for $\theta_0\in\Theta$.\\
-
-\definition{Composite Hypothesis}
-A \textit{Composite Hypothesis} states that a parameter takes a value from a set.\\
-\ie $\theta\in\Theta_0$ for $\Theta_0\subseteq\Theta$.\\
-
-\definition{Test Statistic}
-A \textit{Test Statistic} is a random variable whose value depends on the observed set of data.\\
-\textit{Test Statistics} are used to assess the likelihood of observing a certain data set under a given \textit{Null Hypothesis} in \textit{Hypothesis Testing}.\\
-
-\definition{$p$-Value}
-The \textit{$p$-Value} of a \textit{Test Statistic} is the probability of observing a value more extreme than the one produced by the observed data, $\x$, under the \textit{Null Hypothesis}.\\
-$$p(\x):=\sup_{\theta\in\Theta_0}\prob(T(\X)\geq T(\x);\theta)$$
-\ie Under the null-hypothesis what is the probability of observing a more extreme test statistic value.\\
-
-\remark{$p(\x)$ is the smallest Significance Level at which we would reject the \text{Null Hypothesis}}
-
-\definition{Hypothesis Testing}
-\textit{Hypothesis Testing} is the porcess of determining which of two hypotheses about model parameters is more consistent with the data.\\
-We define a \textit{Null Hypothesis} and an \textit{Alternative Hypothesis}. The \textit{Null Hypothesis} acts as our default position, and we only reject it is if the observed data is too extreme (given that it is true).\\
-\nb \textit{Null} and \textit{Alternative Hypothesis} are mutually exclusive.\\
-
-\proposition{Process for Hypothesis Testing}
-Let $\x$ be a realisation of $\X$
-\begin{enumerate}
-	\item Choose a model $f(\cdot;\theta)$ st $\X\sim f(\cdot;\theta)$ for $\theta\in\Theta$.
-	\item Define a \textit{Null Hypothesis}, $H_0$, and an \textit{Alternative Hypothesis}, $H_1$.
-	\item Define a \textit{Test Statistic}, $T(\cdot)$.
-	\item Choose a \textit{Significance Level}, $\alpha$, and calculate the equivalent \textit{Critical Value}, $c$, for the \textit{Test Statistic}.
-	\item Calculate value of the \textit{Test Statistic} under the observed data, $t_\text{obs}=T(\x)$.
-	\item If $t_\text{obs}\geq c$ then reject $H_0$ in favour of $H_1$, otherwise accept $H_0$.
-\end{enumerate}
-
-\definition{Power Function, $\pi$}
-The \textit{Power Function}, $\pi(\cdot)$, measures the probability of rejecting the \textit{Null-Hypothesis} given that another set of parameter values is true (usually test with the \textit{Alternative Hypothesis}).\\
-Let $\X\sim f(\cdot;\theta)$, $T(\cdot)$ be a \textit{Test Statistic} and $c$ be the \textit{Critical Value} of $T$. Then
-$$\pi(\theta_1;T,c)=\prob(T(\X)\geq c;\theta_1)$$
-
-\subsection{Intervals}
-
-\definition{Random Interval}
-Let $\X\sim f_n(\cdot;\theta^*)$ for $\theta^*\in\Theta$ and $L,U:\mathcal{X}^n\to\Theta$ st $\forall\ \x\in\mathcal{X}^n\ L(\x)<U(\x)$.\\
-A \textit{Random Interval} is an \textit{Interval} whose bounds depends on a \textit{Random Variable}.\\
-Here $\mathcal{I}(\X):=[L(\X),U(\X)]$ is a \textit{Random Interval}.\\
-\nb $L(\cdot)$ \& $U(\cdot)$ are maps from observed data to parameter values.\\
-
-\definition{Coverage of an Interval}
-Let $\mathcal{I}(\X):=[L(\X),U(\X)]$ be a \textit{Random Interval} for $\theta$ with true value $\theta^*$.\\
-The \textit{Coverage of an Interval} is the probability that the true value of the parameter it is estimating lies in the inverval.
-$$C_\mathcal{I}=\prob(\theta^*\in\mathcal{I}(\X);\theta^*)$$
-
-\definition{Confidence Interval}
-A $1-\alpha$ \textit{Confidence Interval} for a parameter is an interval with \textit{Coverage} at least $1-\alpha$.
-\begin{center}
-$\mathcal{I}(\X):=[L(\X),U(\X)]$ is a $1-\alpha$ \textit{Confidence Interval} if $\prob(\theta^*\in\mathcal{I})\geq1-\alpha$
-\end{center}
-\nb If $\prob(\theta^*\in\mathcal{I}(\X))=1-\alpha$ then $\mathcal{I}$ is an \textit{\underline{Exact} Confidence Interval}.\\
-
-\remark{Confidence Intervals are a part of Frequentist Statistics, not Bayesian}
-
-\definition{Credible Interval}
-%TODO
-
-\remark{Credible Intervals are a part of Bayesian Statistics, not Frequentist}
 
 \subsection{Causality}
 
@@ -321,8 +271,164 @@ Since $\textbf{Z}$ is independent of $\textbf{H}$. $\textbf{Z}^T\textbf{H}\simeq
 \end{array}\]
 This shows the estimate produced by using \textit{Instrumental Variables} produces a much more accurate estimate of the model parameters, than when they are not used \& \textit{Convolution Variables} exist.
 
-\subsection{Regularity Conditions}
-%AIC??
+\subsection{Hypothesis Testing}
+
+\remark{Hypothesis Testing is \underline{mostly} a Frequentist method, not Bayesian.}
+
+\remark{Hyphothesis Testing amounts to choosing the simplist model which has no obvious incosistencies with the data}
+
+\definition{Simple Hypothesis}
+A \textit{Simple Hypothesis} states that a parameter takes an \underline{exact} value.\\
+\ie $\theta=\theta_0$ for $\theta_0\in\Theta$.\\
+
+\definition{Composite Hypothesis}
+A \textit{Composite Hypothesis} states that a parameter takes a value from a set.\\
+\ie $\theta\in\Theta_0$ for $\Theta_0\subseteq\Theta$.\\
+
+\definition{Test Statistic}
+A \textit{Test Statistic} is a random variable whose value depends on the observed set of data.\\
+\textit{Test Statistics} are used to assess the likelihood of observing a certain data set under a given \textit{Null Hypothesis} in \textit{Hypothesis Testing}.\\
+
+\definition{$p$-Value}
+\textit{$p$-Value} measures the goodness of fit of statistical models.\\
+The \textit{$p$-Value} is the probability of observing more extreme that the data used for fitting, under the theorised model, $\pmb\Theta_0$.\\
+Let $\X\sim f(\cdot;\pmb\theta)$ and $\x$ be a realisation.
+$$p(\x):=\sup_{\theta\in\Theta_0}\prob(\X\geq \x;\pmb\theta)=\sup_{\theta\in\Theta_0}f(\textbf{x};\pmb\theta)$$
+A higher \textit{$p$-Value} suggests a better model fit.\\
+
+\remark{$p$-Values are good at testing the fit of a model, but not at comparing the relative fit of two models}
+
+\remark{$p(\x)$ is the smallest Significance Level at which we would reject the \text{Null Hypothesis}}
+
+\definition{Hypothesis Testing}
+\textit{Hypothesis Testing} is the porcess of determining which of two hypotheses about model parameters is more consistent with the data.\\
+We define a \textit{Null Hypothesis} and an \textit{Alternative Hypothesis}. The \textit{Null Hypothesis} acts as our default position, and we only reject it is if the observed data is too extreme (given that it is true).\\
+\nb \textit{Null} and \textit{Alternative Hypothesis} are mutually exclusive.\\
+
+\proposition{Process for Hypothesis Testing}
+Let $\x$ be a realisation of $\X$
+\begin{enumerate}
+	\item Choose a model $f(\cdot;\theta)$ st $\X\sim f(\cdot;\theta)$ for $\theta\in\Theta$.
+	\item Define a \textit{Null Hypothesis}, $H_0$, and an \textit{Alternative Hypothesis}, $H_1$.
+	\item Define a \textit{Test Statistic}, $T(\cdot)$.
+	\item Choose a \textit{Significance Level}, $\alpha$, and calculate the equivalent \textit{Critical Value}, $c$, for the \textit{Test Statistic}.
+	\item Calculate value of the \textit{Test Statistic} under the observed data, $t_\text{obs}=T(\x)$.
+	\item If $t_\text{obs}\geq c$ then reject $H_0$ in favour of $H_1$, otherwise accept $H_0$.
+\end{enumerate}
+
+\definition{Neymann-Pearson Test Statistic}
+The \textit{Neymann-Pearson Test Statistic} is a generalisation of the \textit{Likelihood Ratio}.\\
+It measures the likelihood of the \textit{Alternative Hypothesis} being correct, relative to the \textit{Null Hypothesis}, given the data.\\
+Let $\X\sim f(\cdot;\pmb\theta)$, $\x$ be a realisation of $\X$ and $H_0:\pmb\theta\in\pmb\Theta_0$ be our \textit{Null Hypothesis}.
+$$T_{np}(\x):=\dfrac{p(\x;\pmb\Theta)}{p(\x;\pmb\Theta_0)}=\dfrac{\sup_{\theta\in\Theta} f(\x;\pmb\theta)}{\sup_{\theta_0\in\Theta_0}f(\x;\pmb\theta_0)}=\dfrac{f(\x;\hat{\pmb\theta}_\text{MLE})}{\sup_{\theta_0\in\Theta_0}f(\x;\pmb\theta_0)}\geq1$$
+Lower values of the \textit{Likelihood Ratio} indicate that $H_0$ is more likely to be true.\\
+
+\definition{Power Function, $\pi$}
+The \textit{Power Function}, $\pi(\cdot)$, measures the probability of rejecting the \textit{Null-Hypothesis} given that another set of parameter values is true (usually test with the \textit{Alternative Hypothesis}).\\
+Let $\X\sim f(\cdot;\theta)$, $T(\cdot)$ be a \textit{Test Statistic} and $c$ be the \textit{Critical Value} of $T$. Then
+$$\pi(\theta_1;T,c)=\prob(T(\X)\geq c;\theta_1)$$
+
+\theorem{Neyman-Pearson Lemma}
+Let $\X\sim f(\cdot;\pmb\theta)$ and $\x$ be a realisation of $\x$.\\
+Consider testing two \textit{Simple Hypothese} with the \textit{Neyman Pearson Test Statistic}.\\
+Choose some $\alpha\in[0,1]$ and find $c_{NP}$ st $\alpha=\prob(T_{NP}\geq c_{NP};\pmb\theta_0)$.\\
+Then the test $(T_{NP},c_{NP})$ is equivalent to the uniformly most powerful test.\\
+%TODO proof
+
+\definition{Generalised Likelihood Ratio Test Statistic}
+Let $\X\sim f(\cdot;\pmb\theta)$ be a model \& $\x$ be a realisation of $\X$.\\
+Consider testing two, \underline{non-nested}, hypotheses
+$$H_0:\textbf{R}(\pmb\theta)=\pmb0\quad\text{against}\quad H_1:\textbf{R}(\pmb\theta)neq\pmb0$$
+where $\textbf{R}(\cdot)$ is a vector-valued function of $\pmb\theta$ st $H_0$ imposes $r$ restrictions on $\pmb\Theta$.\\
+The \textit{Generalised Likelihood Ratio Test Statistic} is defined as
+$$T_{GLR}:=2[\ell(\hat{\pmb\theta}_\text{MLE})-\sup_{\textbf{R}(\pmb\theta)=\pmb0}\ell(\pmb\theta)]\sim\chi^2_r$$
+%TODO proof
+
+\subsection{Intervals}
+
+\definition{Random Interval}
+Let $\X\sim f_n(\cdot;\theta^*)$ for $\theta^*\in\Theta$ and $L,U:\mathcal{X}^n\to\Theta$ st $\forall\ \x\in\mathcal{X}^n\ L(\x)<U(\x)$.\\
+A \textit{Random Interval} is an \textit{Interval} whose bounds depends on a \textit{Random Variable}.\\
+Here $\mathcal{I}(\X):=[L(\X),U(\X)]$ is a \textit{Random Interval}.\\
+\nb $L(\cdot)$ \& $U(\cdot)$ are maps from observed data to parameter values.\\
+
+\definition{Coverage of an Interval}
+Let $\mathcal{I}(\X):=[L(\X),U(\X)]$ be a \textit{Random Interval} for $\theta$ with true value $\theta^*$.\\
+The \textit{Coverage of an Interval} is the probability that the true value of the parameter it is estimating lies in the inverval.
+$$C_\mathcal{I}=\prob(\theta^*\in\mathcal{I}(\X);\theta^*)$$
+
+\definition{Confidence Interval}
+A $1-\alpha$ \textit{Confidence Interval} for a parameter is an interval with \textit{Coverage} at least $1-\alpha$.
+\begin{center}
+$\mathcal{I}(\X):=[L(\X),U(\X)]$ is a $1-\alpha$ \textit{Confidence Interval} if $\prob(\theta^*\in\mathcal{I})\geq1-\alpha$
+\end{center}
+\nb If $\prob(\theta^*\in\mathcal{I}(\X))=1-\alpha$ then $\mathcal{I}$ is an \textit{\underline{Exact} Confidence Interval}.\\
+
+\remark{Confidence Intervals are a part of Frequentist Statistics, not Bayesian}
+
+\definition{Credible Interval}
+Let $\X\sim f(\cdot;\pmb\theta)$ and $\x$ be a realisation of $\X$.\\
+A $1-\alpha$ \textit{Credible Interval} is as an interval $(\theta_1,\theta_2)$ where the probability that the true parameter lies in the parameter is $1-\alpha$.
+$$1-\alpha=\prob(\theta^*\in(\theta_1,\theta_2)\Longleftrightarrow\int^{\theta_1}_{\theta_2}p(\theta|\theta)d\theta=1-\alpha$$
+When the model has multiple parameters we find a different intervval for each parameter.\\
+\nb Multiple such intervals will exist and we find these intervals by sampling.\\
+
+\remark{Credible Intervals are a part of Bayesian Statistics, not Frequentist}
+
+\definition{Test Inversion}
+\textit{Test Inversion} is the process of finding a \textit{Confidence Interval/Set} by finding the range of values which would cause the \textit{Null Hypothesis} to be accepted.\\
+\nb AKA \textit{Wilk's Intervals}.\\
+
+\propositionn{\text{Every value in a Wilk's Interval has a greater likelihood than any value outside.}}
+
+
+\subsection{Other ways of Assessing Fit}
+
+\definition{Residual}
+The \textit{Residual} is the difference between the true value of the \textit{Response Variables} \& our \textit{Fitted Values}.
+$$\epsilon:=|y_i-\hat{y}_i|$$
+
+\definition{Residual Sum of Squares}
+The \textit{Residual Sum of Squares} is the sum of the squared value of the \textit{Residuals} for each observation.\\
+The \textit{RSS} is used as a measure for how well our model fits the data
+$$RSS:=\sum_{i=1}^N\epsilon_i^2=\sum_{i=1}^N(y_i-\hat{y}_i)^2=\|\textbf{y}-\hat{\textbf{y}}\|^2$$
+
+\remark{More complicated models tend to have greater likelihood}
+whether or not the extra complications reflect anything in the true data generating process.\\
+
+\definition{Kullback-Leibler Divergence}
+\textit{Kullback-Leibler Divergence} is a measure of how similar two models are.\\
+Let $f(\cdot)$ be the true model \& $g(\cdot)$ be an approximation.
+$$KL(f,g)=\int[\ln f(\textbf{y})-\ln g(\textbf{y})]f(\textbf{y})d\textbf{y}$$
+\nb This is a measure of information loss caused by $g(\cdot)$.\\
+
+\proposition{Testing Models with KL Divergence}
+Let $f$ be a proposed model with true parameters values $\pmb\theta^*$.\\
+To compare a proposed set of parameters, $\pmb\theta$, we want to calculate
+$$KL(f^*,f_\theta)=\int[\ln f(\textbf{y};\pmb\theta^*)-\ln f(\textbf{y};\pmb\theta)]f(\textbf{y};\pmb\theta^*)d\textbf{y}$$
+\nb This is not tractable since $f^*$ is unknown (otherwise we would use it).\\
+
+\definition{Akaike's Information Criterion}
+\textit{Akaike's Information Criterion}, AIC, is a goodness-of-fit measure for models.
+$$AIC(\pmb\theta)=-2\ell(\pmb\theta)+p$$
+where $p:=|\pmb\theta|$ (the number of estimated parameters).\\
+Lower \textit{AIC} values indicate better fit.\\
+\nb The factor of $2$ is to put \textit{AIC} on the scale as the $T_{GLR}$.\\
+
+\remark{AIC is non-consistent.}
+As $n\to\infty$ the probability of choosing the correct model does not tend to 1.\\
+
+\proposition{Using KL Divergence}
+Let $f$ be a proposed model with true parameters $\pmb\theta^*$.\\
+We want to find the set of parameters, $\hat{\pmb\theta}$, which perform closely to the true values.\\
+\ie $\argmin_{\hat{\pmb\theta}}KL(f_{\hat\theta},f^*)$ where $f_{\hat\theta}:=f(\cdot;\hat{\pmb\theta})$ \& $f^*:=f(\cdot;\pmb\theta^*)$.\\
+It turns out that $\expect(KL(f_{\hat\theta_\text{MLE}},f^*))$ is tractable.
+$$\hat\expect(KL(f_{\hat\theta_\text{MLE}},f^*))=-\ell(\pmb\theta_\text{MLE})+p+\int\ell(\pmb\theta^*;\textbf{y})f(\textbf{y};\pmb\theta^*)d\textbf{y}$$
+Where $p:=|\pmb\theta|$ (the number of estimaed parameters).\\
+\text{Note that this involves truth, thus is minised by whichever model minimises \textit{Akaike's Information Criterion}.}
+%TODO derivation (done on paper)
+
+
 
 \section{Linear Models}
 
@@ -586,7 +692,7 @@ Let $\textbf{y}$ a set of $n$ observations from $f(\cdot;\pmb\theta)$.\\
 $$L_n(\pmb\theta;\textbf{y}):=f_n(\textbf{y};\pmb\theta)=\prod_{i=1}^nf(y_i;\pmb\theta)$$
 Often we use the \textit{Log-Likelihood} function as it turns products into summations and exponents into parameter.
 $$\ell_n(\pmb\theta;\textbf{y}):=\ln L(\pmb\theta;\textbf{y})=\sum_{i=1}^nf(y_i;\pmb\theta)$$
-\nb $\argmax_\theta L(\theta)\equiv\argmax_\theta \ell(\theta)$
+\nb $\argmax_\theta L(\theta)\equiv\argmax_\theta \ell(\theta)$.\\
 
 \definition{Maximum Likelihood Estimate}
 Let $\textbf{y}$ a set of $n$ observations from $f(\cdot;\pmb\theta)$.\\
@@ -680,19 +786,17 @@ This is because $\frac1n\ell(\pmb\theta)\overset{n\to\infty}{\longrightarrow}\fr
 Let $\hat{\pmb\theta}$ be an MLE for a set of parameters, with true value $\pmb\theta^*$.\\
 As the same size tends to infty
 $$\hat{\pmb\theta}\sim\text{Normal}(\pmb\theta^*,\mathcal{I}^{-1})$$
-This means that in regular situtations, for large sample sizes, MLEs are unbiased and achieve the \textit{Cram\'er Rao Lower Bound}.
+This means that in regular situtations, for large sample sizes, MLEs are unbiased and achieve the \textit{Cram\'er Rao Lower Bound}.\\
 
 \proof{Proposition 3.7}
 If the log-likelihood is based on independent observations then $\ell(\pmb\theta)=\sum_i\ell_i(\pmb\theta)$.\\
 $\implies\frac{\partial\ell}{\partial\pmb\theta}=\sum_i\frac{\partial\ell_i}{\partial\pmb\theta}$.
 Thus the central limit theorem applies and we get the result.\\
-If the log-likelihood is \underline{not} base don independent observations then $\frac{\partial\ell}{\partial\pmb\theta}$ usually has a limiting normal distribution so the result holds anyways.\proved
+If the log-likelihood is \underline{not} base don independent observations then $\frac{\partial\ell}{\partial\pmb\theta}$ usually has a limiting normal distribution so the result holds anyways.
 
-\subsection{Hypothesis Teting}
+\subsection{Intervals}
 
-\definition{Neyman-Pearson Lemma}
 
-\definition{Generalise Likelihood Ratio Test Statistic}
 
 \subsection{Numerical Optimisation}
 
@@ -764,7 +868,37 @@ If $f(\cdot)$ is not avaiable (but $\nabla f\ \&\ \nabla^2 f$ are) we have a few
 \end{itemize}
 \nb There plenty of methods not covered here.
 
-\subsection{Intervals}
+\section{Estimating Posterior Distribution}
+%TODO Slice sampling 10.3.2
+\proposition{Difficulty Computing Bayes' Theorem} %TODO HERE
+The \textit{Likelihood} \& \textit{Prior Distributions} are computable in \textit{Bayes' Theorem}, but the \textit{Evidence Distribution}, $p(\textbf{y})$ is not. Thus the difficult in calculating the \textit{Posterior Distribution} lies in trying to calculate the \textit{Evidence Distribution} for the observed data.\\
+
+\remark{Likelihood is the probability of observing the data that we observed}
+
+\definition{Markov Chains} % 9.1
+\definition{Detailed Balanced Condition} %9.2
+\definition{MCMC Methods} % 9
+
+\subsection{Metropolis Hastings}
+\proposition{Metropolis Hastings Method} % 9.3-9.6
+\remark{Convergence} % 9.10
+\remark{Interval Estimation} % 9.11
+
+\subsection{Gibbs Sampling}
+\proposition{Gibbs Sampling} % 9.7-9.9
+\remark{Convergence} % 9.10
+\remark{Interval Estimation} % 9.11
+
+\subsection{Estimating Posterior Point-Value}
+
+\definition{Posterior Mode} %11
+
+\section{Bayesian Inference}
+
+\definition{Marginal Likelihood} % 11.1.1
+\definition{Bayes Factor} % 11.1.1 & 11.1.2
+\definition{Bayesian Information Criterion} %11.1.3
+\definition{Deviance Information Criterion} %11.1.4
 
 \newpage\setcounter{section}{-1}
 \section{Appendix}
