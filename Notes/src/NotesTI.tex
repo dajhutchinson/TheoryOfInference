@@ -557,7 +557,7 @@ We want to test $H_0:\textbf{R}(\pmb\theta)=\textbf{0}$.\\
 If this null hypothesis is true then
 $$2[\ell(\hat{\pmb\theta})-\ell(\hat{\pmb\theta}_0]\sim\chi^2_r\text{ where }r=|\text{restrictions}|$$
 
-\example{}
+\example{Poisson Maximum Likelihood Estimate}
 Consider the following model with a single parameter $\beta$
 $$y_i\sim\text{Poisson}(e^{\beta x_i})$$
 Let $\{(x_1,y_1),\dots,(x_n,y_n)\}$.\\
@@ -568,6 +568,457 @@ L(\beta)&=&\displaystyle{\prod_{i=1}^n\dfrac{(e^{\beta x_i})^{y_i}e^{-e^{\beta x
 \implies\ell(\beta)&=&\sum_{i=1}^ny_i\beta x_i-e^{\beta x_i}-\ln y_i!
 \end{array}\]
 By taking the derivative of $\ell(\cdot)$ and finding the stationary points we identify $\hat\beta_\text{MLE}=2.41$.
+
+\subsection{Numerical Optimisation}
+
+\remark{MLE in Practice}
+It is often not possile to find an explicit expression for a maximum likelihood estimate. In these cases we maximise the log-likelihood numerically.\\
+There are several methods for doing this. Newton's Method is deemed the best.\\
+
+\remark{Numerical Optimisation in R}
+In R \textit{numerical optimisation} concentrates on finding parameters which minimise a function, not those which maximise them.\\
+Finding the parameters which maximise is equivalnt to finding those which minimise the negative of the function.
+$$\hat\theta=\text{argmax}_\theta f(\theta)=\text{argmin}_\theta -f(\theta)$$
+
+\remark{Assumptions}
+As there are so very hard problems around numerical optimisation, we make the following assumptions
+\begin{enumerate}
+	\item The \textit{Objective Function}, $f$, is sufficiently smooth and bounded below.
+	\item The elements of the parameter vector $\pmb\theta$ are unrestricted real values.\\
+	If we want to restrict $\pmb\theta$ it needs to be implemented as $\pmb\theta=\textbf{r}(\pmb\theta_r)$ where $\pmb\theta_r$ is unrestricted.
+\end{enumerate}
+\nb Given these assumptions we are still not guaranteed to find a solution unless we know that $f$ is convex, which is generally an assumption too far.
+
+\definitionn{Newton's Method for Numerically Maximisation}
+\begin{enumerate}
+	\item Make an initial parameter value guess.
+	\item Obtain a quadratic approximation to the \textit{Log-Likelihood Function} which behaves similarlly to the log-likelihood function in the region of this guess.\\
+	\nb This is done by using a \textit{Taylor Approximation} of the \textit{Log-Likelihood Function}.
+	$$f(\pmb\theta+\pmb\Delta)=f(\pmb\theta)+\nabla f(\pmb\theta)^T\pmb\Delta+\frac12\pmb\Delta^T\nabla^2f(\pmb\theta+t\pmb\Delta)\pmb\Delta$$
+	Solve for $\pmb\Delta$ which maximises.
+	\item Update parameter guesss to be maximiser of this quadratic approxiation.
+	\item Repeat \textit{ii)-iii)} with new guesses, until convergence.
+\end{enumerate}
+
+\propositionn{Newton's Method Algorithm}
+\begin{enumerate}
+	\item Set $k=0$ and $\pmb\theta^{[0]}$ to be an initial guess.
+	\item Evaluate $f(\pmb\theta^{[k]}),\nabla f(\pmb\theta^{[k]})$ and $\nabla^2 f(\pmb\theta^{[k]})$.
+	\item Test whether $\pmb\theta^{[k]}$ is a minimum by confirmed $\nabla f(\pmb\theta^{[k]})=\textbf{0}$ and terminate if it is.\\
+11	\nb Typically we just check that $\nabla f(\pmb\theta^{[k]})$ is sufficiently close to $\textbf{0}$.
+	\item If $\textbf{H}:=\nabla^2 f(\pmb\theta^{[k]})$ is not positive definite, perturb it so that it is.
+	\item If $\textbf{H}\pmb\Delta=-\nabla f(\pmb\theta^{[k]})$ for the search direction $\pmb\Delta$.
+	\item If $f(\pmb\theta^{[k]}+\pmb\Delta)$ is not $<f(\pmb\theta^{[k]})$, repeatdely halve $\pmb\Delta$ until it is.
+	\item Set $\pmb\theta^{[k+1]}=\pmb\theta^{[k]}+\pmb\Delta$ increment $k$ by one and return to step \textit{ii)}.
+\end{enumerate}
+
+\remark{Ensure Newton's Method converges to the MLE}
+We need to ensure that the approximating quadratic actually has a maximum (rather than a minimum or saddle point).\\
+In one dimension this is done by confirming the second deriative is negative, in multiple dimensions we confirm that the second derivative matrix is positive definite.\\
+\textbf{And}, we need to check that the proposed change in parameter values actually increases the log-likelihood function. If it doesn't then we move the parameter back towards the previous parameter guess until the log-likelihood is increased at the new values.\\
+
+\proposition{Netwon's Method with evaluating $f$}
+Sometimes $f$ is not available (or is difficult to compute in a stable fassion).\\
+Newton's Method only requires evaluation of $f$ in order to chek that the Newton Step has led to a reduction in $f$.\\
+We can replace the condition that $f(\pmb\theta+\pmb\Delta)\leq f(\pmb\theta)$ with the condition that $f$ is non-increasing in the direction $\pmb\Delta$ at $\pmb\theta'+\pmb\Delta$. (\ie $\nabla f(\pmb\theta'+\pmb\Delta)^T\pmb\Delta\leq0$).\\
+By controlling step length here we can often ensure convergence in cases where the iteration would otherwise diverge.\\
+
+\proposition{Variation on Newton's Method}
+We can replace $-\nabla^2 \ell(\pmb\theta)$ by $-\expect[\nabla^2\ell(\pmb\theta)]$ (AKA \textit{Fisher Scoring}). This replacement is always positive (semi-)definite, perturbation to positive definitness is not requirement and by the arguments surrounding ($\Delta=-\textbf{H}\nabla f(\pmb\theta)$), the method converges when used with simple step-length control.\\
+
+\definition{Quasi-Newton Methods}
+\textit{Quasi-Newton Methods} are Newton-Type methods in which an approximation to the Hessian Matrix, or its inverse, is built up iteratively from the first derivative information computed at each trial set of parameter values.\\
+This does not require the computation of the second derivation.\\
+\nb Available from $\mathtt{optim(\dots,method=``BFGS")}$ in R
+
+\subsection{MLE Theory}
+
+\proposition{Properties of Expected Log Likelihood}
+Large sample theory for maximum likelihood estimators relies on some results for the expected value as teh sample size tends to infinity.
+\begin{enumerate}
+	\item $\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\theta_t}\right)=\textbf{0}$.\\
+	\textit{Proof}
+	$$\expect\left(\frac\partial{\partial\pmb\theta}\ln f(\textbf{y};\pmb\theta)\right)=\int\frac{1}{f(\textbf{y};\theta)}\dfrac{\partial f(\textbf{y};\theta)}{\partial\pmb\theta}d\textbf{y}=\int\dfrac{\partial f}{\partial\pmb\theta}d\textbf{y}=\dfrac{\partial}{\partial\pmb\theta}\int f(\textbf{y};\pmb\theta)d\textbf{y}=\dfrac{\partial\pmb1}{\partial\pmb\theta}=\pmb0$$
+	\item $\text{Cov}\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\theta_t}\right)=\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\theta_t}\dfrac{\partial\ell}{\partial\pmb\theta^T}\bigg|_{\theta_t}\right)$\\
+	\textit{Proof} follows directly from $i)$ and the definition of a covariance matrix.\\
+	\nb Here $\frac{\partial l}{\partial\pmb\theta}$ is a column vector and $\frac{\partial l}{\partial\pmb\theta^T}$ is a row vector.
+	\item $\pmb{\mathcal{I}}=\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\theta_t}\dfrac{\partial\ell}{\partial\pmb\theta^T}\bigg|_{\theta_t}\right)=-\expect\left(\dfrac{\partial^2\ell}{\partial\pmb\theta\partial\pmb\theta^T}\bigg|_{\theta_t}\right)$. This is the \textit{Fisher Information Matrix}.\\
+	\textit{Proof}\\
+	\[\begin{array}{rrcl}
+	&\displaystyle\int\frac{\partial\log f_\theta}{d\pmb\theta}f_\theta(\textbf{y})d\textbf{y}&=&\textbf{0}\\
+	\implies&\displaystyle\int\frac{\partial^2\log f_\theta}{\partial\pmb\theta\partial\pmb\theta^T}f_\theta(\textbf{y})+\frac{\partial\log f_\theta}{\partial\pmb\theta}\frac{\partial f_\theta}{\partial\pmb\theta^T}d\textbf{y}&=&\pmb0\\
+	\text{but}&\dfrac{\partial\log f_\theta}{\partial\pmb\theta^T}&=&\frac1{f_\theta}\frac{\partial f_\theta}{\partial\pmb\theta^T}\\
+	\implies&\displaystyle\int\dfrac{\partial^2\log f_\theta}{\partial\pmb\theta\partial\pmb\theta^T}f_\theta(\textbf{y})d\textbf{y}&=&-\displaystyle\int\dfrac{\partial\log f_\theta}{\partial\pmb\theta}\dfrac{\partial\log f_\theta}{\partial\pmb\theta^T}f_\theta(\textbf{y})d\textbf{y}
+	\end{array}\]
+	\item The expected log-likelihood has a global maximum at $\pmb\theta_t$. $$\expect(\ell(\pmb\theta_t))\geq\expect(\ell(\pmb\theta))\ \forall\ \pmb\theta$$
+	\textit{Proof}\\
+	Since $\log$ is a concanve function we can use \textit{Jensen's Inequality} to show that
+	\[\begin{array}{rcl}
+	\expect\left(\log\left(\dfrac{f_\theta(\textbf{y})}{f_{\theta_t}(\textbf{y})}\right)\right)&\leq&\log\left(\expect\left(\dfrac{f_\theta(\textbf{y})}{f_{\theta_t}(\textbf{y})}\right)\right)\\
+	&=&\log\displaystyle\int\dfrac{f_\theta(\textbf{y})}{f_{\theta_t}(\textbf{y})}f_{\theta_t}(\textbf{y})d\textbf{y}\\
+	&=&\log\displaystyle\int f_\theta(\textbf{y})d\textbf{y}\\
+	&=&\log1\\
+	&=&0
+	\end{array}\]
+\end{enumerate}
+
+\subsection{Cramer-Rao Lower Bound}
+
+\theorem{Cramer-Rao Lower Bound}
+$\pmb{\mathcal{I}}^{-1}$ is a lower bound on the variance matrix of any unbiased estimator $\tilde{\pmb\theta}$ in the sense that $\cov(\tilde{\pmb\theta})-\pmb{\mathcal{I}}^{-1}$ is positive semi-definite.\\
+
+\proof{Cramer-Rao Lower Bound}
+Note that $f\frac{\partial(\log f)}{\partial\theta}=\frac{\partial f}{\partial\theta}$, $\frac{\partial\pmb\theta_t}{\partial\pmb\theta_t^T}=\textbf{I}$ and $\tilde{\pmb\theta}$ is unbiased.\\
+Thus
+\[\begin{array}{rrcl}
+&\displaystyle\int\tilde{\pmb\theta}f_{\theta_t}(\textbf{y})d\textbf{y}&=&\pmb\theta_t\\
+\implies&\displaystyle\int\tilde{\pmb\theta}\dfrac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t^T}\bigg|_{\theta_t}f_{\theta_t}(\textbf{y})d\textbf{y}&=&\textbf{I}
+\end{array}\]
+Hence, by \textbf{Proposition 5.6} $i)$, the matrix of covariances of elements of $\tilde{\pmb\theta}_t$ with elements of $\frac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t}$ can be obtained 
+$$\cov\left(\tilde{\pmb\theta},\frac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t}\bigg|_{\theta_t}\right)=\expect\left(\tilde{\pmb\theta}\dfrac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t^T}\bigg|_{\theta_t}\right)-\expect(\tilde{\pmb\theta})\expect\left(\dfrac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t^T}\bigg|_{\theta_t}\right)=\textbf{I}$$
+Combining this with \textbf{Proposition 5.6} $ii)$ we obtain the variance-covariance matrix
+$$\cov\begin{pmatrix}\tilde{\pmb\theta}\\\dfrac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t}\bigg|_{\theta_t}\end{pmatrix}=\begin{pmatrix}\cov(\tilde{\pmb\theta})&\textbf{I}\\\textbf{I}&\pmb{\mathcal{I}}\end{pmatrix}$$
+This matrix is positive semi-definite by virtue of being a variance-covariance matrix.\\
+If follows that
+$$\begin{pmatrix}\textbf{I}&-\pmb{\mathcal{I}}^{-1}\end{pmatrix}\begin{pmatrix}\cov(\tilde{\pmb\theta})&\textbf{I}\\\textbf{I}&\pmb{\mathcal{I}}\end{pmatrix}\begin{pmatrix}\textbf{I}\\-\pmb{\mathcal{I}}^{-1}=\cov(\tilde{\pmb\theta})-\pmb{\mathcal{I}}^{-1}\end{pmatrix}$$
+is positive semi-definite, and the result is problem.\\
+
+\remark{As a lower bound}
+The sense in which $\pmb{\mathcal{I}}^{-1}$ can be unclear.\\
+Consider the variance of any linear transformaton of the form $\textbf{a}^T\tilde{\pmb\theta}$.\\
+By the result proven in \textbf{Proof 5.1} and the definition of positive semi-definiteness
+\[\begin{array}{rrcl}
+&0&\leq&\textbf{a}^T[\cov(\tilde{\pmb\theta}-\pmb{\mathcal{I}}^{-1}]\textbf{a}\\
+&&=&\var(\textbf{a}^T\tilde{\pmb\theta})-\textbf{a}^T\pmb{\mathcal{I}}^{-1}\textbf{a}\\
+\implies&\var(\textbf{a}^T\tilde{\pmb\theta})&\geq&\textbf{a}^T\pmb{\mathcal{I}}^{-1}\textbf{a}
+\end{array}\]
+
+\remark{Consistency of MLE}
+\textit{Maximum Likelihood Estimators} are usually consistent (\ie as the sample size tends to infty $\hat{\pmb\theta}$ tends to $\pmb\theta_t$) provided that the likelihood is informative about the parameters.\\
+This occurs as, in regualar situations, $\frac1n\ell(\pmb\theta)\to\frac1n\expect(\ell(\pmb\theta))$.\\
+
+\proposition{Large Sample Distribution of MLE}
+Taylor's Theorem states that
+$$\frac{\partial\ell}{\partial\pmb\theta}\bigg|_{\hat\theta}\simeq\frac{\partial\ell}{\partial\pmb\theta}\bigg|_{\theta_t}+\dfrac{\partial^2\ell}{\partial\pmb\theta\partial{\pmb\theta}^T}\bigg|_{\theta_t}(\hat{\pmb\theta}-\pmb\theta_t)$$
+Assuming $\frac1n\pmb{\mathcal{I}}$ is constant (in the $n\to\infty$ limit) then
+$$\frac1n\frac{\partial^2\ell}{\partial\pmb\theta\partial\pmb{\theta}^T}\bigg|_{\theta_t}\overset{n\to\infty}{\longrightarrow}-\frac{\pmb{\mathcal{I}}}{n}$$
+while $\frac{\partial\ell}{\partial\pmb\theta}\big|_{\theta_t}$ is a random vector with mean $\pmb0$ and covariance matrix $\pmb{\mathcal{I}}$ by \textbf{Proposition 5.6} $i)$ \& $ii)$.\\
+Therefore in the large sample limit
+$$\hat{\pmb\theta}-\pmb\theta_t\sim\pmb{\mathcal{I}}^{-1}\frac{\partial\ell}{\partial\pmb\theta}\bigg|_{\theta_t}$$
+Meaning $\expect(\hat{\pmb\theta}-\pmb\theta_t)=0$ and $\var(\hat{\pmb\theta}-\pmb\theta_t)=\pmb{\mathcal{I}}^{-1}$.\\
+Hence in regular situations in the large sample limit, ML estimators are unbiased and achieve the \textit{Cramer-Rao Lower Bound}.
+
+\subsection{Hypothesis Testing}
+
+\proposition{$p$-Value}
+Suppose we observe data $\textbf{y}$ and wish to test if some parameters $\pmb\theta_0$ are likely to have produced these results.\\
+The $p$-value is the probability of observing data at least as extreme as $\textbf{y}$ under $\pmb\theta_0$.\\
+\nb In this scenario the null hypothesis is a simple hypothesis while the alternative is a composite hypothesis. There are cases where we wish to compare two composite hypotheses.\\
+
+\remark{Problem with $p$-Value}
+Consider the scenario in \textbf{Proposition 5.8} and an alternative hypothesis $H_1:`\pmb\theta\text{ unrestricted}'$.\\
+Here a $p$-value for $H_0$ is no good asit does not make a distinciton between $\textbf{y}$ be improbable under $H_0$ but probable under $H_1$, and $\textbf{y}$ being improbable under both.\\
+
+\propositionn{Solutions to \textbf{Remark 5.9}}
+Standarise the PMF under the null hypothesis to be the highest value that could have been given for $\textbf{y}$ (under any set of parameters).\\
+\ie Judge the \textit{Relative Plausibility} of $\textbf{y}$ under $H_0$ on the basis of $\frac{f_{\theta_0}(\textbf{y})}{f_{\hat\theta}(\textbf{y})}$ where $\hat\theta$ is the set of parameters which maximises $f_\theta(\textbf{y})$ for the given $\textbf{y}$.\\
+\nb The reciprocal of this is known as the \textit{Likelihood Ratio}.\\
+
+\definition{Likelihood Ratio}
+The \textit{Likelihood Ratio} measures how likely the alternative hypothesis is relative to the null, given the data.
+$$LR:=\frac{f(\textbf{y};\hat\theta_1)}{f(\textbf{y};\theta_0)}$$
+This is a \textit{test statistic} from which we can calculate $p$-values.\\
+\nb The \textit{Likelihood Ratio Test Statistic} returns high values when alternative hypothesis is more likely, and lower when null hypothesis is more likely.
+
+\proposition{Test Variants}
+There are a number of variations on hypothesis tests: two composite hypotheses; two simple hypotheses; one simple \& one composite.\\
+These can all be dealt with using the \textit{Likelihood Ratio Test Statistic}.\\
+
+\theorem{Neyman-Pearson Lemma}
+Likelihood ratio is the most powerful test possible.\\
+%TODO proof
+
+\subsection{Distribution of Generalise Likelihood Ratio Test}
+
+\proof{$2[\ell(\hat\theta)-\ell-\ell(\hat\theta_0)]\sim\chi^2_r$}
+Consider testing
+$$H_0:\textbf{R}(\pmb\theta)=\pmb0\text{ against }H_1:\textbf{R}(\pmb\theta)\neq\pmb0$$
+where $\textbf{R}$ is a vector-valued function of $\pmb\theta$ such that $H_0$ imposes $r$ restrictions on the parameter vector.\\
+If $H_0$ is true then as $n\to\infty$
+$$2\lambda:=2[\ell(\hat{\pmb\theta}_\text{MLE})-\ell(\hat{\pmb\theta}_0]\sim\chi^2_r$$
+where $\ell$ is the log-likelihood function and $\hat{\pmb\theta}_0$ is the value of $\pmb\theta$ which maximises the likelihood subject to the constraint that $\textbf{R}(\pmb\theta)=\pmb0$.\\
+Re-parameterise st $\pmb\theta^T=(\pmb\phi^T,\pmb\gamma^T)$ where $\pmb\phi$ is $r$ dimensional and the null-hypothesis can be rewritter $H_0:\pmb\phi=\pmb\phi_0$.\\
+Let the unrestricted MLE be $(\hat{\pmb\phi}^T,\hat{\pmb\gamma}^T)$ and let $(\hat{\pmb\phi}_0^T,\hat{\pmb\gamma}_0^T)$ be the MLE under the restrictions which define the null hypothesis.\\
+We wish to express $\hat{\pmb\gamma}_0$ in terms of $\hat{\pmb\phi},\hat{\pmb\gamma}$ and $\pmb\phi_0$.\\
+We take a taylor expansion of $\ell$ around the unrestricted MLE, $\hat{\pmb\theta}$
+$$\ell(\pmb\theta)\simeq\ell(\hat{\pmb\theta})-\frac12(\pmb\theta-\hat{\pmb\theta})^T\textbf{H}(\pmb\theta-\hat{\pmb\theta})\text{ where }H_{ij}=-\frac{\partial^2\ell}{\partial\theta_i\partial\theta_j}\bigg|_{\hat{\pmb\theta}}$$
+Taking the exponent we find
+$$L(\pmb\theta)\simeq L(\hat{\pmb\theta})\text{exp}\left\{-\frac12(\pmb\theta-\hat{\pmb\theta})^T\textbf{H}(\pmb\theta-\hat{\pmb\theta}\right\}$$
+For a large sample limit and defining $\pmb\Sigma=\textbf{H}^{-1}$ the likelihood is proportional to the pdf of
+$$\text{Normal}\left(\begin{pmatrix}\hat{\pmb\psi}\\\hat{\pmb\gamma}\end{pmatrix},\begin{pmatrix}\pmb\Sigma_{\phi\phi}&\pmb\Sigma_{\phi\gamma}\\\pmb\Sigma_{\gamma\phi}&\pmb\Sigma_{\gamma\gamma}\end{pmatrix}\right)$$
+If $\pmb\phi=\pmb\phi_0$ then this pdf is maximised by $\hat{\pmb\gamma}_0:=\expect(\pmb\gamma|\pmb\phi_0)$ which is
+$$\hat{\pmb\gamma}_0:=\hat{\pmb\gamma}+\pmb\Sigma_{\gamma\phi}\pmb\Sigma_{\phi\phi}^{-1}(\pmb\phi_0-\hat{\pmb\phi})\text{ by general properties of MVN densities}$$
+If the null hypothesis is true then in the large sample limit $\hat{\pmb\phi}\to_\prob\pmb\phi_0$ so that the approximate likelihood tends to the true likelihood and we can expected this definition of $\hat{\pmb\gamma}_0$ to hold for maximisers of the true likelihood.\\
+We can express $\hat{\pmb\gamma}_0$ in terms of $\textbf{H}$.\\
+Writing $\pmb\Sigma\textbf{H}=\textbf{I}$ in partioned form gives
+$$\begin{pmatrix}\Sigma_{\phi\phi}&\Sigma_{\phi\gamma}\\\Sigma_{\gamma\phi}&\Sigma_{\gamma\gamma}\end{pmatrix}\begin{pmatrix}\textbf{H}_{\phi\phi}&\textbf{H}_{\phi\gamma}\\\textbf{H}_{\gamma\phi}&\textbf{H}_{\gamma\gamma}\end{pmatrix}=\begin{pmatrix}\textbf{I}&\pmb0\\\pmb0&\textbf{I}\end{pmatrix}$$
+Multiplying out gives two useful equations
+$$\pmb\Sigma_{\phi\phi}\textbf{H}_{\phi\phi}+\pmb\Sigma_{\phi\gamma}\textbf{H}_{\gamma\phi}=\textbf{I}\text{ and }\pmb\Sigma_{\phi\phi}\textbf{H}_{\phi\gamma}+\pmb\Sigma_{\phi\gamma}\textbf{H}_{\gamma\gamma}=\textbf{0}$$
+Note that $\textbf{H}_{\phi\gamma}^T=\textbf{H}_{\gamma\phi}$ and $\pmb\Sigma_{\phi\gamma}^T=\pmb\Sigma_{\gamma\phi}$ by symmetry.\\
+Rearranging the two previous equations gives that
+$$\pmb\Sigma_{\phi\phi}^{-1}=\textbf{H}_{\phi\phi}-\textbf{H}_{\phi\gamma}\textbf{H}^{-1}_{\gamma\gamma}\textbf{H}_{\gamma\phi}\text{ and }-\textbf{H}_{\gamma\gamma}^{-1}\textbf{H}_{\gamma\phi}=\pmb\Sigma_{\gamma\phi}\pmb\Sigma_{\phi\phi}^{-1}$$.\\
+Substituting back we get
+$$\hat{\pmb\gamma}_0=\hat{\pmb\gamma}+\textbf{H}_{\gamma\gamma}^{-1}\textbf{H}_{\gamma\phi}(\hat{\pmb\phi}-\pmb\phi_0)$$
+Provided the null hypothesis is true (so that $\hat{\pmb\phi}$ is close to $\pmb\phi_0$) we can reuse the previous expansion and write the log-likelihood at the restricted MLE
+$$\ell(\pmb\phi_0,\hat{\pmb\gamma}_0)\simeq\ell(\hat{\pmb\phi},\hat{\pmb\gamma})-\frac12\begin{pmatrix}\pmb\phi_0-\hat{\pmb\phi}\\\hat{\pmb\gamma}_0-\hat{\pmb\gamma}\end{pmatrix}\textbf{H}\begin{pmatrix}\pmb\phi_0-\hat{\pmb\phi}\\\hat{\pmb\gamma}_0-\hat{\pmb\gamma}\end{pmatrix}$$
+Hence
+$$2[\ell(\hat{\pmb\phi},\hat{\pmb\gamma})-\ell(\pmb\phi_0,\hat{\pmb\gamma}_0)\simeq\begin{pmatrix}\pmb\phi_0-\hat{\pmb\phi}\\\hat{\pmb\gamma}_0-\hat\gamma\end{pmatrix}^T\textbf{H}\begin{pmatrix}\pmb\phi_0-\hat{\pmb\phi}\\\hat{\pmb\gamma}_0-\hat\gamma\end{pmatrix}$$
+Substituting for $\hat{\pmb\gamma}_0$ and expanding $\textbf{H}$ to its partioned form gives
+\[\begin{array}{rcl}
+2\lambda&\simeq&\begin{pmatrix}\pmb\phi_0-\hat{\pmb\phi}\\\textbf{H}^{-1}_{\gamma\gamma}\textbf{H}_{\gamma\phi}(\hat{\pmb\phi}-\pmb\phi_0)\end{pmatrix}^T\begin{pmatrix}\textbf{H}_{\phi\phi}&\textbf{H}_{\phi\gamma}\\\textbf{H}_{\gamma\phi}&\textbf{H}_{\gamma\gamma}\end{pmatrix}\begin{pmatrix}\pmb\phi_0-\hat{\pmb\phi}\\\textbf{H}^{-1}_{\gamma\gamma}\textbf{H}_{\gamma\phi}(\hat{\pmb\phi}-\pmb\phi_0)\end{pmatrix}\\
+&=&(\hat{\pmb\phi}-\pmb\phi_0)^T[\textbf{H}_{\phi\phi}-\textbf{H}_{\phi\gamma}\textbf{H}^{-1}_{\gamma\gamma}\textbf{H}_{\gamma\phi}](\hat{\pmb\phi}-\pmb\phi_0)\\
+&=&(\hat{\pmb\phi}-\pmb\phi_0)^T\pmb\Sigma_{\phi\phi}^{-1}(\hat{\pmb\phi}-\pmb\phi_0)
+\end{array}\]
+If $H_0$ is true, then as $n\to\infty$ this expresion will tend towards exactness as $\hat{\pmb\phi}\to\pmb\phi_0$.\\
+Further, provided $\textbf{H}\overset{n\to\infty}{\longrightarrow}\pmb{\mathcal{I}}$ as then $\pmb\Sigma$ tends to $\pmb{\mathcal{I}}^{-1}$, hence $\pmb\Sigma_{\phi\phi}$ tends to teh covarance matrix of $\hat{\pmb\phi}$.\\
+Hence, by tthe asymptotic normality of the MLE $\hat{\pmb\phi}$
+$$2[\ell(\hat\theta)-\ell-\ell(\hat\theta_0)]\sim\chi^2_r\text{ under }H_0$$
+
+\subsection{Confidence Intevals}
+
+\definition{Test Inversion}
+\textit{Test Inversion}  is the process of finding confidence intervals or sets by finding the range of values that would be accepted as the null hypothesis in a test is known.
+
+\subsection{Regularity Conditions}
+
+\definition{Regularity Conditions}
+\textit{Regularity Conditions} are a set of conditions that a model must meed in order to be deemed ``\textit{Regular}". Several results depend on these conditions being met
+\begin{enumerate}
+	\item The densities defined by distinct values of $\pmb\theta$ are distinct.\\
+	If this is not the case the parameters need not be \textit{identifable} and these is no guarantee of consistency.
+	\item $\pmb\theta_t$ is interior to the space of possible parameter values.\\
+	This is necessary in order to be able to approximate the log-likelihood by a \textit{Taylor Expansion} in the vicinity of $\pmb\theta_t$.
+	\item Within some neighbourhood of $\pmb\theta_t$, the first three derivatives of the log likelihood exist and are bounded, while the Fisher Information Matrix satisfies \textbf{Proposition 5.6} $iii)$.
+\end{enumerate}
+
+\subsection{Akaike's Information Criterion}
+
+\definition{Kullback-Leibler Divergence}
+\textit{Kullback-Leibler Divergence} is a similiarity measure for two densities
+$$KL(f_\theta,f_t)=\int[\log f_t(\textbf{y})-\log f_\theta(\textbf{y})]f_t(\textbf{y})d\textbf{y}$$
+where $f_t$ is the true density of \textbf{y} and $f_\theta$ is the model approximation to \textbf{y}.\\
+
+\proposition{Using Kullback-Leibler Divergence to choose models}
+Given a choice of models it makes sense to pick one which has the lowest \textit{KL Divergence} from the true model.\\
+In order for this to be practical we use the expected value of $KL(f_{\hat\theta},f_t)$ as it is tractable when $\hat\theta$ is the MLE.\\
+Let $\pmb\theta_K$ denote the value of $\pmb\theta$ which would minimise $KL(\cdot,\cdot)$.\\
+Consider the \textit{Taylor Expansion}
+$$\log f_{\hat\theta}(\textbf{y})\simeq\log f_{\theta_K}(\textbf{y})+(\hat{\pmb\theta}-\pmb\theta_K)^T\dfrac{\partial\log f_\theta}{\partial\pmb\theta}\bigg|_{\theta_K}+\frac12(\hat{\pmb\theta}-\pmb\theta_K)^T\dfrac{\partial^2\log f_\theta}{\partial\pmb\theta\partial\pmb{\theta}^T}\bigg|_{\theta_K}(\hat{\pmb\theta}-\pmb\theta_K)$$
+If $\pmb\theta_K$ minimises $KL(\cdot)$ then
+$$\int\frac{\partial\log f_\theta}{\partial\theta}\bigg|_{\theta_K}f_td\textbf{y}=0$$
+So substituting the taylor expansion into the definition of $KL(\cdot)$, while treating $\hat{\pmb\theta}$ as fixed, results in
+$$KL(f_{\hat\theta},f_t)\simeq K(f_{\theta_K},f_t)+\frac12(\hat{\pmb\theta}-\pmb\theta_K)^T\pmb{\mathcal{I}}_{\theta_K}(\hat{\pmb\theta}-\pmb\theta_K)\text{ where }\pmb{\mathcal{I}}_{\theta_K}\text{ is the information matrix at }\pmb\theta_K$$.\\
+Assume that the model is sufficiently correct that $\expect(\hat{\pmb\theta})\simeq\pmb\theta_K$ and $\cov(\hat{\pmb\theta})\simeq\pmb{\mathcal{I}_{\theta_K}}$, at least for large samples.\\
+In this case we have
+$$\expect[\ell(\hat{\pmb\theta})-\ell(\pmb\theta_K)]\simeq\expect\left(\frac12(\hat{\pmb\theta}-\pmb\theta_K)^T\pmb{\mathcal{I}}_{\theta_K}(\hat{\pmb\theta}-\pmb\theta_K)\right)\simeq\frac{p}2\text{ where }p:=\text{dim}(\pmb\theta)$$
+Taking the expactions of $KL(f_{\hat\theta},f_t)$ and substituting an approximation from above we get
+$$\expect[KL(f_{\hat\theta},f_t)]\simeq K(f_{\theta_K},f_t)+\frac{p}2$$
+This still involves the unknowable $f_t$. Consider
+\[\begin{array}{rcl}
+\expect[-\ell(\hat{\pmb\theta})&=&\expect[-\ell(\pmb\theta_K)-\{\ell(\hat{\pmb\theta}-\ell(\pmb\theta_K)\}]\\
+&\simeq&-\displaystyle\int\log(f_{\theta_K}(\textbf{y})]f_t(\textbf{y})d\textbf{y}-\frac{p}2\\
+&=&KL(f_{\theta_K},f_t)-\frac{p}2-\displaystyle\int\log(f_t(\textbf{y}))f_t(\textbf{y})d\textbf{y}
+\end{array}\]
+Using the result to eliminate $KL(f_{\theta_K},f_t)$ from above suggest the estimate
+$$\expect(\widehat{KL(f_{\hat\theta},f_t}=-\ell(\hat{\pmb\theta})+p+\displaystyle\int\log[f_t(\textbf{y})]f_t(\textbf{y})d\textbf{y}$$
+Since the last term on the right-hand side only involves the truth, this last estimate is minimised by whichever model minimises
+$$AIC:=-2\ell(\hat{\pmb\theta})+2p$$
+\nb The factor of 2 is by convention so that AIC is on the same scale as $2[\ell(\hat\theta)-\ell(\theta)]$.\\
+
+\remark{Objection to AIC}
+AIC is \underline{not} consistent.\\
+As $n\to\infty$ the probability of selecting the correct model does not tend to 1.\\
+For \textit{Nested Models} $2[\ell(\hat\theta)-\ell(\theta)]\sim\chi^2$ states that the difference in $-2\ell(\hat\theta)$ between teh true model and an overly complex model follows a $chi^2_r$ distribution where $r$ is the number of spurious parameters.\\
+Neither $\chi^2_r$ nor $2p$ depends on $n$, so the probability of selecting the overly complex model by $AIC$ is nonzero and independent of $n$ (for large $n$).
+
+\section{Bayesian Inference (MCMC Metods)}
+
+\remark{Posterior Distribution}
+For linear models the posterior distribution has tractable.\\
+This is generally not the case and in order to use Bayes' theorme we need to do one of the following
+\begin{enumerate}
+	\item Approximate the posterior, or posterior expectations that are of more direct interest; Or,
+	\item Find a way of simulating from the posteior that avoids the difficulties in trying to compute posterior densities directly.
+\end{enumerate}
+\nb This course only covers the simulation appraoch.\\
+
+\proposition{Divising Simulation Methods}
+Note that $f(\theta|y)\propto f(\theta,y)=\frac{f(y|theta)}{f(\theta)}$.\\
+We can compute values for this by simulating from $f(\theta|y)$.\\
+
+\definition{Markov Chains}
+A \textit{Markov Chain} is a sequence of random vectors $\X_1,\X_2,\dots$ which satisfies
+$$f(\x_j|\x_{j-1},\x_{j-2},\dots,\x_1)=f(\x_j|\x_{j-1})\forall j$$
+Ie the probability of a realisation depends solely on the previous realisation \& non-earlier.\\
+\nb $\prob(\x_j|\x_{j-1})$ is called the \textit{Transition Kernel} of the \textit{Markov Chain}.\\
+
+\remark{MCMC=Markoc Chain Monte Carlo}
+
+\definition{Stationary Distribution}
+A \textit{Stationary Distribution} of a \textit{Markov Chain} is a distribution, $f_x$ which satisfies
+$$f_x(\x_j)=\int \prob(\x_j|\x_{j-1})f_x(\x_{j-1})d\x_{j-1}$$
+\nb Whether a \textit{Stationary Distribution} exists depends on $\prob$ being irreducible (\ie Wherever we start the chain there is a positive probability of visiting all possible values of $\X$).\\
+
+\definition{Recurrent}
+A \textit{Markov Chain} is \textit{Recurrent} if whenveer its length tends to infinity it will revisit any non-negligible set of values an infinite number of times.\\
+\nb In this case the \textit{Stationary Distribution} is also the \textit{Limiting Distribution}.\\
+
+\remark{Recurrent}
+If a \textit{Markov Chain} is \textit{Recurrent} we can start at any possible value of $\X$ and its marginal distribution will eventually converge on the \textit{Stationary Distribution}, $f_x$.\\
+Thus as simulation length, $J$, tends to infinity
+$$\frac1J\sum_{j=1}^J\phi(\x_j)\to\expect_{f_x}[\phi(\X)]$$
+This is an extension of the law of large numbers to this particular sort of correlated sequence, this is what makes MCMC methods useful.\\
+\nb This property is known as \textit{ergodicity}.\\
+
+\definition{Reversibility}
+A MCMC scheme will generate samples, $\{\pmb\theta_1,\pmb\theta_2,\dots\}$, from $f(\pmb\theta|\textbf{y})$ if it satisfies \textit{Reversibility} (AKA \textit{Detailed Balance Condition}).\\
+Let $\prob(\pmb\theta_i|\pmb\theta_j)$ be the pdf of $\pmb\theta_i$ given $\pmb\theta_j$, according to the chain.\\
+We require
+$$P(\pmb\theta_j|\pmb\theta_{j-1})f(\pmb\theta_{j-1}|\textbf{y})=\prob(\pmb\theta_{j-1}|\pmb\theta_j)f(\pmb\theta_j|\textbf{y})$$
+
+\proposition{Using Reversibility}
+Note that the LHS is the joint pdf of $\pmb\theta_j$ and $\pmb\theta_{j-1}$.\\
+Integrating wrt $\pmb\theta_{j-1}$ gives
+\[\begin{array}{rcl}
+\displaystyle\int P(\pmb\theta_j|\pmb\theta_{j-1})f(\pmb\theta_{j-1}|\textbf{y})d\pmb\theta_{j-1}&=&\displaystyle\int P(\pmb\theta_{j-1}|\pmb\theta_j)f(\pmb\theta_j|\textbf{y})d\pmb\theta_{j-1}\\
+&=&f(\pmb\theta_J|\textbf{Y})
+\end{array}\]
+Thus, if we start with a $\pmb\theta_1$ that is not impossible according to $f(\pmb\theta|\textbf{y})$ then the chain will generate from the target distribution.\\
+The speed of converge to a high-probability region of $f(\pmb\theta|\textbf{y})$ is a different problem.\\
+
+\subsection{Metropolis Hastings Method}
+
+\proposition{Metropolis Hastings Method}
+The \textit{Metropolis-Hastings Method} constructs a chain with an appropriate $P$.\\
+It can be performed as follows
+\begin{enumerate}
+	\item Pick a \textit{proposal distribution} $q(\pmb\theta_j|\pmb\theta_{j-1})$ (\eg a normal distribution centred around $\pmb\theta_{j-1}$.
+	\item Pick a value $\pmb\theta_0$, set $j=1$ and iterate $iii)-v)$.
+	\item Generate $\pmb\theta'_j$ from $q(\pmb\theta_j|\pmb\theta_{j-1})$.
+	\item Set $\pmb\theta_j=\pmb\theta_j'$ with probabilitiy
+	$$\alpha=\min\left\{1,\dfrac{f(\textbf{y}|\pmb\theta'_j)f(\pmb\theta'_j)q(\pmb\theta_{j-1}|\pmb\theta_j')}{f(\textbf{y}|\pmb\theta_{j-1})f(\pmb\theta_{j-1})q(\pmb\theta'_j|\pmb\theta_{j-1})}\right\}$$.
+	\item Increment $j$
+\end{enumerate}
+
+\remark{$\alpha$ - Metropolis Hastings Method}
+Note that the $q$ terms cancel if $q$ only depends on the magnitude of $(\pmb\theta_j-\pmb\theta_{j-1})$ which is the case it is a normal centred on $\pmb\theta_{j-1}$.\\
+The same is true for the priors, $f(\pmb\theta'_j)$ and $f(\pmb\theta_{j-1})$, if they are improper uniform.\\
+If both of these are true then $\alpha=\min\{1,L(\pmb\theta_j')/L(\pmb\theta_{j-1})\}$.\\
+
+\remark{Choosing $\pmb\theta_0$ - Metropolis Hastings Method}
+$\pmb\theta_1$ may be highly improbable, so the chain will require many iterations to reach the high-probability region of $f(\pmb\theta|\textbf{y})$.\\
+Usually we require to discard the \textit{burn-in period} (\ie first few hundred $\pmb\theta_j$ vectors simulated).
+
+\proof{Metropolis Hastings Method Works}
+Here I prove that \textit{Metropolis-Hastings Method} works if it satisfies \textit{reversibility}.\\
+For notation let $\pi(\pmb\theta)=f(\pmb\theta)$, remebering that $f(\pmb\theta|\textbf{y})\propto f(\textbf{y}|\pmb\theta)f(\pmb\theta)$.\\
+This means the acceptance probability from $\pmb\theta$ to $\pmb\theta'$ is
+$$\alpha(\pmb\theta',\pmb\theta)=\min\left\{1,\dfrac{\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')}{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)}\right\}$$
+We want to show that $\pi(\pmb\theta)P(\pmb\theta'|\pmb\theta)=\pi(\pmb\theta')P(\pmb\theta|\pmb\theta')$.\\
+This is trivial if $\pmb\theta'=\pmb\theta$.\\
+Otherwise, we know that $P(\pmb\theta'|\pmb\theta)=q(\pmb\theta'|\pmb\theta)\alpha(\pmb\theta',\pmb\theta)$.\\
+Thus
+\[\begin{array}{rcl}
+\pi(\pmb\theta)P(\pmb\theta'|\pmb\theta)&=&\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)\min\left\{1,\dfrac{\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')}{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)}\right\}\\
+&=&\min\{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta),\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')\}\\
+&=&\pi(\pmb\theta')P(\pmb\theta|\pmb\theta')\text{ by symmetry}
+\end{array}\]
+
+\proposition{Choosing Proposal Distributions}
+The \textit{Metropolis-Hastings Method} requires the proposal of a distribution.\\
+In many practical applications, several pilot runs of the \textit{Metropolis-Hastings Sampler} are needed to `tune' the proposal distribution, along with some analysis of model struture.\\
+In particular
+\begin{enumerate}
+	\item With simple independent random walk proposals, different standard deviations are likely to be required for different parameters.
+	\item As its dimension increases it often becomes increasingly difficult to update all elements of $\pmb\theta$ simultaneously, unless uselessly tiny steps are proposed.\\
+	The difficulty is that a purely random step is increasingly unlikely to land in a place wheret eh posterior is non-negligible as dimensions increase.
+	\item It may be necessary to use correlated proposals, rather than updating each elment of $\pmb\theta$ independently.\\
+	Bearing in mind the impractical fact that the perfect proposal would be the posterior iteself, it is tempting to base the proposal on a Gaussian approximation to the posterior, obtained analytically, or from a pilot run.
+\end{enumerate}
+
+\remark{Choosing Proposal Distribution}
+To summarise the following are important when designing a proposal distribution
+\begin{enumerate}
+	\item It is often necessary to update parameters in blocks.
+	\item The perfect proposal is the posterior itself.
+\end{enumerate}
+\nb $ii)$ is impractical but when applied blockwise it can result in a very efficient scheme (\ie Gibbs Sampling).
+
+\subsection{Gibbs Sampling}
+
+\proposition{General Idea}
+Consider a random draw from the joint posterior ditribution of $\pmb\theta^{[-1]}(\theta_2,\dots,\theta_q)^T$ (\ie For all dimensions except the first).\\
+Suppose we would like a draw from the joint posterior distribution of the whole of $\pmb\theta$.\\
+This is trival since $f(\pmb\theta|\textbf{y})=f(\theta_1|\pmb\theta^{[-1]},\textbf{y})f(\pmb\theta^{[-1]}|\textbf{y})$.\\
+Thus we can simulate $\theta_1$ from $f(\theta_1|\pmb\theta^{[-1]},\textbf{y})$ and append the result onto $\pmb\theta^{[-1]}$.\\
+This doesn't only work for the first dimension, but for all.\\
+Thus we can simulate the whole of $\pmb\theta$ by cycling through all dimensions.
+
+\definition{Gibbs Sampler}
+Suppose the parameter row vector is partitioned into subvectors $\pmb\theta:=(\pmb\theta^{[1]},\dots,\pmb\theta^{[K]})$.\\
+Further, define
+$$\tilde{\pmb\theta}_j^{[-k]}=(\pmb\theta^{[1]}_{j+1},\dots,\pmb\theta^{[k-1]}_{j+1},\pmb\theta^{[k+1]}_j,\pmb\theta^{[K]}_j)$$
+Let $\pmb\theta_1$ be an initial guess.\\
+We perform $J$ steps of the \textit{Gibbs Sampler Process} as follows
+\begin{enumerate}
+	\item For $j\in[1,J]$:
+	\begin{enumerate}
+		\item For $k\in[1,\dots,K]$ siulate $\pmb\theta_{j+1}^{[k]}\sim f(\pmb\theta^{[k]}|\tilde{\pmb\theta}_j^{[-k]},\textbf{y})$.
+	\end{enumerate}
+\end{enumerate}
+
+\proposition{How to find these conditional distributions}
+It is generally natural to specify a model in terms of a hierarchy of conditional dependencies, but these dependencies all run in one direction. Thus the problem of working out the conditional dependencies is in the other direction.\\
+Alternatively, if we attempt to specify the model directly in terms of all its conditional distributions, we will have the no less tricky problem of checking that our speecification actually corresponds to a properly defined joint distribution.\\
+\nb Usually identifying the conditionals is not too bad and even if we cannot recognise the condtiionals as belonging to some standard distribution it is always possible to devise some ay of simulating from them (Using a Metropolis Hastings can be done).\\
+
+\remark{Trick for recognising conditionals}
+The trick for recognising conditionals is to use the fact that, for any \textit{pdf}, multiplicative factors that do not involve the argument of the \textit{pdf} must be part of the normalising constant.\\
+Thus it is sufficient to recognise its form, to within a normalising constant.\\
+\nb \textbf{9.8} in notes gives an example where this trick is used.\\
+
+\proposition{Limitations}
+\textit{Gibbs Sampling} produces slow moving chains if parameters have high posterior correlation, as sampling from the conditionals then produces very small steps.\\
+Updating the parameters in blocks or reparameterising to reuce posteior dependence can help to improve msing.\\
+If improper priors are used with \textit{Gibbs Sampling} then it is important to check that the posterior is actuallly proper (it is not always possible to detect impropriety for the output of the sampler).
+
+\subsection{Checking for Convergence of MCMC Chains}
+
+\remark{MCMC methods are very general}
+In principle we can use any model \& given enough time can produce a sample from the posterior.\\
+Although, it may take several thousand (or way more) iterations for this sample to be produced.\\
+
+\remark{Posterior could be Multi-Modal}
+Run multiple chains starting at very different positions.\\
+
+\proposition{Analysing quantiles}
+By examining how specific quantiles of hte sample, up to iteration $j$, behave when plotted against $j$, we may be able to detect convergence if all the quantiles converge.\\
+
+\definition{Autocorrelation Length}
+The \textit{Autocorrelation Length} of a chain is twice the sum of the correlations, minus 1.\\
+
+\proposition{Effective Sample Size}
+\textit{Effective Sample Size} of a chain is what size of independent samples from $f(\pmb\theta|\textbf{y})$ would be equivalent to the correlated sample from our MCMC scheme.\\
+\textit{Autocorrelation Length} can be used to assess this
+$$\text{Effective Sample Size}=\frac{\text{Sample Size}}{\text{Autocorrelation}}$$
+
+\subsection{Interval Estimation}
+
+\proposition{}
+Given reliable posterior simulations from a chian, inteval estimates and quantiles for model comparision can be computed.\\
+Inteval estimates are straightforward since intervals can be based directly on the observed quantiles of the simulated parameters.
+
+\section{Graphical Models \& Automatic Gibbs Sampling}
 
 \newpage
 \setcounter{section}{-1}
