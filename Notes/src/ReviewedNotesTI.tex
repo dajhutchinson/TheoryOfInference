@@ -79,6 +79,7 @@
 \newcommand{\remarkk}[1]{\stepcounter{remark} \textbf{Remark \arabic{section}.\arabic{remark}\ - }\textit{#1}}
 \newcommand{\theorem}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{section}.\arabic{theorem}\ - }\textit{#1}\\}
 \newcommand{\theoremm}[1]{\stepcounter{theorem} \textbf{Theorem \arabic{section}.\arabic{theorem}\ - }\textit{#1}}
+TODO - JAGS \& RJAGS
 
 \tableofcontents
 
@@ -162,9 +163,31 @@ A \textit{Statistical Model} is deemed \textit{Regular} if it fulfils all the fo
 \subsection{Graphical Models}
 %TODO 10
 
-\definition{Directed Acycle Graphs}
-\definition{Stocastic Nodes}
-\definition{Deterministic Nodes}
+\definition{Directed Acyclic Graphs}
+A \textit{Directed Acyclic Graph}, DAG, is a graph which consists of directed edges and \underline{no} cycles.\\
+The direction of edges show dependence with the target element being dependent on the origin element.
+
+\proposition{Graphical Model}
+A \textit{Model} can be represented graphically using a \textit{Directed Acyclic Graph} with variables for nodes \& dependence from the edges.\\
+The distribution of a variable is completely known \underline{if} you know the values of all its parent nodes.\\
+The nodes in a \textit{Graphical Model} take three types
+\begin{enumerate}
+	\item \textit{Stocastic Nodes} are variables with a distribution which depends stochastically on otehr nodes.\\
+These can be observed or unobserved.
+	\item \textit{Deterministic Nodes} are nodes that are deterministic functions of other nodes.\\
+They cannot be observed.
+	\item \textit{Constant Nodes} are fixed numbers and have no parents.
+\end{enumerate}
+The edges in a \textit{Graphical Model} show one of two relationship types
+\begin{enumerate}
+	\item \textit{Deterministic Relationship} between nodes (usually a dashed arrow).
+	\item \textit{Stochastic Relationship} between nodes (usually a solid arrow).
+\end{enumerate}
+
+\proposition{Distributions from Graphical Model}
+Let $x_i$ represent the variable associated with the $i^\text{th}$ node in the graph.\\
+We have joint distribution of the \underline{non-constant} nodes
+$$f(\x)=\prod_if(x_i|\text{Parent}(x_i))$$
 
 \subsection{Inference by Mathmetical Manipulation}
 
@@ -329,20 +352,20 @@ Let $\X\sim f(\cdot;\theta)$, $T(\cdot)$ be a \textit{Test Statistic} and $c$ be
 $$\pi(\theta_1;T,c)=\prob(T(\X)\geq c;\theta_1)$$
 
 \theorem{Neyman-Pearson Lemma}
+\textit{NON-EXAMINABLE}.\\
 Let $\X\sim f(\cdot;\pmb\theta)$ and $\x$ be a realisation of $\x$.\\
 Consider testing two \textit{Simple Hypothese} with the \textit{Neyman Pearson Test Statistic}.\\
 Choose some $\alpha\in[0,1]$ and find $c_{NP}$ st $\alpha=\prob(T_{NP}\geq c_{NP};\pmb\theta_0)$.\\
 Then the test $(T_{NP},c_{NP})$ is equivalent to the uniformly most powerful test.\\
-%TODO proof
 
 \definition{Generalised Likelihood Ratio Test Statistic}
+\textit{JUST NEED TO KNOW RESULT}.\\
 Let $\X\sim f(\cdot;\pmb\theta)$ be a model \& $\x$ be a realisation of $\X$.\\
 Consider testing two, \underline{non-nested}, hypotheses
 $$H_0:\textbf{R}(\pmb\theta)=\pmb0\quad\text{against}\quad H_1:\textbf{R}(\pmb\theta)neq\pmb0$$
 where $\textbf{R}(\cdot)$ is a vector-valued function of $\pmb\theta$ st $H_0$ imposes $r$ restrictions on $\pmb\Theta$.\\
 The \textit{Generalised Likelihood Ratio Test Statistic} is defined as
 $$T_{GLR}:=2[\ell(\hat{\pmb\theta}_\text{MLE})-\sup_{\textbf{R}(\pmb\theta)=\pmb0}\ell(\pmb\theta)]\sim\chi^2_r$$
-%TODO proof
 
 \subsection{Intervals}
 
@@ -425,9 +448,52 @@ We want to find the set of parameters, $\hat{\pmb\theta}$, which perform closely
 It turns out that $\expect(KL(f_{\hat\theta_\text{MLE}},f^*))$ is tractable.
 $$\hat\expect(KL(f_{\hat\theta_\text{MLE}},f^*))=-\ell(\pmb\theta_\text{MLE})+p+\int\ell(\pmb\theta^*;\textbf{y})f(\textbf{y};\pmb\theta^*)d\textbf{y}$$
 Where $p:=|\pmb\theta|$ (the number of estimaed parameters).\\
-\text{Note that this involves truth, thus is minised by whichever model minimises \textit{Akaike's Information Criterion}.}
+Note that this involves the true parameter value, thus is minised by whichever model minimises \textit{Akaike's Information Criterion}.\\
 %TODO derivation (done on paper)
 
+\proof{$\hat\expect(KL(f_{\hat\theta_\text{MLE}},f^*))=-\ell(\pmb\theta_\text{MLE})+p+\int\ell(\pmb\theta^*;\textbf{y})f(\textbf{y};\pmb\theta^*)d\textbf{y}$}
+Define $\pmb\theta_{KL}:=\argmin_{\pmb\theta}KL(f_{\theta},f^*)$, the parameters which minimise \textit{KL Divergence}.\\
+By \textit{Taylor's Theorem}
+\[\begin{array}{rrcl}
+&\ln f_{\hat\theta_\text{MLE}}(\textbf{y})&\simeq&\ln f_{\theta_{KL}}(\textbf{y})+(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^T\dfrac{\partial\ln f_\theta}{\partial\theta}\bigg|_{\theta_{KL}}\\
+&&+&\dfrac12(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^T\dfrac{\partial^2\ln f_\theta}{\partial\theta\partial\theta^T}\bigg|_{\theta_{KL}}(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})\\
+\implies&KL(f_{\hat\theta_\text{MLE}},f^*)&\simeq&\displaystyle\int\ln f^*(\textbf{y})-f^*(\textbf{y})\bigg[\ln f_{\theta_{KL}}(\textbf{y})+(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^T\dfrac{\partial\ln f_\theta}{\partial\theta}\bigg|_{\theta_{KL}}\\
+&&+&\frac12(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^T\dfrac{\partial^2\ln f_\theta}{\partial\theta\partial\theta^T}(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_K)\bigg]d\textbf{y}\\
+&&=&\displaystyle\int\ln f^*(\textbf{y})-f^*(\textbf{y})\ln f_{\theta_{KL}}(\textbf{y})+(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_K)^T\underbrace{\dfrac{\partial \ln f_\theta}{\partial\theta}\bigg|_{\theta_{KL}}f^*(\textbf{y})}_{=0\text{ since }\theta_{KL}\text{ minimises}}\\
+&&+&\dfrac12f^*(\textbf{y})(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^T\dfrac{\partial^2\ln f_\theta}{\partial\theta\partial\theta^T}\bigg|_{\theta_{KL}}(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^Td\textbf{y}\\
+&&=&\displaystyle\int\ln f^*(\textbf{y})-f^*(\textbf{y})\ln f_{\theta_{KL}}(\textbf{y})+(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_K)^T\\
+&&+&\dfrac12f^*(\textbf{y})(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^T\dfrac{\partial^2\ln f_\theta}{\partial\theta\partial\theta^T}\bigg|_{\theta_{KL}}(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^Td\textbf{y}\\
+&&=&KL(f_{\theta_{KL}},f^*)+\displaystyle\int\dfrac12(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^T\dfrac{\partial^2\ln f_\theta}{\partial\theta\partial\theta^T}\bigg|_{\theta_{KL}}(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})f^*(\textbf{y})d\textbf{y}\\
+&&=&KL(f_{\theta_{KL}},f^*)+\frac12(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})^T\mathcal{I}_{\theta_{KL}}(\hat{\pmb\theta}_\text{MLE}-\pmb\theta_{KL})
+\end{array}\]
+where $\mathcal{I}_{\theta_{KL}}:=\expect\left(\frac{\partial\ell}{\partial\theta\partial\theta^T}\bigg|_{\theta=\theta^*}\right)$ (Fisher Information Matrix).\\
+Assuming the model, $f$, is sufficiently regular then for large $n$
+$$\expect(\hat{\pmb\theta}_\text{MLE})\simeq\pmb\theta_{KL}\ \&\ \cov(\hat{\pmb\theta}_{MLE})\simeq\mathcal{I}_{\theta_{KL}}$$
+Since $2[\ell(\hat{\pmb\theta}_{MLE}-\ell(\hat{\pmb\theta}_0]\sim\chi^2_r$ we have
+\[\begin{array}{rrcll}
+&\expect[\ell(\hat{\pmb\theta}_{MLE}-\ell(\hat{\pmb\theta}_0]&\simeq&\expect\left(\frac12(\hat{\pmb\theta}-\pmb\theta_{KL})\mathcal{I}_{\theta_{KL}}(\hat{\pmb\theta}_{MLE}-\pmb\theta_{KL}\right)\\
+&&=&\frac{p}2\text{ where }p:=|\pmb\theta|\text{ by result at end of 8.6}&(1)\\
+\implies&\expect(KL(f_{\hat\theta_{MLE}},f^*))&\simeq&KL(f_{\theta_{KL}},f^*)+\frac{p}2&(2)
+\end{array}\]
+This still contains the true value, which is unknown.\\
+We have
+\[\begin{array}{rcll}
+\expect(-\ell(\hat{\pmb\theta}_{MLE}))&=&\expect(-\ell(\hat{\pmb\theta}_{MLE})+\ell(\pmb\theta_{KL})-\ell(\pmb\theta_{KL}))\\
+&=&\expect(-\ell(\pmb\theta_{KL})-\{\ell(\hat{\pmb\theta}_{MLE})-\ell(\pmb\theta_{KL})\})\\
+&=&-\expect(\ell(\pmb\theta_{KL}))-\expect(\ell(\hat{\pmb\theta}_{MLE})-\ell(\pmb\theta_{KL}))\\
+&\simeq&-\underbrace{\int\ell(\pmb\theta_{KL})f^*(\textbf{y})d\textbf{y}}_\text{by def of $\expect$}-\underbrace{\frac{p}2}_\text{by (1)}\\
+\text{Further}&=&-\displaystyle\int\ell(\pmb\theta_{KL})f^*(\textbf{y})d\textbf{y}-\frac{p}2+\int\ell(\pmb\theta^*)f^*(\textbf{y})d\textbf{y}-\int\ell(\pmb\theta^*)f^*(\textbf{y})d\textbf{y}\\
+&=&\displaystyle\int[\ell(\pmb\theta^*)-\ell(\pmb\theta_{KL})]f^*(\textbf{y})d\textbf{y}-\int\ell(\pmb\theta^*)f^*(\textbf{y})d\textbf{y}-\frac{p}2\\
+&=&\underbrace{KL(f_{\theta_{KL}},f^*)}_\text{by def of KL}-\displaystyle\int\ell(\pmb\theta^*)f^*(\textbf{y})d\textbf{y}-\frac{p}2
+\end{array}\]
+By rearranging the final result
+\[\begin{array}{rcll}
+KL(f_{\theta_{KL}},f^*)&=&\displaystyle\int\ell(\pmb\theta^*)f^*(\textbf{y})d\textbf{y}+\frac{p}2+\expect(-\ell(\hat{\pmb\theta}_{MLE}))\\
+&=&\displaystyle\int\ell(\pmb\theta^*)f^*(\textbf{y})d\textbf{y}+\frac{p}2-\ell(\hat{\pmb\theta}_{MLE})&(3)
+\end{array}\]
+Thus
+$$\expect(KL(f_{\hat\theta_{MLE}},f^*)\simeq\int\ell(\pmb\theta^*)f^*(\textbf{y})d\textbf{y}+p-\ell(\hat{\pmb\theta}_{MLE})\text{ by substitution (3) into (2)}$$
+\nb $f_{\theta}:=f(\cdot;\pmb\theta)$ \& $f^*:=f(\cdot;\pmb\theta^*)$ (for compactness).
 
 
 \section{Linear Models}
@@ -818,16 +884,39 @@ In order to make problems easier we assume that the \textit{Objective Function} 
 \end{enumerate}
 \nb We require $f$ to be convex for \textit{Newton Methods} to work but that is an assumption too far. If it is not then we may only find a local minimum, not global.\\
 
-\proposition{Requirements for Newton's Method}
-In order to guarantee that \textit{Newton's Method} converges to the MLE, we need to ensure the followin
+\proposition{Principles for Newton's Method}
+\textit{EXAMINABLE}.\\
+Let $f(\cdot)$ be the function we wish to optimise.\\
+\textit{Newton's Method} for \textit{Numerical Optimisation} is based on iteratively approximating $f$ by a truncated Taylor expansion and seeking the minimum of the approxiamte at each step.
+$$f(\pmb\theta+\pmb\Delta)=f(\pmb\theta)+\nabla f(\pmb\theta)^T\pmb\Delta+\frac12\pmb\Delta^T\nabla^2 f(\pmb\theta+t\pmb\Delta)\pmb\Delta\text{ for }t\in(0,1)$$
+Thus
+\begin{center}$f(\pmb\theta+\pmb\Delta)\geq f(\pmb\theta)$ for small $\pmb\Delta$ is equivalent to $\nabla f(\pmb\theta)=\pmb0$ and $\nabla^2 f(\pmb\theta)$ being positive definite.\\
+\ie $\pmb\theta$ is a minimum of $f$.\end{center}
+We have that $\pmb\Delta:=-\textbf{H}\nabla f(\pmb\theta)$ is a \textit{Descent Direction} if $\textbf{H}$ is a positive definite matrix.\\ %RESULT IN NOTES
+
+\definitionn{Newton's Method for Numerical Optimisation}
 \begin{enumerate}
-	\item The approximating quadratic actually has a maximum (not a minimum, inflection point etc.).\\
-	If it has a minimum then we use its negative value instead.
-	\item The proposed change in parameter values actually increases the \textit{Log-Likelihood} itself.\\
+	\item Make an initial parameter value guess.
+	\item Obtain a quadratic approximation to the \textit{Log-Likelihood Function} which behaves similarlly to the log-likelihood function in the region of this guess.\\
+	\nb This is done by using a \textit{Taylor Approximation} of the \textit{Log-Likelihood Function}.
+	$$f(\pmb\theta+\pmb\Delta)=f(\pmb\theta)+\nabla f(\pmb\theta)^T\pmb\Delta+\frac12\pmb\Delta^T\nabla^2f(\pmb\theta+t\pmb\Delta)\pmb\Delta$$
+	Solve for $\pmb\Delta$ which maximises.\\
+	\nb Take derivate wrt $\pmb\Delta$ and equate to zero %TODO
+	\item Update parameter guesss to be maximiser of this quadratic approxiation.
+	\item Repeat \textit{ii)-iii)} with new guesses, until convergence.
+\end{enumerate}
+
+\proposition{Requirements for Newton's Method}
+In order to guarantee that \textit{Newton's Method} converges to the MLE, we need to ensure the following
+\begin{enumerate}
+	\item \text{The approximating quadratic actually has a maximum (not minimum, inflection point etc.).}\\
+	\nb If it has a minimum then we use its negative value instead.
+	\item The proposed change in parameter values actually \underline{increases} the \textit{Log-Likelihood} itself.\\
 	If not we move the parameter back towards the previous parameter guess until the \textit{Log-Likelihood} increases.
 \end{enumerate}
 
 \definition{Newton's Method}
+\textit{NON-EXAMINABLE}.\\
 Let $f(\pmb\theta)$ be the function we wish to optimise (this would be the \textit{Likelihood Function}).\\
 \textit{Newton's Method} is a method for \textit{Numerical Optimisation}.\\
 The idea is to iteratively use a truncated \textit{Taylor Expansion} (to the second degree) of function $f(\pmb\theta)$ and to find the minimum of this approximation at each step.
@@ -853,6 +942,7 @@ The idea is to iteratively use a truncated \textit{Taylor Expansion} (to the sec
 \remark{\text{The first derivative tells us the direction, the second derivative suggests the step length}}
 
 \remark{$f(\pmb\theta^{[k]})$ is only evaluated to ensure that step is an improvement.}
+\textit{NON-EXAMINABLE}.\\
 If $f(\cdot)$ is not avaiable (but $\nabla f\ \&\ \nabla^2 f$ are) we have a few options
 \begin{itemize}
 	\item Show that $f$ is non-increasing in the direction of the step, $\Delta$, at $\pmb\theta+\Delta$ (\ie $\nabla f(\pmb\theta+\Delta)^T\Delta\leq0$).
@@ -875,35 +965,319 @@ The \textit{Likelihood} \& \textit{Prior Distributions} are computable in \texti
 
 \remark{Likelihood is the probability of observing the data that we observed}
 
+\definition{Markov Chain Monte Carlo Methods}
+\textit{MCMC Methods} are techniques for generating a sample from a probability distribution.\\
+Here we use them to generate a sample from the posterior of a model.\\
+They are very general \& will work with almost any model, given enough iterations.\\
+
+\remark{Convergence in MCMC Methods}
+We can run MCMC Methods for as many iterations as we like, thus we need to measure whether convergence has occured so we can stop sampling at the correct time.
+\begin{itemize}
+	\item[-] This can be done by inspect plots of data \& looking at the rolling values of quantiles.\\
+	\nb If we think the posterior is multi-modal then multiple MCMC chains should be run at once.
+	\item[-] Examine the \textit{Autocorrelation Function} of the chain components.\\
+	This considers reading the chain at different intervals \& what correlations occur in doing so. Lower values indicate greater independence.
+	\item[-] \textit{Autocorrelation Length} is twice the sum of the correlations (at different interval lengths) minus 1.\\
+	We typically sum up values until the correlations appear to be 0.\\
+	From this we can calculate the effecitve sample size (\ie How many `independent' values we have sampled from all the iterations of the chain).
+	$$\text{ESS}:=\frac{\#\text{ chain iterations}}{\text{Autocorrelation length}}$$
+\end{itemize}
+From these can perform better tests sub as two-sample Kologorov-Smirnov test, or ANOVA methods for multiple chains.\\
+
+\remark{Interval Estimation from MCMC methods}
+Given a sufficiently large sample from an \textit{MCMC Method} we can compute intervals by finding appropriate quantiles of the sample.
+
+\subsection{Markov Chains}
+
 \definition{Markov Chains} % 9.1
-\definition{Detailed Balanced Condition} %9.2
-\definition{MCMC Methods} % 9
+A \textit{Markov Chain} is a sequence of random vectors $\X_1,\X_2,\dots$ which satisfies the condition
+$$\forall\ j,\ f(\x_j|\x_{j-1},\dots,\x_1)=f(\x_j|\x_{j-1})$$
+\ie The probability of a realisation depends on the previous realisation only \& non-earlier.\\
+
+\definition{Transition Kernel}
+The \textit{Transition Kernel} of the \textit{Markov Chain} is the probability of transition to a given state, given the current state.
+$$\prob(\x_j|\x_{j-1})$$
+
+\definition{Stationary Distribution}
+A \textit{Stationary Distribution} of a \textit{Markov Chain} is a distribution $f_x$ which satisfies
+$$f_x(\x_j)=\int \prob(\x_j|\x_{j-1})f_x(\x_{j-1})d\x_{j-1}$$
+\nb The existence of a \textit{Stationary Distribution} is not guaranteed \& depends on $\prob$ being irriducible (\ie whenever we start the chain, there is a positive probability of visiting all possible values of $\X$).\\
+
+\definition{Recurrent}
+A \textit{Markov Chain} is \textit{Recurrent} if we can start at any value of $\X$ and its marginal distribution, $\phi$, will eventually converge to the \textit{Stationary Distribution}, $f_x$.\\
+For a simulation of length $J\to\infty$
+$$\frac1J\sum_{j=1}^J\phi(\x_j)\to\expect_{f_x}(\phi(\X))$$
+\nb This is know as \textit{Ergodicity}.\\
+
+\remark{Reccurence is an extension of the WLLN to the correlated sequence \& is why MCMCs are useful.}
+
+\definition{Detailed Balanced Condition}
+Let $\prob(\pmb\theta_i|\pmb\theta_j)$ be the pdf of $\pmb\theta_i$ given $\pmb\theta_j$ according to the \textit{Markov Chain}.\\
+The \textit{Detailed Balanced Condition} is that
+$$\prob(\pmb\theta_j|\pmb\theta_{j-1})f(\pmb\theta_{j-1}|\textbf{y})=\prob(\pmb\theta_{j-1}|\pmb\theta_j)f(\pmb\theta_j|\textbf{y})$$
+\nb Also know as \textit{Reversibility}.\\
+
+\proposition{Using Detailed Balanced Condition}
+Notice that the LHS of the \textit{Detailed Balanced Condition} is the joint pdf of $\pmb\theta_j\ \&\ \pmb\theta_{j-1}$.\\
+Integrating both sides wrt $\pmb\theta_{j-1}$ gives
+\[\begin{array}{rcl}
+\displaystyle\int\prob(\pmb\theta_j|\pmb\theta_{j-1}f(\pmb\theta_{j-1}|\textbf{y})d\pmb\theta_{j-1}&=&\displaystyle\int\prob(\pmb\theta_{j-1}|\pmb\theta_j)f(\pmb\theta_j|\textbf{y})d\pmb\theta_{j-1}\\
+&=&f(\pmb\theta_j|\textbf{y})
+\end{array}\]
+This means that if we start at a value, $\pmb\theta_1$, which is not impossible (\ie $f(\pmb\theta_1|\textbf{y})>0$), then the chain will generate from the target distribution.\\
+\nb The speed of convergence to a high-probability region of $f(\pmb\theta|\textbf{y})$ is a different problem.
 
 \subsection{Metropolis Hastings}
+
 \proposition{Metropolis Hastings Method} % 9.3-9.6
-\remark{Convergence} % 9.10
-\remark{Interval Estimation} % 9.11
+The \textit{Metropolis Hastings Method} constructs a chain with an appropriate $P$.\\
+\begin{enumerate}
+	\item Propose a distribution $q(\pmb\theta_j|\pmb\theta_{j-1})$ (\eg Normal distribution centred around $\pmb\theta_{j-1}$).
+	\item Pick a value $\pmb\theta_0$ \& set $j=1$.
+	\item Generate $\pmb\theta_j'$ from $q(\pmb\theta_j|\pmb\theta_{j-1})$.
+	\item Set $\pmb\theta_j=\pmb\theta_j'$ with probability
+	$$\alpha=\min\left\{1,\quad\dfrac{f(\textbf{y}|\pmb\theta_j')f(\pmb\theta_j')q(\pmb\theta_{j-1}|\pmb\theta_j')}{f(\textbf{y}|\pmb\theta_{j-1})f(\pmb\theta_{j-1})q(\pmb\theta'_j)\pmb\theta_{j-1})}\right\}$$
+	\item Increment $j$.
+	\item Repeat iii)-v) until convergence.
+\end{enumerate}
+
+\remark{Metropolis Hastings Method - $\alpha$}
+Note that the $q$ terms cancel iff $q$ only depends on the magnitude of $(\pmb\theta_j-\pmb\theta_{j-1})$.\\
+This occurs if $q$ is a normal distribution centred on $\pmb\theta_{j-1}$.\\
+The priors, $f(\pmb\theta'_j)\ \&\ f(\pmb\theta_{j-1})$, cancel out if they are impropert uniform.\\
+If both $q$ \& prior terms cancel out then
+$$\alpha(\pmb\theta',\pmb\theta)=\min\left\{1,\quad\dfrac{L(\pmb\theta_j')}{L(\pmb\theta_{j-1})}\right\}$$
+
+\remark{Metroplis Hastings Method - Choosing Initial Guess, $\pmb\theta_0$}
+$\pmb\theta_0$ may be highly imporbably, meaning the chian will require many iteraions to reach a region of high-probability in $f(\pmb\theta|\textbf{y})$.\\
+Usually we discard the \textit{burn-in period} (\ie first few hundred $\pmb\theta_j$ vectors simulated where little progress is made).\\
+
+\remark{Metropolis Hastings Method - Choosing Proposed Distribution, $q$}
+Generally we perform several pilor runs of the \textit{Metropolis-Hastings Sampler} in order to `tune' the proposal distribution.
+\begin{enumerate}
+	\item It is often necessary to update parameters in blocks.
+	\item The perfect proposal is the posterior itself (so will never be met).
+\end{enumerate}
+
+\proof{Metropolis Hastings Method}
+Here it is shown that \textit{Metropolis-Hastings Method} works if it satisfies \textit{Detailed Balanced Condition}.\\
+For notation, let $\pi(\pmb\theta):=f(\pmb\theta)$, remembering that $f(\pmb\theta|\textbf{y})\propto f(\textbf{y}|\pmb\theta)f(\pmb\theta)$.\\
+This means the acceptance probability from $\pmb\theta$ to $\pmb\theta'$ is
+$$\alpha(\pmb\theta',\pmb\theta)=\min\left\{1,\dfrac{\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')}{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)}\right\}$$
+We need to show that $\pi(\pmb\theta)P(\pmb\theta'|\pmb\theta)=\pi(\pmb\theta')P(\pmb\theta|\pmb\theta')$.\\
+This is trivial if $\pmb\theta'=\pmb\theta$.\\
+Otherwise:\\
+We know that $p(\pmb\theta'|\pmb\theta)=q(\pmb\theta'|\pmb\theta)\alpha(\pmb\theta',\pmb\theta)$.\\
+Thus
+\[\begin{array}{rcl}
+\pi(\pmb\theta)P(\pmb\theta'|\pmb\theta)&=&\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)\min\left\{1,\quad\dfrac{\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')}{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)}\right\}\\
+&=&\min\{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta),\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')\}\\
+&=&\pi(\pmb\theta')P(\pmb\theta|\pmb\theta')\text{ by symmetry}
+\end{array}\]
+\proved
 
 \subsection{Gibbs Sampling}
-\proposition{Gibbs Sampling} % 9.7-9.9
-\remark{Convergence} % 9.10
-\remark{Interval Estimation} % 9.11
+
+\definition{Gibbs Sampling} % 9.7-9.9
+Suppose the parameter row vector is partitioned into subvectors st $\pmb\theta\equiv(\pmb\theta^{[1]},\dots,\pmb\theta^{[K]})$.\\
+Further, define $$\tilde{\pmb\theta}_j^{[-k]}:=(\pmb\theta_{j+1}^{[1]},\dots,\pmb\theta_{j+1}^{[k-1]},\pmb\theta_{j}^{[k+1]},\dots,\pmb\theta_{j}^{[K]})$$
+Let $\pmb\theta_1$ be an initial guess.\\
+We perform $J$ steps of the \textit{Gibbs Sampler Process} as follows
+\begin{enumerate}
+	\item For $j\in[1,J]$, $k\in[1,K]$:
+	\begin{enumerate}
+		\item Simulate $\pmb\theta_{j+1}^[k]\sim f(\pmb\theta^{[k]}|\tilde{\pmb\theta}_j^{[-k]},\textbf{y})$.\\
+		\nb \text{We are conditioning on the most recently simulated values due to definition of $\tilde{\pmb\theta}_j^{[-k]}$.}
+	\end{enumerate}
+\end{enumerate}
+
+\remarkk{Gibbs Sampling - Finding Conditional Distributions}
+\begin{itemize}
+	\item[-] Generally we will be able to recognise the conditions as some standar distribution.\\
+	This often relies on noting that any multiplicative factors of a pdf which do not involve the argument of the pdf are part of the normalising constant \& thus recognise the pdf only requires recognising the form to within a normalising constant.
+	\item[-] If not, we can devise some way of simulating them.
+	\item[-] As a last resort, \textit{Metropolis Hastings} can be used for this step.
+\end{itemize}
+
+\remark{Gibbs Sampling - Limitations}
+\begin{itemize}
+	\item[-] \textit{Gibbs Sampling} produces a slow moving chain if parameters have high posterior correlation, as sampling from these conditionals produces very small steps.\\
+Updating the parameters in blocks or reparameterising to reduce posterior dependence can help to improve mixing.
+	\item[-] If improper priors are used with \textit{Gibbs Sampling}, then it is important to check that the posterior is actually proper .\\
+	It is not always possible to detect impropriety for the output of the sampler.
+\end{itemize}
+
+\subsection{Automatic Gibbs Sampling}
+
+\proposition{Gibbs Sampling uses Graphical Models (\textbf{Section 1.3})}
+Let $x_i$ represent the variable associated with the $i^\text{th}$ node in a given \textit{Graphical Model}.\\
+\textit{Gibbs Sampling} requires simulating from the full conditionals of all unobserved \textit{Stochastic Nodes}.\\
+From the \textit{Graphical Model} we can infer a distribution
+\[\begin{array}{rcl}
+f(x_j|\x^{[-j]})&=&\dfrac{f(\x)}{\int f(\x)dx_j}\\
+&=&\dfrac{\prod_if(x_i|\text{parents}(x_i))}{\int\prod_if(x_i|\text{parents}(x_i))dx_j}\text{ by \textbf{Proposition 1.2}}\\
+&=&\dfrac{f(x_j|\text{parents}(x_j))\prod_{i\in\text{children}(j)}f(x_i|\text{parents}(x_i))}{\int f(x_j|\text{parents}(x_j))\prod_{i\in\text{children}(j)}f(x_i|\text{parents}(x_i))dx_j}\\
+&\propto&f(x_j|\text{parents}(x_j))\prod_{i\in\text{children}(j)}f(x_i|\text{parent}(x_i))
+\end{array}\]
+This shows that, no matter how complicated the \textit{Graphical Model} is, the conditional required for the \textit{Gibbs Update} of $x_j$, $f(x_j|\x^{[-j]})$ depends only on the parent conditional densities of $x_j$ and its children.\\
+This is a relatively small number of terms.\\
+
+\proposition{Conjugate Distributions}
+The RHS of the final result in \textbf{Proposition 4.4} has the same structure as a \textit{Prior} for $x_j$, $f(x_j|\text{parents}(x_j))$, multiplied by a \textit{Likelihood} term for $x_j$.\\
+This means we can use \textit{conjugacy of distributions} to ascertain the density of $f(x_k|\x^{[-j]})$.\\
+
+\proposition{Slice Sampling}
+\textit{Slice Sampling} is used when there is no convenient form of the conditional, $f(x_j|\x^{[-j]})$.\\
+\textit{Slice Sampling} is done as follows
+\begin{enumerate}
+	\item Chose some finite $k>0$.
+	\item Sample $y$ uniformly from $[0,kf(x)]$.
+	\item Return an $x$ which satisfies $kf(x)\geq y$.
+\end{enumerate}
+Here we are sampling from two distributions
+$$f(y|x)\sim U(0,kf(x))\quad\text{and}\quad f(x|y)\sim U(x\in\{x:kf(x)\geq y\})$$
+To identify the set $\{x:kf(x)\geq y\}$ in \textit{Uni-Modal Distributions} requires finding a single interval, but for \textit{Multi-Modal Distributions} we need to find serveral.
 
 \subsection{Estimating Posterior Point-Value}
 
 \definition{Posterior Mode} %11
+The \textit{Posterior Mode} is the set of parameter values with the greatest likelihood, according to the \textit{Posterior Distribution}.
+$$\hat{\pmb\theta}:=\argmax_\theta f(\pmb\theta|\textbf{y})$$
+\nb This is the parameters which are most consistent with the data.\\
+
+\proposition{Improper Uniform Prior}
+If we specify an improper uniform prior, $f(\pmb\theta)=k$, then $f(\pmb\theta|\textbf{y})\propto f(\textbf{y}|\pmb\theta)$ and the \textit{Posterior Modes} are equivalent to the \textit{Maximum Likelihood Estimates}.\\
+
+\proposition{Large Sample Size}
+For a large sample size the \textit{Posterior Mode} is the \textit{Maximum Likelihood Estimate}
+$$\pmb\theta|\textbf{y}\sim\text{Normal}(\hat{\pmb\theta}_\text{MLE},\mathcal{I}^{-1})$$
 
 \section{Bayesian Inference}
 
+\definition{Loss Function}
+A \textit{Loss Function} quantifies the loss associated with a particular set of parameter predictions, $\hat{\pmb\theta}$.\\
+We wish to find the set of parameters which minimise a \textit{Loss Function}.\\
+
 \definition{Marginal Likelihood} % 11.1.1
+The \textit{Marginal Likelihood} of a model, $M$, is the marginal density of observing the outcomes
+$$f(\textbf{y}|M)=\int f(\textbf{y}|\pmb\theta)f(\pmb\theta)d\pmb\theta$$
+where $\pmb\theta$ are the parameters of $M$.\\
+\nb This is hard to calculate.\\
+
+\remark{The value of the Marginal Likelihood is sensitive to the chosen Prior}
+
+\subsection{Bayes Factors}
+
 \definition{Bayes Factor} % 11.1.1 & 11.1.2
+Let $M_0$ \& $M_1$ be two models and $\textbf{y}$ some observed data.\\
+\textit{Bayes Factor} summarises the evidence for/against two alernative models.
+$$B_{10}:=\dfrac{f(\textbf{y}|M_1)}{f(\textbf{y}|M_0)}\equiv\dfrac{\prob(M_1|\textbf{y})\prob(M_0)}{\prob(M_0|\textbf{y})\prob(M_1)}$$
+We interpret semantic meaning of \textit{Bayes Factor} using the value of $2\ln B_{10}$
+\begin{center}
+\begin{tabular}{c|l}
+$2\ln B_{10}$&Evidence against $B_{10}$\\
+\hline
+$0-2$&Barely worth mentioning\\
+$2-6$&Positive\\
+$6-10$&Strong\\
+$>10$&Very Strong\\\hline
+\end{tabular}
+\end{center}
+\nb This is similar to the \textit{$p$-Value} in the \textit{Frequentist Approach}.\\
+
+\remark{Bayes Factor v Likelihood Ratio Statistic}
+\textit{Bayes Factor} uses \textit{Marginal Distributions} which requires integrating over all possible parameter values. This is the major difference between \textit{Bayes Factor} \& the \textit{Likelihood Ratio Statistic}.\\
+
+\remark{Due to sensitivity of Marginal Likelihood on the Prior, we usually cannot justify using Bayes Factor}
+We can only justify it when the priors that differ between alternative models are really precise \& are meaningful representation of prior knowledge.\\
+Even in this case it is hard to compute the marginal likelihood.\\
+
+\proposition{Partial Bayes Factor}
+Let $\textbf{y}$ be some observered data \& $(\x,\textbf{z})$ a partitioning of $\textbf{y}$.\\
+Using $f(\pmb\theta|\x)$ as the prior gives \textit{Marginal Likelihood} of $\textbf{z}$ under model $M$
+$$f(\textbf{z}|M,\x)=\int f(\textbf{z}|\pmb\theta,\x)f(\pmb\theta|\x)d\pmb\theta$$
+We know that $f(\pmb\theta|\x)=\dfrac{f(\x|\pmb\theta)f(\pmb\theta)}{f(\x)}=\dfrac{f(\x|\pmb\theta)f(\pmb\theta)}{\int f(\x|\pmb\theta)f(\pmb\theta)d\pmb\theta}$.\\
+Thus we get the \textit{Partial Bayes Fator}
+\[\begin{array}{rcl}
+f(\textbf{z}|M,\x)&=&\dfrac{\int f(\textbf{z}|\pmb\theta,\x)f(\x|\pmb\theta)f(\pmb\theta)d\pmb\theta}{\int f(\x|\pmb\theta)f(\pmb\theta)d\pmb\theta}\text{ by substitution}\\
+&=&\dfrac{\int f(\textbf{y}|\pmb\theta)f(\pmb\theta)d\pmb\theta}{\int f(\textbf{x}|\pmb\theta)f(\pmb\theta)d\pmb\theta}
+\end{array}\]
+Since the same prior is used on the top \& bottom, the sensitivity to the prior is reduced.\\
+
+\definition{Intrinsic Bayes Factor}
+An \textit{Intrinsic Bayes Factor} is an extension of \textit{Partial Bayes Factors}.\\
+When partitioning the observed data, $\textbf{y}$, into $(\x,\textbf{z})$ we ensure $\x$ is just large enough that $f(\pmb\theta|\x)$ is proper and then average the resulting \textit{Partial Bayes Factors} over all such $\x$.\\
+This removes the arbitrariness of any particular choice of $\x$.\\
+
+\definition{Fractional Bayes Factor}
+There is a result that $f(\x|\pmb\theta)\approx f(\textbf{y}|\pmb\theta)^b$ where $b:=\dfrac{\text{dim}(\x)}{\text{dim}(\textbf{y})}$.\\
+A \textit{Fractional Bayes Factor} combines this result with the result of \textit{Partial Bayes Factor} to get
+$$f(\textbf{z}|M,\x)\approx\dfrac{\int f(\textbf{y}|\pmb\theta)f(\pmb\theta)d\pmb\theta}{\int f(\textbf{y}|\pmb\theta)^bf(\pmb\theta)d\pmb\theta}\text{ where }b:=\dfrac{\text{dim}(\x)}{\text{dim}(\textbf{y})}$$
+For this to select the right model in large sample size, then $b\to0$ as $n\to\infty$.
+
+\subsection{Information Criterion}
+
+\proposition{Information Criterion}
+\textit{Information Criterion} are an older method for comparing two models \& they avoid the difficulties around the sensitivity wrt priors.\\
+
 \definition{Bayesian Information Criterion} %11.1.3
+Let $\textbf{y}$ be observed data of dimension $n$ \& $\pmb\theta$ be the model parameters with dimension $p$.\\
+The \textit{Bayesian Information Criterion} of a model is defined as
+$$BIC:=-2\ln f(\textbf{y}|\hat{\pmb\theta}_{MLE})+p\ln n$$
+
+\proposition{Comapring BIC}
+The difference in \textit{Bayesian Information Criterion} for two models is an approximation of twice the \textit{log Bayes Factor}.\\
+We should select the model with the lower \textit{BIC}.\\
+%TODO derivation
+
+\proposition{Derivining BIC}
+Let $\textbf{y}$ be observed data of dimension $n$ \& $\pmb\theta$ be the model parameters with dimension $p$.\\
+Define $P$ to be the marginal likelihood of observing $\textbf{y}$.
+$$P:=\int f(\textbf{y}|\pmb\theta)f(\pmb\theta)d\pmb\theta$$
+Define $\tilde{\pmb\theta}:=\argmax_\theta f(\textbf{y}|\pmb\theta)f(\pmb\theta)$.\\
+By a \textit{Taylor Expansion} we have
+\[\begin{array}{rrcl}
+&\ln[f(\textbf{y}|\pmb\theta)f(\pmb\theta)]&\simeq&\ln[f(\textbf{y}|\tilde{\pmb\theta})f(\tilde{\pmb\theta})]-\frac12(\pmb\theta-\tilde{\pmb\theta})^T\left(-\dfrac{\partial^2\ln[f(\textbf{y}|\pmb\theta)f(\pmb\theta)]}{\partial\pmb\theta\partial\pmb\theta^T}\right)(\pmb\theta-\tilde{\pmb\theta})\\
+\implies&f(\textbf{y}|\pmb\theta)f(\pmb\theta)&\simeq&f(\textbf{y}|\pmb\theta)f(\pmb\theta)\text{exp}\left\{-\frac12(\pmb\theta-\tilde{\pmb\theta})^T\left(-\dfrac{\partial^2\ln[f(\textbf{y}|\pmb\theta)f(\pmb\theta)]}{\partial\pmb\theta\partial\pmb\theta^T}\right)(\pmb\theta-\tilde{\pmb\theta})\right\}
+\end{array}\]
+The term in the curly braces is from a multivaraite normal pdf. Thus
+$$P\simeq f(\textbf{y}|\tilde{\pmb\theta})f(\tilde{\pmb\theta})(2\pi)^{p/2}\left|-\frac{\partial^2\ln[f(\textbf{y}|\pmb\theta)f(\pmb\theta)]}{\partial\pmb\theta}{\partial\pmb\theta^T}\right|^{-1/2}$$
+As $n\to\infty$ we have $-\dfrac{\partial^2\ln[f(\textbf{y}|\pmb\theta)f(\pmb\theta)]}{\partial\pmb\theta}{\partial\pmb\theta^T}=n\mathcal{I}_0$ where $\mathcal{I}_0$ is the (fixed) information matrix for a single obseration. Thus
+$$\left|-\frac{\partial^2\ln[f(\textbf{y}|\pmb\theta)f(\pmb\theta)]}{\partial\pmb\theta}{\partial\pmb\theta^T}\right|=n^p|\mathcal{I}_0|$$
+Thus
+$$\ln P\simeq\ln f(\textbf{y}|\tilde{\pmb\theta})+\ln f(\tilde{\pmb\theta})+\frac{p}2\ln2\pi-\frac{p}2\ln n-\frac12\ln|\mathcal{I}_0|$$
+As $n\to\infty$, $\tilde{\pmb\theta}\to\hat{\pmb\theta}_{MLE}$ while ther terms that do not depend on $n$ become negligible.\\
+Thus we arrive at the \textit{Bayesian Information Criterion} by removing those terms \& substituting this result.\\
+
+\remark{In Complex Bayesian Models it is not always clear how to count the number of free parameters in the model.}
+Since priors restrict the freedom of a parameter to vary.\\
+
+\definition{Deviance}
+\textit{Deviance} is a measure of the number of `effective' degrees of freedom in a \textit{Bayesian Model}.
+$$D(\pmb\theta):=-2\ln f(\textbf{y}|\pmb\theta)+c$$
+where $c$ is a neglectable constant depending only on the $\textbf{y}$.\\
+
+\remark{In the large sample domain $D(\pmb\theta)-D(\expect(\pmb\theta))\sim\chi^2_r$}
+
+\definition{Effective Degrees of Freedom}
+\textit{Effective Degrees of Freedom} is a measure of how many parameters are free in a \textit{Bayesian Model}.
+$$p_D:=\overline{D(\pmb\theta)}-D(\overline{\pmb\theta})$$
+
+\remark{}
+\textit{Effective Degrees of Freedom}, $p_D$, is a direct estimate of $\expect[D(\pmb\theta)-D(\expect(\pmb\theta))]$.\\
+Noting that $\expect(\chi^2_r)=$.\\
+
 \definition{Deviance Information Criterion} %11.1.4
+The \textit{Deviance Information Criterion} is defined as
+$$DIC:=D(\overline{\pmb\theta})+2p_D$$
+\nb This is similar to the \textit{AIC}.
 
 \newpage\setcounter{section}{-1}
 \section{Appendix}
 
 \subsection{Definitions}
+
+\definition{Proper}
 
 \definition{Parametric Models}
 \textit{Parameteric Models} are \textit{Statistical Models} whose only unkowns are parameters.\\
@@ -971,5 +1345,12 @@ $$\X\textbf{Y}\simeq\pmb0$$
 \theorem{Jensen's Inequality}
 For any random variable $X$ and concave function $f$
 $$f[\expect(X)]\geq\expect[f(X)]$$
+
+\subsection{Remarks}
+
+\remark{Conditional from Joint}
+If we are given a joint distribution $f(x,y)$ and factor out its normalising constant, we can read off the conditional distribution of a variable ($f(x|y)$ or $f(y|x)$) by just using the terms which include the variable.\\
+The distribution should then be recognisable \& the normalising constant findable.
+
 
 \end{document}
