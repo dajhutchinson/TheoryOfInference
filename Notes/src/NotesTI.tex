@@ -11,7 +11,7 @@
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usepackage{changepage} 
+\usepackage{changepage}
 
 \begin{document}
 
@@ -589,7 +589,7 @@ As there are so very hard problems around numerical optimisation, we make the fo
 \end{enumerate}
 \nb Given these assumptions we are still not guaranteed to find a solution unless we know that $f$ is convex, which is generally an assumption too far.
 
-\definitionn{Newton's Method for Numerically Maximisation}
+\definitionn{Newton's Method for Numerical Optimisation}
 \begin{enumerate}
 	\item Make an initial parameter value guess.
 	\item Obtain a quadratic approximation to the \textit{Log-Likelihood Function} which behaves similarlly to the log-likelihood function in the region of this guess.\\
@@ -674,7 +674,7 @@ Thus
 &\displaystyle\int\tilde{\pmb\theta}f_{\theta_t}(\textbf{y})d\textbf{y}&=&\pmb\theta_t\\
 \implies&\displaystyle\int\tilde{\pmb\theta}\dfrac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t^T}\bigg|_{\theta_t}f_{\theta_t}(\textbf{y})d\textbf{y}&=&\textbf{I}
 \end{array}\]
-Hence, by \textbf{Proposition 5.6} $i)$, the matrix of covariances of elements of $\tilde{\pmb\theta}_t$ with elements of $\frac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t}$ can be obtained 
+Hence, by \textbf{Proposition 5.6} $i)$, the matrix of covariances of elements of $\tilde{\pmb\theta}_t$ with elements of $\frac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t}$ can be obtained
 $$\cov\left(\tilde{\pmb\theta},\frac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t}\bigg|_{\theta_t}\right)=\expect\left(\tilde{\pmb\theta}\dfrac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t^T}\bigg|_{\theta_t}\right)-\expect(\tilde{\pmb\theta})\expect\left(\dfrac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t^T}\bigg|_{\theta_t}\right)=\textbf{I}$$
 Combining this with \textbf{Proposition 5.6} $ii)$ we obtain the variance-covariance matrix
 $$\cov\begin{pmatrix}\tilde{\pmb\theta}\\\dfrac{\partial\log f_{\theta_t}}{\partial\pmb\theta_t}\bigg|_{\theta_t}\end{pmatrix}=\begin{pmatrix}\cov(\tilde{\pmb\theta})&\textbf{I}\\\textbf{I}&\pmb{\mathcal{I}}\end{pmatrix}$$
@@ -740,7 +740,7 @@ Likelihood ratio is the most powerful test possible.\\
 
 \subsection{Distribution of Generalise Likelihood Ratio Test}
 
-\proof{$2[\ell(\hat\theta)-\ell-\ell(\hat\theta_0)]\sim\chi^2_r$}
+\proof{$2[\ell(\hat\theta)-\ell(\hat\theta_0)]\sim\chi^2_r$}
 Consider testing
 $$H_0:\textbf{R}(\pmb\theta)=\pmb0\text{ against }H_1:\textbf{R}(\pmb\theta)\neq\pmb0$$
 where $\textbf{R}$ is a vector-valued function of $\pmb\theta$ such that $H_0$ imposes $r$ restrictions on the parameter vector.\\
@@ -781,8 +781,8 @@ Substituting for $\hat{\pmb\gamma}_0$ and expanding $\textbf{H}$ to its partione
 \end{array}\]
 If $H_0$ is true, then as $n\to\infty$ this expresion will tend towards exactness as $\hat{\pmb\phi}\to\pmb\phi_0$.\\
 Further, provided $\textbf{H}\overset{n\to\infty}{\longrightarrow}\pmb{\mathcal{I}}$ as then $\pmb\Sigma$ tends to $\pmb{\mathcal{I}}^{-1}$, hence $\pmb\Sigma_{\phi\phi}$ tends to teh covarance matrix of $\hat{\pmb\phi}$.\\
-Hence, by tthe asymptotic normality of the MLE $\hat{\pmb\phi}$
-$$2[\ell(\hat\theta)-\ell-\ell(\hat\theta_0)]\sim\chi^2_r\text{ under }H_0$$
+Hence, by the asymptotic normality of the MLE $\hat{\pmb\phi}$
+$$2[\ell(\hat\theta)-\ell(\hat\theta_0)]\sim\chi^2_r\text{ under }H_0$$
 
 \subsection{Confidence Intevals}
 
@@ -820,7 +820,7 @@ So substituting the taylor expansion into the definition of $KL(\cdot)$, while t
 $$KL(f_{\hat\theta},f_t)\simeq K(f_{\theta_K},f_t)+\frac12(\hat{\pmb\theta}-\pmb\theta_K)^T\pmb{\mathcal{I}}_{\theta_K}(\hat{\pmb\theta}-\pmb\theta_K)\text{ where }\pmb{\mathcal{I}}_{\theta_K}\text{ is the information matrix at }\pmb\theta_K$$.\\
 Assume that the model is sufficiently correct that $\expect(\hat{\pmb\theta})\simeq\pmb\theta_K$ and $\cov(\hat{\pmb\theta})\simeq\pmb{\mathcal{I}_{\theta_K}}$, at least for large samples.\\
 In this case we have
-$$\expect[\ell(\hat{\pmb\theta})-\ell(\pmb\theta_K)]\simeq\expect\left(\frac12(\hat{\pmb\theta}-\pmb\theta_K)^T\pmb{\mathcal{I}}_{\theta_K}(\hat{\pmb\theta}-\pmb\theta_K)\right)\simeq\frac{p}2\text{ where }p:=\text{dim}(\pmb\theta)$$
+$$\expect[\ell(\hat{\pmb\theta})-\ell(\pmb\theta_K)]\simeq\expect(\frac{1}{2}\chi^2_p)\simeq\frac{p}2\text{ where }p:=\text{dim}(\pmb\theta)\text{ by \mathbf{Proof 5.2}}$$
 Taking the expactions of $KL(f_{\hat\theta},f_t)$ and substituting an approximation from above we get
 $$\expect[KL(f_{\hat\theta},f_t)]\simeq K(f_{\theta_K},f_t)+\frac{p}2$$
 This still involves the unknowable $f_t$. Consider
@@ -830,7 +830,7 @@ This still involves the unknowable $f_t$. Consider
 &=&KL(f_{\theta_K},f_t)-\frac{p}2-\displaystyle\int\log(f_t(\textbf{y}))f_t(\textbf{y})d\textbf{y}
 \end{array}\]
 Using the result to eliminate $KL(f_{\theta_K},f_t)$ from above suggest the estimate
-$$\expect(\widehat{KL(f_{\hat\theta},f_t}=-\ell(\hat{\pmb\theta})+p+\displaystyle\int\log[f_t(\textbf{y})]f_t(\textbf{y})d\textbf{y}$$
+$$\expect(\widehat{KL(f_{\hat\theta},f_t}))=-\ell(\hat{\pmb\theta})+p+\displaystyle\int\log[f_t(\textbf{y})]f_t(\textbf{y})d\textbf{y}$$
 Since the last term on the right-hand side only involves the truth, this last estimate is minimised by whichever model minimises
 $$AIC:=-2\ell(\hat{\pmb\theta})+2p$$
 \nb The factor of 2 is by convention so that AIC is on the same scale as $2[\ell(\hat\theta)-\ell(\theta)]$.\\

@@ -5,13 +5,13 @@
 \usepackage{amsfonts}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{changepage}
 \usepackage{dsfont}
 \usepackage{enumerate}
 \usepackage{enumitem}
 \usepackage{fancyhdr}
 \usepackage{graphicx}
 \usepackage{tikz}
-\usepackage{changepage} 
 
 \begin{document}
 
@@ -21,6 +21,20 @@
 
 \renewcommand{\headrulewidth}{0pt}
 \setlist[enumerate,1]{label={\roman*)}}
+
+% footnotemark style
+\renewcommand{\thefootnote}{[\arabic{footnote}]}
+
+%Tik Styles
+\tikzset{
+	circleStyle/.style={
+	circle,
+	draw,
+	text width=6mm,
+	inner sep=0pt,
+	align=center
+	}
+}
 
 % Cover page title
 \title{Theory of Inference - Reviewed Notes}
@@ -165,7 +179,7 @@ A \textit{Statistical Model} is deemed \textit{Regular} if it fulfils all the fo
 
 \definition{Directed Acyclic Graphs}
 A \textit{Directed Acyclic Graph}, DAG, is a graph which consists of directed edges and \underline{no} cycles.\\
-The direction of edges show dependence with the target element being dependent on the origin element.
+The direction of edges show dependence with the target element being dependent on the origin element.\\
 
 \proposition{Graphical Model}
 A \textit{Model} can be represented graphically using a \textit{Directed Acyclic Graph} with variables for nodes \& dependence from the edges.\\
@@ -183,6 +197,45 @@ The edges in a \textit{Graphical Model} show one of two relationship types
 	\item \textit{Deterministic Relationship} between nodes (usually a dashed arrow).
 	\item \textit{Stochastic Relationship} between nodes (usually a solid arrow).
 \end{enumerate}
+
+\examplee{Graphic Model}
+\begin{center}
+	\begin{tikzpicture}
+		\node[circleStyle] (l1) at (0,0) {$\lambda_1$};
+		\node[circleStyle] (a1) at (0,-1) {$\alpha_1$};
+		\node[circleStyle] (l2) at (0,-2) {$\lambda_2$};
+		\node[circleStyle] (a2) at (0,-3) {$\alpha_2$};
+
+		\node[circleStyle] (K) at (2,-.5) {$K$};
+		\node[circleStyle] (r) at (2,-2.5) {$r$};
+
+		\node[circleStyle] (mu) at (4,-1.5) {$\mu$};
+
+		\node[circleStyle] (yt) at (6,-1.5) {$y_t$};
+
+		\node[circleStyle] (s2) at (8,-1.5) {$\sigma^2$};
+
+		\node[circleStyle] (l3) at (10,-1) {$\lambda_3$};
+		\node[circleStyle] (a3) at (10,-2) {$\alpha_3$};
+
+
+		\path[->] (l1) edge (K);
+		\path[->] (a1) edge (K);
+		\path[->] (l2) edge (r);
+		\path[->] (a2) edge (r);
+
+		\path[dashed,->] (K) edge (mu);
+		\path[dashed,->] (r) edge (mu);
+
+		\path[->] (mu) edge (yt);
+		\path[->] (s2) edge (yt);
+
+		\path[->] (l3) edge (s2);
+		\path[->] (a3) edge (s2);
+
+	\end{tikzpicture}
+\end{center}
+The plot above is a DAG for a model where $y_t\sim f(\sigma^2,\mu)$, $\mu=g(K,r)$ and we assume priors of $K,r,\sigma^2\sim h(\alpha_j,\lambda_j)$ (typically gamma). The lines from $K$ and $r$ to $\mu$ is dashed because $g(\cdot,\cdot)$ is a deterministic function (\eg $g(K,r)=Ke^r$) whereas the other relationships are stochastic (\ie $f$ and $h$ are pdfs).\\
 
 \proposition{Distributions from Graphical Model}
 Let $x_i$ represent the variable associated with the $i^\text{th}$ node in the graph.\\
@@ -210,7 +263,7 @@ An \textit{Interval} generated from \textit{Bootstrapping} datasets are generall
 \nb This discrepancy is reduced as sample size increases.\\
 
 \proposition{Bootstrap Percentiles}
-When wishing to create an interval for $\theta$ using \textit{Bootstrapped} data, we treat the $\hat\theta$ values as if they came from $\prob(\mu|X)$.
+When wishing to create an interval for $\theta$ using \textit{Bootstrapped} data, we treat the $\hat\theta$ values as if they came from $\prob(\theta|\X)$.
 
 \subsection{Causality}
 
@@ -218,10 +271,10 @@ When wishing to create an interval for $\theta$ using \textit{Bootstrapped} data
 \textit{Causality} is a relationship between two events where one of the events caused the other.\\
 
 \definition{Correlation}
-\textit{Causality} is a relationship between two events where the events are likely to occur together. This does not mean that one event has caused the other, but they may have been caused by the same variable (which may be hidden).\\
+\textit{Correlation} is a relationship between two events where the events are likely to occur together. This does not mean that one event has caused the other, but they may have been caused by the same variable (which may be hidden).\\
 
 \remark{When two variables are highly correlated it is hard to distinguish their effects}
- 
+
 \definition{Counfounding Variable}
 A \textit{Confounding Variable} is a variable which influences both the \textit{Predictor} \& \textit{Response Variables} in a system.\\
 Suppose $x,h$ are highly-correlated and $y=\beta_0+\beta_1x$. The model $y=\beta_2+\beta_3h$ would appear statistically good even though $h$ had no part in geneating $y$. Here $x$ is the \textit{Confounding Variable}.\\
@@ -233,7 +286,7 @@ Suppose $x,h$ are highly-correlated and $y=\beta_0+\beta_1x$. The model $y=\beta
 \textit{Randomisatiation} is a technique used when designing experiments to break relationships between \textit{Confounder Variables} and our \textit{Response Variable}.\\
 \textit{Randomisation} involves taking a set of subjects and randomly assigning them to different ``treatments".\\
 Provided these treaments only vary the \textit{Predictor Variable} we wish to test, this breaks association between other \textit{Prectior Variables} \& our \textit{Response Variable}. Making these \textit{Predictor Variables} now part of the ranom variability of the model, $\varepsilon$.\\
- 
+
 \remark{Randomisation is the Gold Standard for Inferring Causation}
 
 \proposition{Mathematical Justification}
@@ -361,8 +414,8 @@ Then the test $(T_{NP},c_{NP})$ is equivalent to the uniformly most powerful tes
 \definition{Generalised Likelihood Ratio Test Statistic}
 \textit{JUST NEED TO KNOW RESULT}.\\
 Let $\X\sim f(\cdot;\pmb\theta)$ be a model \& $\x$ be a realisation of $\X$.\\
-Consider testing two, \underline{non-nested}, hypotheses
-$$H_0:\textbf{R}(\pmb\theta)=\pmb0\quad\text{against}\quad H_1:\textbf{R}(\pmb\theta)neq\pmb0$$
+Consider testing two, \underline{nested}, hypotheses
+$$H_0:\textbf{R}(\pmb\theta)=\pmb0\quad\text{against}\quad H_1:\textbf{R}(\pmb\theta)\neq\pmb0$$
 where $\textbf{R}(\cdot)$ is a vector-valued function of $\pmb\theta$ st $H_0$ imposes $r$ restrictions on $\pmb\Theta$.\\
 The \textit{Generalised Likelihood Ratio Test Statistic} is defined as
 $$T_{GLR}:=2[\ell(\hat{\pmb\theta}_\text{MLE})-\sup_{\textbf{R}(\pmb\theta)=\pmb0}\ell(\pmb\theta)]\sim\chi^2_r$$
@@ -433,7 +486,7 @@ $$KL(f^*,f_\theta)=\int[\ln f(\textbf{y};\pmb\theta^*)-\ln f(\textbf{y};\pmb\the
 
 \definition{Akaike's Information Criterion}
 \textit{Akaike's Information Criterion}, AIC, is a goodness-of-fit measure for models.
-$$AIC(\pmb\theta)=-2\ell(\pmb\theta)+p$$
+$$AIC(\pmb\theta)=-2\ell(\pmb\theta)+2p$$
 where $p:=|\pmb\theta|$ (the number of estimated parameters).\\
 Lower \textit{AIC} values indicate better fit.\\
 \nb The factor of $2$ is to put \textit{AIC} on the scale as the $T_{GLR}$.\\
@@ -498,19 +551,19 @@ $$\expect(KL(f_{\hat\theta_{MLE}},f^*)\simeq\int\ell(\pmb\theta^*)f^*(\textbf{y}
 
 \section{Linear Models}
 
-\proposition{Implementing Factors}
-Suppose a model has \textit{Factor Variable} $g_i$ which seperates observations into $n$ categories.\\
-In the function for $y_i$, $g_i$ would be represented by a single term $\gamma_{g_i}$ whose value depends on the value of $g_i$. (\ie A different weight is assigned to each group). \\
-We want to find the $n$ values which $\gamma_{g_i}$ can take.\\
-We can express this in terms of matrices, as below, with each row on the LHS denoting which category each observation belongs to
-$$\begin{pmatrix}0&1&0&\dots&\\1&0&0&\dots\\0&0&1&\dots\\\vdots&\vdots&\vdots&\ddots\end{pmatrix}\begin{pmatrix}\gamma_1\\\gamma_2\vdots\\\gamma_n\end{pmatrix}$$
-\nb Each row has a single $1$ element and $n-1$ zero elements.\\
-
-\remark{We want to find the parameters to the Precitor Variables which produce accurate values for the Response Variables.}
-
 \definition{Model Matrix}
 Each element in a \textit{Model Matrix} is a function of the \textit{Predictor Variables}.\\
 Each row depends on a different set of observations.\\
+
+\proposition{Implementing Factors}
+Suppose a model has \textit{Factor Variable} $g_i$ which seperates observations into $n$ categories.\\
+In the function for $y_i$, $g_i$ is represented by $n-1$ terms $\gamma_{g_i}$ whose values depends on the value of $g_i$. (\ie A different weight is assigned to each group).\\
+For an observation $\gamma_{g_i}$ is set to 1 iff the observation is in category $g_i$. Only $n-1$ variables are used since belonging to $g_n$ can be inferred by $\gamma_{g_i}=0\ \forall\ i$.\\
+We can express this in terms of matrices, as below, with each row on the LHS denoting which category each observation belongs to
+$$\begin{pmatrix}0&1&0&\dots&\\1&0&0&\dots\\0&0&1&\dots\\\vdots&\vdots&\vdots&\ddots\end{pmatrix}\begin{pmatrix}\gamma_1\\\gamma_2\\\vdots\\\gamma_{n-1}\end{pmatrix}$$
+\nb Each row has a single $1$ element and $n-2$ zero elements.\\
+
+\remark{We want to find the parameters to the Predictor Variables which produce accurate values for the Response Variables.}
 
 \definition{Linear Model}
 A \textit{Linear Model} is a \textit{Statistical Model} whose response vector, $\textbf{y}$, is linear wrt its \textit{Model Matrix}, $\X$, and some zero-mean random error, $\pmb\varepsilon$.
@@ -638,7 +691,7 @@ Thus each element of $\hat{\pmb\beta}$ is a \textit{minimum variance unbiased es
 
 \subsubsection{Hypothesis Testing \& Intervals}
 
-\remark{Populat Hypothesis Test}
+\remark{Popular Hypothesis Test}
 Often we want to test whether any $\beta_i=0$ as this would indicate that those predictors do not affect the model accuracy.\\
 
 \proposition{Distribution of $\hat{\pmb\beta}$}
@@ -713,7 +766,7 @@ Where $RSS_0$ is the residual sum of squares when $H_0$ is true and $RSS_1$ is t
 \proposition{Testing whether a Factor Variable belongs in a Model}
 \textit{Factor Variables} have multiple parameters associated to them in a model and thus to test whether the \textit{Factor Variable} should be in the model requires testing whether all of these parameters should equal 0.\\
 This can be tested using the results in \textbf{Propostion 2.12} with $\textbf{d}=\pmb0$ and $\textbf{C}$ is the rows of the $I_p$ which indicate the parameters we wish to test.\\
-In this case $q$ is the number of parmeters we wish to test. 
+In this case $q$ is the number of parmeters we wish to test.
 
 \subsection{Bayesian Approach}
 
@@ -810,10 +863,15 @@ $$\expect\left(\dfrac\partial{\partial\pmb\theta}\ln f(\textbf{y};\pmb\theta)\ri
 \proved
 
 \theorem{Covariance as Expectation}
-Let $\ell(\cdot:=\ln f(\textbf{y};\pmb\theta))\ \&\ \pmb\theta^*$ be the true parameter values.
+Let $\ell(\cdot):=\ln f(\textbf{y};\pmb\theta))\ \&\ \pmb\theta^*$ be the true parameter values.
 $$\cov\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\right)=\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\dfrac{\partial\ell}{\partial\pmb\theta^T}\bigg|_{\pmb\theta=\pmb\theta^*}\right)$$
 \textit{Proof}\\
-Follows from \textbf{Theorem 3.1} and the defiinition of a covariance matrix, noting that $\frac{\partial\ell}{\partial\pmb\theta}$ is a column vector and $\frac{\partial\ell}{\partial\pmb\theta^T}$ is a row vector.\\
+\[\begin{array}{rcl}
+\cov\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\right)&:=&\expect\left[\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}-\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\right)\right)\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}-\expect\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\right)\right)^T\right]\\
+&=&\expect\left[\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}-\pmb0\right)\left(\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}-\pmb0\right)^T\right]\text{ by \textbf{Theorem 3.1}}\\
+&=&\expect\left[\dfrac{\partial\ell}{\partial\pmb\theta}\bigg|_{\pmb\theta=\pmb\theta^*}\dfrac{\partial\ell}{\partial\pmb\theta^T}\bigg|_{\pmb\theta=\pmb\theta^*}\right]
+\end{array}\]
+\proved
 
 \proposition{Fisher Information Matrix as negative expectation}
 Let $\ell(\cdot):=\ln f(\textbf{y};\pmb\theta))\ \&\ \pmb\theta^*$ be the true parameter values.
@@ -1036,7 +1094,7 @@ The \textit{Metropolis Hastings Method} constructs a chain with an appropriate $
 	\item Pick a value $\pmb\theta_0$ \& set $j=1$.
 	\item Generate $\pmb\theta_j'$ from $q(\pmb\theta_j|\pmb\theta_{j-1})$.
 	\item Set $\pmb\theta_j=\pmb\theta_j'$ with probability
-	$$\alpha=\min\left\{1,\quad\dfrac{f(\textbf{y}|\pmb\theta_j')f(\pmb\theta_j')q(\pmb\theta_{j-1}|\pmb\theta_j')}{f(\textbf{y}|\pmb\theta_{j-1})f(\pmb\theta_{j-1})q(\pmb\theta'_j)\pmb\theta_{j-1})}\right\}$$
+	$$\alpha=\min\bigg\{1,\quad\dfrac{\overbrace{f(\textbf{y}|\pmb\theta_j')}^{\propto f(\pmb\theta'_j|\mathbf{y})}f(\pmb\theta_j')q(\pmb\theta_{j-1}|\pmb\theta_j')}{\underbrace{f(\textbf{y}|\pmb\theta_{j-1})f(\pmb\theta_{j-1})}_{\propto f(\pmb\theta_{j-1}|\mathbf{y})}q(\pmb\theta'_j|\pmb\theta_{j-1})}\bigg\}$$
 	\item Increment $j$.
 	\item Repeat iii)-v) until convergence.
 \end{enumerate}
@@ -1060,19 +1118,19 @@ Generally we perform several pilor runs of the \textit{Metropolis-Hastings Sampl
 \end{enumerate}
 
 \proof{Metropolis Hastings Method}
-Here it is shown that \textit{Metropolis-Hastings Method} works if it satisfies \textit{Detailed Balanced Condition}.\\
-For notation, let $\pi(\pmb\theta):=f(\pmb\theta)$, remembering that $f(\pmb\theta|\textbf{y})\propto f(\textbf{y}|\pmb\theta)f(\pmb\theta)$.\\
+Here it is shown that \textit{Metropolis-Hastings Method} works if it satisfies \text{\textit{Reversibility}}.\\
+For notation, let $\pi(\pmb\theta):=f(\pmb\theta|\mathbf{y})\propto f(\textbf{y}|\pmb\theta)f(\pmb\theta)$.\\
 This means the acceptance probability from $\pmb\theta$ to $\pmb\theta'$ is
 $$\alpha(\pmb\theta',\pmb\theta)=\min\left\{1,\dfrac{\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')}{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)}\right\}$$
-We need to show that $\pi(\pmb\theta)P(\pmb\theta'|\pmb\theta)=\pi(\pmb\theta')P(\pmb\theta|\pmb\theta')$.\\
+We need to show that $\pi(\pmb\theta)f(\pmb\theta'|\pmb\theta)=\pi(\pmb\theta')f(\pmb\theta|\pmb\theta')$.\\
 This is trivial if $\pmb\theta'=\pmb\theta$.\\
-Otherwise:\\
-We know that $p(\pmb\theta'|\pmb\theta)=q(\pmb\theta'|\pmb\theta)\alpha(\pmb\theta',\pmb\theta)$.\\
-Thus
+Otherwise (\ie $\pmb\theta'\neq\pmb\theta$):\\
+We know that $f(\pmb\theta'|\pmb\theta)=q(\pmb\theta'|\pmb\theta)\alpha(\pmb\theta',\pmb\theta)$ by rearrangement. Thus
 \[\begin{array}{rcl}
-\pi(\pmb\theta)P(\pmb\theta'|\pmb\theta)&=&\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)\min\left\{1,\quad\dfrac{\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')}{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)}\right\}\\
+\pi(\pmb\theta)f(\pmb\theta'|\pmb\theta)&=&\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)\alpha(\pmb\theta',\pmb\theta)\\
+&=&\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)\min\left\{1,\quad\dfrac{\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')}{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta)}\right\}\\
 &=&\min\{\pi(\pmb\theta)q(\pmb\theta'|\pmb\theta),\pi(\pmb\theta')q(\pmb\theta|\pmb\theta')\}\\
-&=&\pi(\pmb\theta')P(\pmb\theta|\pmb\theta')\text{ by symmetry}
+&=&\pi(\pmb\theta')d(\pmb\theta|\pmb\theta')\text{ by symmetry}
 \end{array}\]
 \proved
 
@@ -1080,13 +1138,13 @@ Thus
 
 \definition{Gibbs Sampling} % 9.7-9.9
 Suppose the parameter row vector is partitioned into subvectors st $\pmb\theta\equiv(\pmb\theta^{[1]},\dots,\pmb\theta^{[K]})$.\\
-Further, define $$\tilde{\pmb\theta}_j^{[-k]}:=(\pmb\theta_{j+1}^{[1]},\dots,\pmb\theta_{j+1}^{[k-1]},\pmb\theta_{j}^{[k+1]},\dots,\pmb\theta_{j}^{[K]})$$
+Further, define $$\tilde{\pmb\theta}_j^{[\neg k]}:=(\pmb\theta_{j+1}^{[1]},\dots,\pmb\theta_{j+1}^{[k-1]},\pmb\theta_{j}^{[k+1]},\dots,\pmb\theta_{j}^{[K]})$$
 Let $\pmb\theta_1$ be an initial guess.\\
 We perform $J$ steps of the \textit{Gibbs Sampler Process} as follows
 \begin{enumerate}
 	\item For $j\in[1,J]$, $k\in[1,K]$:
 	\begin{enumerate}
-		\item Simulate $\pmb\theta_{j+1}^[k]\sim f(\pmb\theta^{[k]}|\tilde{\pmb\theta}_j^{[-k]},\textbf{y})$.\\
+		\item Simulate $\pmb\theta_{j+1}^{[\neg k]}\sim f(\pmb\theta^{[k]}|\tilde{\pmb\theta}_j^{[-k]},\textbf{y})$.\\
 		\nb \text{We are conditioning on the most recently simulated values due to definition of $\tilde{\pmb\theta}_j^{[-k]}$.}
 	\end{enumerate}
 \end{enumerate}
@@ -1114,11 +1172,12 @@ Let $x_i$ represent the variable associated with the $i^\text{th}$ node in a giv
 \textit{Gibbs Sampling} requires simulating from the full conditionals of all unobserved \textit{Stochastic Nodes}.\\
 From the \textit{Graphical Model} we can infer a distribution
 \[\begin{array}{rcl}
-f(x_j|\x^{[-j]})&=&\dfrac{f(\x)}{\int f(\x)dx_j}\\
-&=&\dfrac{\prod_if(x_i|\text{parents}(x_i))}{\int\prod_if(x_i|\text{parents}(x_i))dx_j}\text{ by \textbf{Proposition 1.2}}\\
-&=&\dfrac{f(x_j|\text{parents}(x_j))\prod_{i\in\text{children}(j)}f(x_i|\text{parents}(x_i))}{\int f(x_j|\text{parents}(x_j))\prod_{i\in\text{children}(j)}f(x_i|\text{parents}(x_i))dx_j}\\
-&\propto&f(x_j|\text{parents}(x_j))\prod_{i\in\text{children}(j)}f(x_i|\text{parent}(x_i))
+f(x_k|\x^{[\neg k]})&=&\dfrac{f(\x)}{\int f(\x)dx_k}\\
+&=&\dfrac{\prod_if(x_i|\text{parents}(x_i))}{\int\prod_if(x_i|\text{parents}(x_i))dx_k}\text{ by \textbf{Proposition 1.2}}\\
+&=&\dfrac{f(x_k|\text{parents}(x_k))\prod_{i\in\text{children}(x_k)}f(x_i|\text{parents}(x_i))}{\int f(x_k|\text{parents}(x_k))\prod_{i\in\text{children}(x_k)}f(x_i|\text{parents}(x_i))dx_k}\text{ since \footnotemark}\\
+&\propto&f(x_k|\text{parents}(x_k))\prod_{i\in\text{children}(x_k)}f(x_i|\text{parent}(x_i))
 \end{array}\]
+\footnotetext{The terms which don't invlove $x_k$ can be removed from the intergral and then cancel out.}
 This shows that, no matter how complicated the \textit{Graphical Model} is, the conditional required for the \textit{Gibbs Update} of $x_j$, $f(x_j|\x^{[-j]})$ depends only on the parent conditional densities of $x_j$ and its children.\\
 This is a relatively small number of terms.\\
 
